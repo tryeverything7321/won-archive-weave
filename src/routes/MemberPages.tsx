@@ -101,7 +101,7 @@ export function ProfilePage() {
     () => services?.auth.currentUser ?? null,
   );
   const [account, setAccount] = useState<{
-    provider?: "kakao" | "naver";
+    provider?: "kakao" | "naver" | "google";
     pseudonym?: string;
     termsVersion?: string;
     communityRulesVersion?: string;
@@ -149,7 +149,7 @@ export function ProfilePage() {
         const data = snapshot.data();
         setAccount({
           provider:
-            data?.provider === "kakao" || data?.provider === "naver"
+            data?.provider === "kakao" || data?.provider === "naver" || data?.provider === "google"
               ? data.provider
               : undefined,
           pseudonym:
@@ -214,7 +214,7 @@ export function ProfilePage() {
       ? "카카오로 연결됨"
       : profile.provider === "naver"
         ? "네이버로 연결됨"
-        : "계정 연결을 확인하고 있어요";
+        : profile.provider === "google" ? "구글로 연결됨" : "계정 연결을 확인하고 있어요";
 
   const logOut = async () => {
     if (!services || loggingOut) return;
@@ -301,7 +301,7 @@ export function ProfilePage() {
         variant="gate"
         eyebrow="내 위브"
         title={<>로그인하고<br />내 위브를 시작해요</>}
-        description="카카오 또는 네이버 계정을 연결하면 내가 남긴 기록과 커뮤니티 활동을 한곳에서 확인할 수 있어요."
+        description="카카오·네이버·구글 계정을 연결하면 내가 남긴 기록과 커뮤니티 활동을 한곳에서 확인할 수 있어요."
       >
         <section className="community-gate profile-login-gate">
           <div className="gate-orbits" aria-hidden="true"><span /><span /><span /></div>
@@ -320,6 +320,7 @@ export function ProfilePage() {
                 onClick={() => startOAuthLogin("naver", "/profile")}
                 provider="naver"
               />
+              <ProviderLoginButton disabled={!isOAuthConfigured} provider="google" onClick={() => startOAuthLogin("google", "/profile")} />
             </div>
             {!isOAuthConfigured && <small>로그인 연결을 준비하고 있어요.</small>}
           </div>
@@ -580,7 +581,7 @@ export function ProfilePage() {
               <div>
                 <h2>회원 확인 기능을 준비하고 있어요</h2>
                 <p>
-                  회원 확인 전에도 네이버나 카카오 로그인과 별명 설정을 마치면
+                  회원 확인 전에도 네이버·카카오·구글 로그인과 별명 설정을 마치면
                   커뮤니티에 참여할 수 있어요.
                 </p>
               </div>

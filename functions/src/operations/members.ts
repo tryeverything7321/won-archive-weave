@@ -1,3 +1,4 @@
+import { normalizeDemographics, summarizeDemographics } from '../profile/demographics.js'
 import { randomUUID } from 'node:crypto'
 import { getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth, type UserRecord } from 'firebase-admin/auth'
@@ -94,7 +95,7 @@ function dateBoundary(value: unknown): number | null {
 
 function parseFilters(data: unknown): MemberFilters {
   const value = data && typeof data === 'object' ? data as Record<string, unknown> : {}
-  const provider = value.provider === 'naver' || value.provider === 'kakao' || value.provider === 'unknown'
+  const provider = value.provider === 'google' || value.provider === 'naver' || value.provider === 'kakao' || value.provider === 'unknown'
     ? value.provider
     : 'all'
   const completion = value.completion === 'complete' || value.completion === 'incomplete' || value.completion === 'unknown'
@@ -335,6 +336,9 @@ export const listAdminMembers = onCall({ region: REGION }, async (request) => {
     return filters.activity === 'present' ? total > 0 : total === 0
   })
   sources = pairs.map(({ source }) => source)
+  const demographics = memberAccessAllowed(request.auth?.token, true)
+    ? summarizeDemographics([...(await documentsByUid('memberProfiles', sources.map(source => source.uid))).values()])
+    : null
 
   let start = 0
   if (rawCursor) {
@@ -374,6 +378,7 @@ export const listAdminMembers = onCall({ region: REGION }, async (request) => {
     nextCursor,
     summary: {
       ...aggregate,
+      demographics,
       timeZone: 'Asia/Seoul',
       period: {
         from: filters.createdFromMs === null ? null : new Date(filters.createdFromMs).toISOString(),
@@ -594,6 +599,7 @@ export const getAdminMemberPrivateDetails = onCall({ region: REGION }, async (re
       organization: field('organization'),
       email: field('email'),
       phone: field('phone'),
+      ...normalizeDemographics(snapshot.data() ?? {}),
       verification: 'member_supplied_unverified',
     },
   }

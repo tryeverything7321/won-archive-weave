@@ -22,13 +22,14 @@ export const services={auth:{get currentUser(){return state.user}},firestore:{},
 export function onAuthStateChanged(auth,cb){state.listeners.push(cb); queueMicrotask(()=>cb(state.user));return ()=>{state.listeners=state.listeners.filter(f=>f!==cb)}}
 export async function getIdTokenResult(user){return user.getIdTokenResult()}
 export async function signOut(){state.switchUser(null)}
+export async function signInWithPopup(){if(state.googleLoginOutcome==='cancelled')throw Object.assign(new Error('cancelled'),{code:'auth/popup-closed-by-user'});state.switchUser('synthetic-google');return {user:state.user}}
 `,
   firestore: `export * from ${real('firebase/firestore')}; import {state} from 'weave-test:state';
 export const collection=(db,...parts)=>({path:parts.join('/')}); export const doc=collection;
 export const query=(source,...constraints)=>({...source,constraints});
 export const where=(...x)=>x; export const orderBy=(...x)=>x; export const limit=(...x)=>x; export const startAfter=(...x)=>x;
 const account={pseudonym:'검증 사용자',provider:'kakao',connected:true,termsVersion:'2026-07-20',communityRulesVersion:'2026-07-20',onboardingVersion:'1'};
-const snapshot={exists:()=>true,data:()=>account,docs:[],size:0,empty:true};
+const snapshot={exists:()=>true,data:()=>({...account,requiredProfileVersion:state.registrationComplete===false?undefined:'2026-10-01'}),docs:[],size:0,empty:true};
 const materialSnapshot=value=>({exists:()=>Boolean(value),id:value?.id,data:()=>value,get:key=>value?.[key]});
 export async function getDoc(source){return source.path.startsWith('materials/')?materialSnapshot(state.materials.find(item=>item.id===source.path.split('/')[1])):source.path.startsWith('activities/')?materialSnapshot(state.activities.find(item=>item.slug===source.path.split('/')[1]||item.id===source.path.split('/')[1])):snapshot}
 export async function getDocs(source){const values=source.path==='materials'?state.materials:source.path==='activities'?state.activities:[];const docs=values.map(materialSnapshot);return {...snapshot,docs,size:docs.length,empty:!docs.length}}
@@ -45,9 +46,9 @@ export function httpsCallable(_functions,name){return async(input)=>{
   if(mode==='denied')throw Object.assign(new Error('synthetic'),{code:'functions/permission-denied'});
   if(mode==='network')throw Object.assign(new Error('synthetic'),{code:'functions/unavailable'});
   if(mode==='malformed')return {data:{profile:'invalid'}};
-  return {data:{profile:mode==='empty'?{}:{bio:'합성 프로필 '+uid,region:'서울',organization:'검증 모임'}}};
+  return {data:{profile:state.savedProfile??(mode==='empty'?{}:{bio:'합성 프로필 '+uid,region:'서울',organization:'검증 모임',realName:'시험 사용자'})}};
  }
- if(name==='updateMyMemberProfile')return {data:{profile:Object.fromEntries(Object.entries(input).filter(([key,value])=>['bio','region','organization','realName','email','phone'].includes(key)&&typeof value==='string'&&value.trim()).map(([key,value])=>[key,value.trim()]))}};
+ if(name==='updateMyMemberProfile'){state.savedProfile=input;state.registrationComplete=true;return {data:{profile:input}};}
  if(name==='getCommunityPostOwnership')return {data:{postIds:[],comments:[],hiddenPostIds:[],hiddenComments:[],canManageAll:false}};
  if(name==='submitSelectedGoogleCalendarEvents')return {data:{status:'published',submitted:input.events.length,duplicates:0,failed:0,results:input.events.map((_,index)=>({index,status:'published'}))}};
  if(name==='listOwnedEvents')return {data:{events:[]}};
@@ -71,6 +72,7 @@ export const firestoreCalendarRepository={async listMonth(options){state.calenda
   'entry.tsx': `
 import React,{useState,useEffect} from 'react';import {createRoot} from 'react-dom/client';
 import {BrowserRouter,Routes,Route,Link} from 'react-router-dom';
+import {AuthCompletePage} from '/src/features/auth/AuthCompletePage.tsx';
 import {AdminPage} from '/src/routes/AdminPages.tsx';
 import {AdminAccessGuard} from '/src/features/auth/AdminAccessGuard.tsx';
 import {SiteLayout} from '/src/app/SiteLayout.tsx';
@@ -111,7 +113,7 @@ const draftCodec={encode:value=>({body:value.body}),decode:value=>{if(!value||ty
 function DraftTest(){const [value,setValue]=useState({body:''});const [user,setUser]=useState(state.user);useEffect(()=>{state.listeners.push(setUser);return ()=>{state.listeners=state.listeners.filter(x=>x!==setUser)}},[]);const draft=useFormDraft({identity:{ownerId:user?.uid??'signedout',kind:'synthetic',documentId:'new'},value,codec:draftCodec,onRestore:setValue});return h('section',null,h('h1',null,'초안 검증'),h(DraftRecoveryPanel,{state:draft.state,recovery:draft.recovery,onContinue:draft.continueDraft,onStartNew:draft.startNew,onDelete:draft.deleteDraft,onRetry:draft.retry}),h('label',null,'검증 본문',h('textarea',{value:value.body,onChange:e=>setValue({body:e.target.value})})),h(Link,{to:'/profile'},'다른 화면으로 이동'))}
 const AdminPreview=({section})=>h(AdminAccessGuard,{members:section==='members'},h(AdminPage,{section}));
 const nav=h('p',{style:{padding:'8px 24px',margin:0,fontSize:'13px',background:'#e9f6f2'}},'합성 검증 화면 · 운영 데이터와 연결되지 않음');
-createRoot(document.getElementById('root')).render(h(BrowserRouter,null,h(SiteLayout,null,nav,h(Routes,null,...['home','members','audit','submissions','community','calendar'].map(section=>h(Route,{key:section,path:section==='home'?'/admin':'/admin/'+section,element:h(AdminPreview,{section})})),h(Route,{path:'/admin/members/:memberId',element:h(AdminPreview,{section:'members'})}),...[['/',HomePage],['/about',AboutPage],['/policies/:policy',PolicyPage],['/pdf-test',PdfPreviewTest],['/archive',ArchivePage],['/resources',ResourcesPage],['/materials/:id',MaterialDetailPage],['/member-test',ProfilePage],['/activities/:slug',ActivityDetailPage],['/community',CommunityExperience],['/calendar',CalendarPage],['/calendar/new',CalendarEventCreatePage],['/calendar/connect',CalendarConnectPage],['/events/:eventId',CalendarEventPage],['/google',GoogleCalendarImport],['/profile',ProfilePage],['/management',Management],['/draft-test',DraftTest],['/contribute',ContributePage],['/thread-test',ThreadTest]].map(([path,Component])=>h(Route,{key:path,path,element:h(Component)}))))));
+createRoot(document.getElementById('root')).render(h(BrowserRouter,null,h(SiteLayout,null,nav,h(Routes,null,...['home','members','audit','submissions','community','calendar'].map(section=>h(Route,{key:section,path:section==='home'?'/admin':'/admin/'+section,element:h(AdminPreview,{section})})),h(Route,{path:'/admin/members/:memberId',element:h(AdminPreview,{section:'members'})}),...[['/auth/complete',AuthCompletePage],['/',HomePage],['/about',AboutPage],['/policies/:policy',PolicyPage],['/pdf-test',PdfPreviewTest],['/archive',ArchivePage],['/resources',ResourcesPage],['/materials/:id',MaterialDetailPage],['/member-test',ProfilePage],['/activities/:slug',ActivityDetailPage],['/community',CommunityExperience],['/calendar',CalendarPage],['/calendar/new',CalendarEventCreatePage],['/calendar/connect',CalendarConnectPage],['/events/:eventId',CalendarEventPage],['/google',GoogleCalendarImport],['/profile',ProfilePage],['/management',Management],['/draft-test',DraftTest],['/contribute',ContributePage],['/thread-test',ThreadTest]].map(([path,Component])=>h(Route,{key:path,path,element:h(Component)}))))));
 `,
 }
 

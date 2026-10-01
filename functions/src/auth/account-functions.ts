@@ -41,9 +41,11 @@ export const disconnectPlatformAccount = onCall({ region: 'asia-northeast3' }, a
       batch.set(firestore.collection('users').doc(uid), {
         connected: false,
         communityEligible: false,
+        requiredProfileVersion: FieldValue.delete(),
         disconnectedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       }, { merge: true })
+      batch.delete(firestore.collection('memberProfiles').doc(uid))
       batch.set(firestore.collection('auditEvents').doc(), {
         type: 'account.disconnected',
         uid,

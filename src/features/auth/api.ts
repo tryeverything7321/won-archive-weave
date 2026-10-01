@@ -1,9 +1,11 @@
-import { signInWithCustomToken, signOut } from 'firebase/auth'
+import { finishGoogleLogin } from './google-login'
+import { rememberSuccessfulLogin } from './recent-login'
+import { GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut } from 'firebase/auth'
 import { httpsCallable } from 'firebase/functions'
 import { getFirebaseServices } from '../../lib/firebase/client'
 import { defaultOAuthReturnTo, safeOAuthReturnTo } from './return-to'
 
-export type OAuthProvider = 'naver' | 'kakao'
+export type OAuthProvider = 'naver' | 'kakao' | 'google'
 
 const oauthAttemptKey = 'weave.oauth.pending'
 const oauthInstallationKey = 'weave.oauth.installation'
@@ -34,7 +36,7 @@ export function pendingOAuthAttempt(): PendingOAuthAttempt | null {
   if (!stored) return null
   try {
     const parsed = JSON.parse(stored) as Partial<PendingOAuthAttempt>
-    if (parsed.provider !== 'kakao' && parsed.provider !== 'naver') return null
+    if (parsed.provider !== 'kakao' && parsed.provider !== 'naver' && parsed.provider !== 'google') return null
     return { provider: parsed.provider, returnTo: safeOAuthReturnTo(parsed.returnTo) }
   } catch {
     return null
@@ -78,6 +80,25 @@ export function oauthStartUrl(provider: OAuthProvider, ticket: string): string {
 export async function startOAuthLogin(provider: OAuthProvider, returnTo = defaultOAuthReturnTo): Promise<void> {
   rememberOAuthAttempt(provider, returnTo)
   const firebase = services()
+  if (provider === 'google') {
+    try {
+      const google = new GoogleAuthProvider()
+      google.setCustomParameters({ prompt: 'select_account' })
+      await finishGoogleLogin({
+        signIn: async () => { await signInWithPopup(firebase.auth, google) },
+        provision: async () => { await httpsCallable(firebase.functions, 'completeGoogleLogin')({}) },
+        signOut: () => signOut(firebase.auth),
+        remember: () => { try { rememberSuccessfulLogin('google', window.localStorage) } catch { /* Optional storage */ } },
+      })
+      clearOAuthAttempt()
+      window.location.assign(safeOAuthReturnTo(returnTo))
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? error.code : ''
+      const cancelled = code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request'
+      window.location.assign('/auth/complete?error=' + (cancelled ? 'cancelled' : code === 'auth/popup-blocked' ? 'popup_blocked' : 'provider_unavailable'))
+    }
+    return
+  }
   if (!firebase.appCheck) {
     window.location.assign('/auth/complete?error=provider_unavailable')
     return
@@ -105,6 +126,10 @@ export async function completeProviderLogin(completionCode: string): Promise<voi
   const exchange = httpsCallable<{ completionCode: string }, { customToken: string }>(firebase.functions, 'exchangeOAuthCompletion')
   const { data } = await exchange({ completionCode })
   await signInWithCustomToken(firebase.auth, data.customToken)
+  const provider = pendingOAuthAttempt()?.provider
+  if (provider) {
+    try { rememberSuccessfulLogin(provider, window.localStorage) } catch { /* Browser storage may be disabled. */ }
+  }
 }
 
 export async function acceptTerms(termsVersion: string, communityRulesVersion: string) {

@@ -1,3 +1,4 @@
+import { normalizeDemographics, type Demographics } from './demographics.js'
 import { HttpsError } from 'firebase-functions/v2/https'
 
 export const memberProfileLimits = {
@@ -29,7 +30,7 @@ export const eventPrefillFields = [
 export type MemberProfileTextField = keyof typeof memberProfileLimits
 export type EventPrefillField = (typeof eventPrefillFields)[number]
 
-export type MemberProfileInput = Partial<Record<MemberProfileTextField, string>>
+export type MemberProfileInput = Partial<Record<MemberProfileTextField, string>> & Demographics
 
 export type MemberProfile = MemberProfileInput & {
   createdAt?: string
@@ -89,7 +90,7 @@ function validatePhone(value: string | undefined) {
 
 export function normalizeMemberProfileInput(value: unknown): MemberProfileInput {
   assertPlainObject(value)
-  const allowed = new Set<string>(memberProfileInputFields)
+  const allowed = new Set<string>([...memberProfileInputFields, 'ageBand', 'wonBuddhismMembership', 'religionConsentVersion'])
   if (Object.keys(value).some((key) => !allowed.has(key))) {
     invalid('저장할 수 없는 내 정보 항목이 포함되어 있어요')
   }
@@ -103,7 +104,7 @@ export function normalizeMemberProfileInput(value: unknown): MemberProfileInput 
   validateEmail(profile.email)
   validatePhone(profile.phone)
 
-  return profile
+  return Object.assign(profile, normalizeDemographics(value as Record<string, unknown>, true))
 }
 
 export function normalizeStoredMemberProfile(value: unknown): MemberProfileInput {
@@ -129,7 +130,7 @@ export function normalizeStoredMemberProfile(value: unknown): MemberProfileInput
   } catch {
     delete profile.phone
   }
-  return profile
+  return Object.assign(profile, normalizeDemographics(source))
 }
 
 function storedProfileDataLoss(): never {
@@ -161,7 +162,7 @@ export function normalizeStoredMemberProfileForOwner(value: unknown): MemberProf
   } catch {
     storedProfileDataLoss()
   }
-  return profile
+  return Object.assign(profile, normalizeDemographics(source))
 }
 
 export function eventPrefillFromProfile(profile: MemberProfileInput): EventPrefillProjection {

@@ -27,12 +27,12 @@ test('membership projection preserves missing values instead of turning them int
     pseudonym: null,
     provider: 'unknown',
     completion: 'unknown',
-    steps: { connected: null, currentTerms: null, currentCommunityRules: null, pseudonymSet: null },
+    steps: { requiredProfile: null, connected: null, currentTerms: null, currentCommunityRules: null, pseudonymSet: null },
   })
   assert.equal(membershipProjection({ connected: false }, '2026-09', '2026-09').completion, 'incomplete')
   assert.equal(membershipProjection({
     pseudonym: ' 물결 ', provider: 'kakao', connected: true,
-    termsVersion: '2026-09', communityRulesVersion: '2026-09',
+    termsVersion: '2026-09', communityRulesVersion: '2026-09', requiredProfileVersion: '2026-10-01',
   }, '2026-09', '2026-09').completion, 'complete')
 })
 

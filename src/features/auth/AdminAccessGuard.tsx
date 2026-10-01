@@ -21,6 +21,7 @@ export function AdminAccessGuard({ children, members = false }: { children: Reac
     {signedOut && <div className="community-login-actions">
       <ProviderLoginButton disabled={!isOAuthConfigured} provider="kakao" onClick={() => startOAuthLogin('kakao', returnTo)} />
       <ProviderLoginButton disabled={!isOAuthConfigured} provider="naver" onClick={() => startOAuthLogin('naver', returnTo)} />
+      <ProviderLoginButton disabled={!isOAuthConfigured} provider="google" onClick={() => startOAuthLogin('google', returnTo)} />
     </div>}
     {failed && <button className="button button-primary" onClick={() => window.location.reload()} type="button">다시 확인</button>}
     <Link className="button button-secondary" to="/profile">내 위브로 돌아가기</Link>

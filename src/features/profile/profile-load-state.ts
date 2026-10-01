@@ -47,6 +47,10 @@ export function assertMemberProfilePayload(value: unknown): Record<string, unkno
     }
     profile[field] = typeof fieldValue === 'string' ? fieldValue : ''
   }
+  for (const field of ['ageBand', 'wonBuddhismMembership', 'religionConsentVersion']) {
+    if (source[field] !== undefined && typeof source[field] !== 'string') throw new ProfileLoadFormatError()
+    if (typeof source[field] === 'string') profile[field] = source[field]
+  }
   return profile
 }
 

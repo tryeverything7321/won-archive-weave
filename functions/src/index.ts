@@ -90,3 +90,5 @@ export { setActivityMaterialLinks, getActivityMaterialLinks, getMaterialLinkImpa
 export { getOperationsOverview, listOperationsQueue } from './operations/overview.js'
 export { listOperatorAuditEvents } from './operations/audit.js'
 export { listAdminMembers, getAdminMemberOverview, listAdminMemberActivity, getAdminMemberPrivateDetails } from './operations/members.js'
+
+export { completeGoogleLogin } from './auth/google-login.js'

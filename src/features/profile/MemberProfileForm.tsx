@@ -9,6 +9,9 @@ import {
 } from './member-profile-api'
 import {
   emptyMemberProfile,
+  ageBandLabels,
+  membershipLabels,
+  religionConsentVersion,
   memberProfileError,
   memberProfileLimits,
   normalizeMemberProfile,
@@ -60,6 +63,9 @@ function editableValue(profile: MemberProfileValue): MemberProfileInput {
     realName: profile.realName,
     email: profile.email,
     phone: profile.phone,
+    ageBand: profile.ageBand,
+    wonBuddhismMembership: profile.wonBuddhismMembership,
+    religionConsentVersion: profile.religionConsentVersion,
   }
 }
 
@@ -395,6 +401,7 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
       }
       if (isCurrentEdit() && isCurrentPhoto()) {
         setStatus({ tone: 'success', message: '내 정보를 저장했어요.' })
+        window.dispatchEvent(new Event('weave:profile-saved'))
       } else if (isCurrentAccountOperation()) {
         setStatus(initialStatus)
       }
@@ -501,15 +508,41 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
 
   return (
     <section className="member-profile-form" aria-labelledby={`${formId}-title`}>
+      {new URLSearchParams(window.location.search).get("registration") === "required" && <p role="status">위브를 계속 이용하려면 실명과 소속을 한 번 입력해 주세요. 저장하면 이전 화면으로 돌아갑니다.</p>}
       <header className="member-profile-heading">
         <div>
           <p className="section-kicker">내 정보</p>
-          <h2 id={`${formId}-title`}>필요할 때 다시 쓸 정보를 관리해요</h2>
+          <h2 id={`${formId}-title`}>내 가입 정보를 관리해요</h2>
         </div>
-        <p>모든 항목은 선택 입력이며, 여기에 적은 정보는 다른 이용자에게 공개되지 않아요.</p>
+        <p>실명과 소속은 필수입니다. 다른 이용자에게는 공개되지 않으며, 업무 권한이 있는 관리자만 필요한 경우 확인합니다.</p>
       </header>
 
       <form onSubmit={save}>
+<fieldset className="member-profile-section member-profile-basic-fields"><legend>필수 가입 정보</legend>          <label className="member-profile-field" htmlFor={`${formId}-real-name`}>
+            <span>실명 (필수)</span>
+            <input
+              id={`${formId}-real-name`}
+              value={value.realName}
+              maxLength={memberProfileLimits.realName}
+              autoComplete="name"
+              required
+              onChange={(event) => setField('realName', event.target.value)}
+            />
+          </label>          <label className="member-profile-field" htmlFor={`${formId}-organization`}>
+            <span>소속 교당·모임 (필수)</span>
+            <input
+              id={`${formId}-organization`}
+              value={value.organization}
+              maxLength={memberProfileLimits.organization}
+              autoComplete="organization"
+              required
+              disabled={value.organization === "소속 없음"}
+              placeholder="예: ○○교당 청년회"
+              onChange={(event) => setField('organization', event.target.value)}
+            />
+          </label>
+          <label className="member-profile-field"><span><input type="checkbox" checked={value.organization === '소속 없음'} onChange={event => setField('organization', event.target.checked ? '소속 없음' : '')} /> 소속 없음</span></label></fieldset>
+        <details className="member-profile-optional"><summary>선택 정보 추가</summary>
         <fieldset className="member-profile-section member-profile-photo-section">
           <legend>프로필 사진</legend>
           <div className="member-profile-photo-preview">
@@ -590,17 +623,7 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
               onChange={(event) => setField('region', event.target.value)}
             />
           </label>
-          <label className="member-profile-field" htmlFor={`${formId}-organization`}>
-            <span>소속 교당·모임</span>
-            <input
-              id={`${formId}-organization`}
-              value={value.organization}
-              maxLength={memberProfileLimits.organization}
-              autoComplete="organization"
-              placeholder="예: ○○교당 청년회"
-              onChange={(event) => setField('organization', event.target.value)}
-            />
-          </label>
+
         </fieldset>
 
         <fieldset className="member-profile-section member-profile-event-fields">
@@ -608,16 +631,7 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
           <p className="member-profile-section-help">
             향후 위브에 행사 신청 기능이 연결되면 입력을 덜 수 있도록 준비하는 정보예요. 지금 자동으로 신청되거나 주최자에게 전달되지는 않아요.
           </p>
-          <label className="member-profile-field" htmlFor={`${formId}-real-name`}>
-            <span>실명</span>
-            <input
-              id={`${formId}-real-name`}
-              value={value.realName}
-              maxLength={memberProfileLimits.realName}
-              autoComplete="name"
-              onChange={(event) => setField('realName', event.target.value)}
-            />
-          </label>
+
           <label className="member-profile-field" htmlFor={`${formId}-email`}>
             <span>이메일</span>
             <input
@@ -649,6 +663,14 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
           </aside>
         </fieldset>
 
+        <fieldset className="member-profile-section member-profile-basic-fields">
+          <legend>선택 정보</legend>
+          <p className="member-profile-section-help">청년회 활동과 프로그램을 준비하기 위한 통계에 사용합니다. 답하지 않아도 위브를 이용할 수 있고, 내 정보에서 언제든 삭제할 수 있습니다. 계정 탈퇴 시 삭제됩니다.</p>
+          <label className="member-profile-field"><span>연령대 (선택)</span><select value={value.ageBand ?? ''} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, ageBand: event.target.value })); }}><option value="">선택하지 않음</option>{Object.entries(ageBandLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+          <label className="member-profile-field member-profile-field--wide"><span><input type="checkbox" checked={value.religionConsentVersion === religionConsentVersion} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, religionConsentVersion: event.target.checked ? religionConsentVersion : undefined, wonBuddhismMembership: event.target.checked ? current.wonBuddhismMembership : undefined })); }} /> 원불교 입교 여부의 수집·이용에 동의합니다 (선택)</span><small>수집 항목: 입교 여부 · 목적: 회원 구성 통계와 활동 기획 · 보유 기간: 동의 철회 또는 계정 탈퇴까지. 동의를 거부해도 서비스 이용에 불이익이 없습니다. 동의를 해제하고 저장하면 기존 응답을 삭제합니다.</small></label>
+          <label className="member-profile-field"><span>원불교 입교 여부 (선택)</span><select disabled={value.religionConsentVersion !== religionConsentVersion} value={value.wonBuddhismMembership ?? ''} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, wonBuddhismMembership: event.target.value })); }}><option value="">선택하지 않음</option>{Object.entries(membershipLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><small>직접 입력하는 정보이며 입교 인증으로 사용하지 않습니다.</small></label>
+        </fieldset>
+        </details>
         <div
           className={`member-profile-status member-profile-status--${status.tone}`}
           role={status.tone === 'error' ? 'alert' : 'status'}

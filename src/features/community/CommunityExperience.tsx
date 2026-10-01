@@ -127,7 +127,7 @@ function Gate({ configured }: { configured: boolean }) {
             정보는 가입 확인과 신고 처리에만 사용합니다.
           </span>
           <div className="gate-steps">
-            <b>카카오·네이버 로그인</b>
+            <b>카카오·네이버·구글 로그인</b>
             <b>별명 정하기</b>
             <b>생각 나누기</b>
           </div>
@@ -142,6 +142,7 @@ function Gate({ configured }: { configured: boolean }) {
               onClick={() => startOAuthLogin("naver", "/community")}
               provider="naver"
             />
+              <ProviderLoginButton disabled={!isOAuthConfigured} provider="google" onClick={() => startOAuthLogin("google", "/community")} />
           </div>
           <small>
             {configured

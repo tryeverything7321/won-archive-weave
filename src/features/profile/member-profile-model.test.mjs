@@ -54,7 +54,8 @@ test('parses only the member profile allowlist', () => {
 
 test('accepts empty contact fields and rejects malformed contact values', () => {
   const empty = Object.fromEntries(Object.keys(validInput).map((key) => [key, '']))
-  assert.equal(memberProfileError(empty), null)
+  assert.equal(memberProfileError(empty), '실명을 입력해 주세요.')
+  assert.equal(memberProfileError({ ...empty, realName: '시험', organization: '소속 없음' }), null)
   assert.equal(memberProfileError({ ...validInput, phone: '+82 10 1234 5678' }), null)
   assert.equal(memberProfileError({ ...validInput, email: 'not-an-email' }), '이메일 주소를 다시 확인해 주세요.')
   assert.equal(memberProfileError({ ...validInput, phone: '전화번호 없음' }), '전화번호를 숫자와 하이픈을 사용해 입력해 주세요.')

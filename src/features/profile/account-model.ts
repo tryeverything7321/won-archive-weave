@@ -1,5 +1,5 @@
 export type AccountProfile = {
-  provider?: 'naver' | 'kakao'
+  provider?: 'naver' | 'kakao' | 'google'
   pseudonym?: string
   connected: boolean
   termsAccepted: boolean

@@ -20,6 +20,7 @@ type Outcome = {
 
 function errorMessage(error: string | null): string {
   if (error === 'cancelled' || error === 'access_denied') return '로그인을 취소했어요. 언제든 다시 시작할 수 있어요.'
+  if (error === 'popup_blocked') return '팝업이 차단됐어요. 이 사이트의 팝업을 허용한 뒤 다시 로그인해 주세요.'
   if (error === 'invalid_state') return '로그인 시간이 만료됐어요. 커뮤니티에서 다시 로그인해 주세요.'
   if (error === 'provider_unavailable') return '로그인 서비스에 연결하지 못했어요. 잠시 뒤 다시 시도해 주세요.'
   return '로그인 정보를 확인하지 못했어요. 커뮤니티에서 다시 로그인해 주세요.'
@@ -69,8 +70,8 @@ export function AuthCompletePage() {
   }, [initialAttempt, navigate, outcome.state, params])
 
   const providers: OAuthProvider[] = outcome.provider === 'naver'
-    ? ['naver', 'kakao']
-    : ['kakao', 'naver']
+    ? ['naver', 'kakao', 'google']
+    : outcome.provider === 'google' ? ['google', 'kakao', 'naver'] : ['kakao', 'naver', 'google']
   const returnTo = safeOAuthReturnTo(initialAttempt?.returnTo)
 
   return <section className="page-frame section-frame"><div

@@ -15,11 +15,15 @@ export const profilePhotoPolicy = {
 
 export type MemberProfileField = keyof typeof memberProfileLimits
 
-export type MemberProfileValue = Record<MemberProfileField, string> & {
+export const religionConsentVersion = '2026-10-01'
+export const ageBandLabels = { under20: '10대 이하', '20s': '20대', '30s': '30대', '40s': '40대', '50plus': '50대 이상' }
+export const membershipLabels = { joined: '입교함', not_joined: '입교하지 않음', unsure: '잘 모르겠음' }
+export type OptionalMemberInformation = { ageBand?: string; wonBuddhismMembership?: string; religionConsentVersion?: string }
+export type MemberProfileValue = Record<MemberProfileField, string> & OptionalMemberInformation & {
   hasProfilePhoto: boolean
 }
 
-export type MemberProfileInput = Record<MemberProfileField, string>
+export type MemberProfileInput = Record<MemberProfileField, string> & OptionalMemberInformation
 
 export const emptyMemberProfile: MemberProfileValue = {
   bio: '',
@@ -45,6 +49,8 @@ export function parseMemberProfile(value: unknown): MemberProfileValue {
     email: readString(source.email, memberProfileLimits.email),
     phone: readString(source.phone, memberProfileLimits.phone),
     hasProfilePhoto: source.hasProfilePhoto === true,
+    ...(typeof source.ageBand === 'string' && source.ageBand in ageBandLabels ? { ageBand: source.ageBand } : {}),
+    ...(typeof source.wonBuddhismMembership === 'string' && source.wonBuddhismMembership in membershipLabels && source.religionConsentVersion === religionConsentVersion ? { wonBuddhismMembership: source.wonBuddhismMembership, religionConsentVersion } : {}),
   }
 }
 
@@ -56,10 +62,16 @@ export function normalizeMemberProfile(value: MemberProfileInput): MemberProfile
     realName: value.realName.trim(),
     email: value.email.trim().toLowerCase(),
     phone: value.phone.trim(),
+    ...(value.ageBand ? { ageBand: value.ageBand } : {}),
+    ...(value.wonBuddhismMembership && value.religionConsentVersion === religionConsentVersion ? { wonBuddhismMembership: value.wonBuddhismMembership, religionConsentVersion } : {}),
   }
 }
 
 export function memberProfileError(value: MemberProfileInput): string | null {
+  if (!value.realName.trim()) return '실명을 입력해 주세요.'
+  if (!value.organization.trim()) return '소속을 입력하거나 소속 없음을 선택해 주세요.'
+  if (value.ageBand && !(value.ageBand in ageBandLabels)) return '연령대를 다시 선택해 주세요.'
+  if (value.wonBuddhismMembership && (value.religionConsentVersion !== religionConsentVersion || !(value.wonBuddhismMembership in membershipLabels))) return '입교 여부의 수집 동의를 확인해 주세요.'
   for (const field of Object.keys(memberProfileLimits) as MemberProfileField[]) {
     if (value[field].trim().length > memberProfileLimits[field]) {
       const labels: Record<MemberProfileField, string> = {

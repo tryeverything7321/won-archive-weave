@@ -1,3 +1,4 @@
+import { ageBandLabels, membershipLabels } from '../profile/member-profile-model';
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ExternalLink, RefreshCw, Search, ShieldCheck, UserRound } from "lucide-react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -26,7 +27,7 @@ function formatDate(value: string | null): string {
 }
 
 function providerLabel(value: AdminMember["provider"]): string {
-  return value === "kakao" ? "카카오" : value === "naver" ? "네이버" : "확인 불가";
+  return value === "google" ? "구글" : value === "kakao" ? "카카오" : value === "naver" ? "네이버" : "확인 불가";
 }
 
 function completionLabel(value: AdminMember["completion"]): string {
@@ -63,7 +64,7 @@ function listFilters(params: URLSearchParams): MemberListFilters {
     ...(params.get("q") ? { search: params.get("q")! } : {}),
     ...(params.get("from") ? { createdFrom: inclusiveKstStart(params.get("from")!) } : {}),
     ...(params.get("to") ? { createdTo: exclusiveKstEnd(params.get("to")!) } : {}),
-    provider: provider === "naver" || provider === "kakao" || provider === "unknown" ? provider : "all",
+    provider: provider === "google" || provider === "naver" || provider === "kakao" || provider === "unknown" ? provider : "all",
     completion: completion === "complete" || completion === "incomplete" || completion === "unknown" ? completion : "all",
     activity: activity === "present" || activity === "none" ? activity : "any",
   };
@@ -95,6 +96,10 @@ function Summary({ summary }: { summary: MemberSummary }) {
         <div><span>행사 등록</span><strong>{countLabel(summary.activityCounts?.event ?? null)}</strong></div>
       </div>
       <p className={styles.basis}>{summary.basis} · {period} · 한국 시간 기준</p>
+      {summary.demographics && <div className={styles.activitySummary} aria-label="선택 정보 집계">{[
+        ['연령대', { ...ageBandLabels, unanswered: '미응답' }, summary.demographics.ageBand],
+        ['입교 여부', { ...membershipLabels, unanswered: '미응답' }, summary.demographics.membership],
+      ].map(([title, labels, counts]) => <div key={String(title)}><strong>{String(title)}</strong>{Object.entries(labels as Record<string, string>).map(([key, label]) => <span key={key}>{label} {(counts as Record<string, number>)[key] ?? 0}명</span>)}</div>)}</div>}
       {!summary.complete && <p className={styles.warning} role="status">일부 활동 집계를 완료하지 못해 활동 합계는 표시하지 않습니다.</p>}
     </section>
   );
@@ -184,7 +189,7 @@ function MemberList() {
         <label className={styles.search}><span>가명 또는 운영 식별값</span><span className={styles.inputWithIcon}><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="가명 또는 wm_ 식별값" /></span></label>
         <label><span>계정 생성 시작일</span><input type="date" value={params.get("from") ?? ""} onChange={(event) => updateFilter("from", event.target.value)} /></label>
         <label><span>계정 생성 종료일</span><input type="date" value={params.get("to") ?? ""} onChange={(event) => updateFilter("to", event.target.value)} /></label>
-        <label><span>현재 로그인 제공자</span><select value={params.get("provider") ?? "all"} onChange={(event) => updateFilter("provider", event.target.value)}><option value="all">전체</option><option value="kakao">카카오</option><option value="naver">네이버</option><option value="unknown">확인 불가</option></select></label>
+        <label><span>현재 로그인 제공자</span><select value={params.get("provider") ?? "all"} onChange={(event) => updateFilter("provider", event.target.value)}><option value="all">전체</option><option value="kakao">카카오</option><option value="naver">네이버</option><option value="google">구글</option><option value="unknown">확인 불가</option></select></label>
         <label><span>가입 절차</span><select value={params.get("completion") ?? "all"} onChange={(event) => updateFilter("completion", event.target.value)}><option value="all">전체</option><option value="complete">완료</option><option value="incomplete">미완료</option><option value="unknown">확인 불가</option></select></label>
         <label><span>기록된 활동</span><select value={params.get("activity") ?? "any"} onChange={(event) => updateFilter("activity", event.target.value)}><option value="any">전체</option><option value="present">있음</option><option value="none">없음</option></select></label>
         <button className={styles.searchButton} type="submit">검색</button>
@@ -341,7 +346,7 @@ function MemberDetail({ memberId }: { memberId: string }) {
           <label><span>제한 정보 조회 사유</span><input value={privateReason} maxLength={200} onChange={(event) => setPrivateReason(event.target.value)} /></label>
           <button type="button" onClick={() => void loadPrivateDetails()}>제한 정보 확인</button>
           {privateNotice && <p className={styles.warning} role="alert">{privateNotice}</p>}
-          {privateDetails && <dl className={styles.privateDetails}><div><dt>실명</dt><dd>{privateDetails.realName ?? "미입력"}</dd></div><div><dt>소속</dt><dd>{privateDetails.organization ?? "미입력"}</dd></div><div><dt>이메일</dt><dd>{privateDetails.email ?? "미입력"}</dd></div><div><dt>전화번호</dt><dd>{privateDetails.phone ?? "미입력"}</dd></div></dl>}
+          {privateDetails && <dl className={styles.privateDetails}><div><dt>실명</dt><dd>{privateDetails.realName ?? "미입력"}</dd></div><div><dt>소속</dt><dd>{privateDetails.organization ?? "미입력"}</dd></div><div><dt>이메일</dt><dd>{privateDetails.email ?? "미입력"}</dd></div><div><dt>전화번호</dt><dd>{privateDetails.phone ?? "미입력"}</dd></div><div><dt>연령대</dt><dd>{ageBandLabels[privateDetails.ageBand as keyof typeof ageBandLabels] ?? '미응답'}</dd></div><div><dt>원불교 입교 여부</dt><dd>{membershipLabels[privateDetails.wonBuddhismMembership as keyof typeof membershipLabels] ?? '미응답'}</dd></div></dl>}
         </details>
       </>}
     </div>

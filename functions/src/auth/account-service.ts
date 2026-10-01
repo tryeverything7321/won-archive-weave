@@ -2,7 +2,7 @@ import { normalizePseudonym, validatePseudonym } from './pseudonym.js'
 
 export type MemberAccount = {
   uid: string
-  provider: 'naver' | 'kakao'
+  provider: 'naver' | 'kakao' | 'google'
   connected: boolean
   termsVersion?: string
   communityRulesVersion?: string

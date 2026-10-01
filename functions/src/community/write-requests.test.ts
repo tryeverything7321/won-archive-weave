@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { randomUUID } from 'node:crypto'
 import { getFirestore } from 'firebase-admin/firestore'
-import { createCommunityComment, createCommunityPost } from './posts.js'
+import { createCommunityComment, createCommunityPost, resolveCommunityCase } from './posts.js'
 import {
   communityWriteFingerprint,
   communityWriteRequestKey,
@@ -57,7 +57,8 @@ test('Firestore transaction makes post and comment retries idempotent and thrott
     createCommunityPost.run({ auth, data: postData } as never),
   ])
   assert.equal(first.postId, replay.postId)
-  assert.equal((await firestore.collection('communityPosts').where('body', '==', postData.body).get()).size, 1)
+  assert.equal((await firestore.collection('communityPosts').doc(first.postId).get()).exists, true)
+  assert.equal((await firestore.collection('communityPostOwners').doc(first.postId).get()).get('ownerUid'), uid)
   await assert.rejects(
     createCommunityPost.run({ auth, data: { ...postData, body: '같은 번호의 다른 글' } } as never),
     (error: { code?: string }) => error.code === 'already-exists',
@@ -79,4 +80,38 @@ test('Firestore transaction makes post and comment retries idempotent and thrott
   ])
   assert.equal(comment.commentId, commentReplay.commentId)
   assert.equal((await firestore.collection('communityPosts').doc(first.postId).get()).get('commentCount'), 1)
+})
+
+test('operator case resolution replays the same command and rejects a conflicting payload', {
+  skip: !process.env.FIRESTORE_EMULATOR_HOST,
+}, async () => {
+  const firestore = getFirestore()
+  const administratorUid = `administrator-${randomUUID()}`
+  const authorUid = `author-${randomUUID()}`
+  const postId = `post-${randomUUID()}`
+  const caseId = `report-${randomUUID()}`
+  await firestore.collection('communityPosts').doc(postId).set({ status: 'active', body: '신고 대상 글' })
+  await firestore.collection('communityPostOwners').doc(postId).set({ ownerUid: authorUid })
+  await firestore.collection('reports').doc(caseId).set({
+    status: 'received', targetType: 'post', targetId: postId,
+  })
+  const auth = { uid: administratorUid, token: { role: 'administrator' } }
+  const data = {
+    caseType: 'report',
+    caseId,
+    action: 'dismiss',
+    resolution: '신고 대상이 아닌 것으로 확인했습니다',
+    requestId: `case_${randomUUID()}`,
+  }
+  const [first, replay] = await Promise.all([
+    resolveCommunityCase.run({ auth, data } as never),
+    resolveCommunityCase.run({ auth, data } as never),
+  ])
+  assert.deepEqual(first, { status: 'dismissed' })
+  assert.deepEqual(replay, first)
+  assert.equal((await firestore.collection('reports').doc(caseId).get()).get('status'), 'dismissed')
+  await assert.rejects(
+    resolveCommunityCase.run({ auth, data: { ...data, resolution: '다른 처리 사유' } } as never),
+    (error: { code?: string }) => error.code === 'already-exists',
+  )
 })

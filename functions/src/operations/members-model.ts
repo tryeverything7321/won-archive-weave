@@ -1,4 +1,4 @@
-export type MemberProvider = 'naver' | 'kakao' | 'unknown'
+export type MemberProvider = 'naver' | 'kakao' | 'google' | 'unknown'
 export type MembershipCompletion = 'complete' | 'incomplete' | 'unknown'
 export type ActivityKind = 'post' | 'comment' | 'submission' | 'event'
 export type TimelineKind = 'account' | ActivityKind
@@ -8,12 +8,14 @@ export type MemberReadClaims = Record<string, unknown> | undefined
 export type AccountRecord = {
   pseudonym?: unknown
   provider?: unknown
+  requiredProfileVersion?: unknown
   connected?: unknown
   termsVersion?: unknown
   communityRulesVersion?: unknown
 }
 
 export type MembershipSteps = {
+  requiredProfile: boolean | null
   connected: boolean | null
   currentTerms: boolean | null
   currentCommunityRules: boolean | null
@@ -43,7 +45,7 @@ export function memberAccessAllowed(claims: MemberReadClaims, privateRead = fals
 }
 
 export function normalizeMemberProvider(value: unknown): MemberProvider {
-  return value === 'naver' || value === 'kakao' ? value : 'unknown'
+  return value === 'naver' || value === 'kakao' || value === 'google' ? value : 'unknown'
 }
 
 export function membershipProjection(
@@ -56,6 +58,7 @@ export function membershipProjection(
     ? account.pseudonym.trim().slice(0, 40)
     : null
   const steps: MembershipSteps = {
+    requiredProfile: exists ? account?.requiredProfileVersion === "2026-10-01" : null,
     connected: typeof account?.connected === 'boolean' ? account.connected : null,
     currentTerms: typeof account?.termsVersion === 'string'
       ? account.termsVersion === currentTermsVersion

@@ -1,7 +1,7 @@
 import { httpsCallable } from "firebase/functions";
 import { getFirebaseServices } from "../../lib/firebase/client";
 
-export type MemberProvider = "naver" | "kakao" | "unknown";
+export type MemberProvider = "naver" | "kakao" | "google" | "unknown";
 export type MembershipCompletion = "complete" | "incomplete" | "unknown";
 export type MemberActivityKind = "account" | "post" | "comment" | "submission" | "event";
 
@@ -19,6 +19,7 @@ export type AdminMember = {
   provider: MemberProvider;
   completion: MembershipCompletion;
   steps: {
+    requiredProfile?: boolean | null;
     connected: boolean | null;
     currentTerms: boolean | null;
     currentCommunityRules: boolean | null;
@@ -39,6 +40,7 @@ export type MemberListFilters = {
 };
 
 export type MemberSummary = {
+  demographics?: { ageBand: Record<string, number>; membership: Record<string, number>; populationCount: number; basis: string } | null;
   populationCount: number;
   createdToday: number;
   completed: number;
@@ -62,6 +64,8 @@ export type MemberActivityItem = {
 };
 
 export type MemberPrivateDetails = {
+  ageBand?: string;
+  wonBuddhismMembership?: string;
   realName: string | null;
   organization: string | null;
   email: string | null;

@@ -118,27 +118,14 @@ test('profile update authorizes first and replaces only the owner document', asy
   })
 })
 
-test('empty update produces an empty owner profile and empty event prefill', async () => {
-  const result = await updateMemberProfileForActor(
-    { uid: 'member-1' },
-    {
-      bio: ' ',
-      region: '',
-      organization: '',
-      realName: '',
-      email: '',
-      phone: '',
-    },
-    {
-      async loadUser() {
-        return currentMember
-      },
-      async replaceProfile(_uid, profile) {
-        return profile
-      },
-    },
-  )
-  assert.deepEqual(result, { profile: {} })
+test('empty update cannot remove required registration information', async () => {
+  let writes = 0
+  const code = await errorCode(() => updateMemberProfileForActor({ uid: 'member-1' }, {}, {
+    async loadUser() { return currentMember },
+    async replaceProfile() { writes++; return {} },
+  }))
+  assert.equal(code, 'invalid-argument')
+  assert.equal(writes, 0)
 })
 
 test('profile response exposes timestamps as ISO strings without copying arbitrary data', () => {

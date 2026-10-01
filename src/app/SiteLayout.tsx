@@ -14,6 +14,7 @@ import { InstagramGlyph } from "../components/InstagramGlyph";
 import { LaunchFeedbackNudge } from "../features/feedback/LaunchFeedbackNudge";
 import { FirstLoginOnboardingGate } from "../features/onboarding/OnboardingFlow";
 import { parseCalendarListRestoreState } from "../features/calendar/calendar-navigation";
+import { RequiredProfileGate } from "../features/profile/RequiredProfileGate";
 import { DraftSessionBoundary } from './DraftSessionBoundary';
 
 import { CreateMenu } from "../features/experience/CreateMenu";
@@ -77,6 +78,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="site-shell" data-workspace={workspace || undefined}>
       <DraftSessionBoundary />
+      <RequiredProfileGate />
       <motion.div
         className="scroll-progress"
         style={{ scaleX: smoothProgress }}

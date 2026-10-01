@@ -1388,6 +1388,7 @@
   font-weight: 700;
 }
 .member-profile-field input,
+.member-profile-field select,
 .member-profile-field textarea {
   width: 100%;
   min-width: 0;
@@ -13000,3 +13001,16 @@ section[aria-label="자료 본문"] {
 @media (max-width: 420px) {
   .calendar-detail-information .calendar-detail-actions > div:last-child { grid-template-columns: minmax(0, 1fr); }
 }
+
+.member-profile-optional { margin-block: 20px; }
+.member-profile-optional > summary { padding: 18px 20px; border: 1px solid #c7dce6; border-radius: 14px; background: #fff; cursor: pointer; color: #173a54; font-weight: 700; }
+.member-profile-optional[open] > summary { margin-bottom: 20px; }
+.member-profile-field input[type="checkbox"] { display: inline-block; width: 20px; height: 20px; min-height: 20px; padding: 0; margin: 0 8px 0 0; vertical-align: middle; accent-color: #174765; }
+.member-profile-field select { font-size: 16px; }
+.member-profile-field input:disabled, .member-profile-field select:disabled { background: #edf3f4; color: #526b7a; }
+
+.provider-login { position: relative; overflow: visible; }
+.provider-recent-login { position: absolute; right: 8px; top: -12px; border: 1px solid #bdd4df; border-radius: 20px; padding: 4px 9px; background: #fff; color: #173a54; font-size: 12px; font-weight: 700; line-height: 1.4; box-shadow: 0 2px 6px #163a5314; }
+
+.provider-login-google-button { display: inline-flex; justify-content: center; align-items: center; gap: 12px; width: min(100%, 244px); min-height: 60px; border: 1px solid #747775; border-radius: 10px; background: #fff; color: #1f1f1f; font: 500 16px Arial, sans-serif; }
+.provider-login-google-button .provider-mark { width: 20px; height: 20px; object-fit: contain; }

@@ -1,6 +1,6 @@
 import { getApps, initializeApp } from 'firebase-admin/app'
 import { FieldValue, getFirestore, type DocumentData } from 'firebase-admin/firestore'
-import { onCall } from 'firebase-functions/v2/https'
+import { HttpsError, onCall } from 'firebase-functions/v2/https'
 import { evaluateActorPolicy, requireActorPolicy } from '../community/actor-policy.js'
 import {
   normalizeMemberProfileInput,
@@ -67,8 +67,15 @@ export async function updateMemberProfileForActor(
   dependencies: Pick<MemberProfileDependencies, 'loadUser' | 'replaceProfile'>,
 ) {
   const { uid } = await evaluateActorPolicy(auth, dependencies.loadUser)
-  const profile = normalizeMemberProfileInput(input)
+  const profile = requireRegistrationProfile(input)
   return memberProfileResponse(await dependencies.replaceProfile(uid, profile))
+}
+
+export function requireRegistrationProfile(input: unknown): MemberProfileInput {
+  const profile = normalizeMemberProfileInput(input)
+  if (!profile.realName) throw new HttpsError('invalid-argument', '실명을 입력해 주세요')
+  if (!profile.organization) throw new HttpsError('invalid-argument', '소속을 입력하거나 소속 없음을 선택해 주세요')
+  return profile
 }
 
 async function loadProfile(uid: string) {
@@ -91,7 +98,18 @@ async function replaceProfile(uid: string, profile: MemberProfileInput) {
       createdAt,
       updatedAt: FieldValue.serverTimestamp(),
     }
+    if (profile.religionConsentVersion) {
+      result.religionConsentedAt = current.get('religionConsentVersion') === profile.religionConsentVersion
+        && current.get('religionConsentedAt') ? current.get('religionConsentedAt') : FieldValue.serverTimestamp()
+    }
     transaction.set(reference, result)
+    transaction.set(firestore.collection('users').doc(uid), { requiredProfileVersion: '2026-10-01' }, { merge: true })
+    transaction.set(firestore.collection('auditEvents').doc(), {
+      type: 'profile.updated', actorUid: uid,
+      religionConsentAction: profile.religionConsentVersion ? 'granted' : current.get('religionConsentVersion') ? 'withdrawn' : 'none',
+      consentVersion: profile.religionConsentVersion ?? null,
+      createdAt: FieldValue.serverTimestamp(),
+    })
   })
   return result
 }
@@ -103,6 +121,6 @@ export const getMyMemberProfile = onCall({ region: 'asia-northeast3' }, async (r
 
 export const updateMyMemberProfile = onCall({ region: 'asia-northeast3' }, async (request) => {
   const { uid } = await requireActorPolicy(request.auth)
-  const profile = normalizeMemberProfileInput(request.data)
+  const profile = requireRegistrationProfile(request.data)
   return memberProfileResponse(await replaceProfile(uid, profile))
 })
