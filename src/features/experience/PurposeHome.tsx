@@ -24,13 +24,3 @@ export function PurposeHome() {
 
   </section>;
 }
-
-export function SecondaryHomePaths() {
-  return <nav className="section-frame" aria-label="위브 더 둘러보기">
-    <div className={styles.secondaryPaths}>
-      <Link to="/archive">다른 모임의 활동 기록 보기 <ArrowRight size={16} aria-hidden="true" /></Link>
-      <Link to="/community">요즘 나누는 이야기 보기 <ArrowRight size={16} aria-hidden="true" /></Link>
-      <Link to="/start">원불교가 처음이라면 <ArrowRight size={16} aria-hidden="true" /></Link>
-    </div>
-  </nav>;
-}

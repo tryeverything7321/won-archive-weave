@@ -13,7 +13,7 @@ function EventCard({ event, featured = false }: { event: CalendarEvent; featured
   const [imageFailed, setImageFailed] = useState(false);
   const hasImage = Boolean(event.thumbnail && !imageFailed);
   return (
-    <article className={`${styles.card} ${featured ? styles.featured : ""} ${hasImage ? styles.withImage : ""}`}>
+    <Link to={`/events/${event.id}`} className={`${styles.card} ${featured ? styles.featured : ""} ${hasImage ? styles.withImage : ""}`}>
       {hasImage && event.thumbnail && (
         <div className={styles.media}>
           <img
@@ -28,18 +28,16 @@ function EventCard({ event, featured = false }: { event: CalendarEvent; featured
       <div className={styles.content}>
         <p className={styles.date}><CalendarDays aria-hidden="true" size={18} />{eventDateTimeLabel(event)}</p>
         <div className={styles.copy}>
-          <h3><Link to={`/events/${event.id}`}>{event.title}</Link></h3>
+          <h3>{event.title}</h3>
           {event.summary.trim() && <p className={styles.summary}>{event.summary}</p>}
           <div className={styles.meta}>
             {event.region.trim() && <span>{event.region}</span>}
             {event.organizerName.trim() && <span>{event.organizerName}</span>}
           </div>
         </div>
-        <Link className={styles.detailLink} to={`/events/${event.id}`}>
-          행사 자세히 보기 <ArrowRight aria-hidden="true" size={17} />
-        </Link>
+        <span className={styles.detailLink}>행사 보기</span>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -71,7 +69,7 @@ export function UpcomingEvents() {
           <p>새로운 만남</p>
           <h2 id="upcoming-events-title">다가오는 행사</h2>
         </div>
-        <Link className="text-link" to="/calendar">전체 일정 보기 <ArrowRight aria-hidden="true" size={17} /></Link>
+        <Link className="text-link" to="/calendar">전체 일정</Link>
       </div>
       {state.status === "loading" && state.events.length === 0 && <p className={styles.message} role="status">다가오는 행사를 불러오는 중이에요.</p>}
       {state.status === "error" && (

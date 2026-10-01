@@ -12,6 +12,11 @@ export function launchNudgeReady(activeSeconds: number, visitedPages: number, in
   return !interrupted && ((activeSeconds >= 60 && visitedPages >= 2) || activeSeconds >= 180);
 }
 
-export function launchFeedbackBody(body: string, enabled: boolean) {
-  return enabled && !body.startsWith(FEEDBACK_MARKER) ? `${FEEDBACK_PREFIX}${body}` : body;
+export const feedbackLabels: Record<string, string> = { problem: '불편해요', idea: '이런 기능 원해요', thanks: '좋았어요' };
+export function feedbackPrefix(type?: string | null) {
+  const label = type && Object.hasOwn(feedbackLabels, type) ? feedbackLabels[type] : '';
+  return label ? `${FEEDBACK_MARKER} ${label}\n\n` : FEEDBACK_PREFIX;
+}
+export function launchFeedbackBody(body: string, enabled: boolean, type?: string | null) {
+  return enabled && !body.startsWith(FEEDBACK_MARKER) ? `${feedbackPrefix(type)}${body}` : body;
 }

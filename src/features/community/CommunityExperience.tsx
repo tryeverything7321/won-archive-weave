@@ -1,6 +1,6 @@
 import { OpeningCommunityTabs } from "./OpeningCommunityTabs";
 import { OPENING_PREFIX, openingPostBody, isOpeningPost } from "./opening-community-model";
-import { FEEDBACK_MARKER, FEEDBACK_PREFIX, launchFeedbackBody } from "../feedback/launch-feedback-model";
+import { FEEDBACK_MARKER, feedbackPrefix, launchFeedbackBody } from "../feedback/launch-feedback-model";
 import { useLocation } from "react-router-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
@@ -243,8 +243,13 @@ export function CommunityExperience() {
   const hasLoadedOlderPosts = useRef(false);
   const { search: routeSearch } = useLocation();
   const feedbackMode = new URLSearchParams(routeSearch).get("feedback") === "launch";
+  const feedbackType = new URLSearchParams(routeSearch).get("feedbackType");
+  useEffect(() => {
+    const feedbackOnly = new URLSearchParams(routeSearch).get("view") === "feedback";
+    queueMicrotask(() => setSearch(current => feedbackOnly ? FEEDBACK_MARKER : current === FEEDBACK_MARKER ? "" : current));
+  }, [routeSearch]);
   const openingMode = new URLSearchParams(routeSearch).get("tab") === "opening";
-  const bodyLimit = 2000 - (openingMode ? OPENING_PREFIX.length : feedbackMode ? FEEDBACK_PREFIX.length : 0);
+  const bodyLimit = 2000 - (openingMode ? OPENING_PREFIX.length : feedbackMode ? feedbackPrefix(feedbackType).length : 0);
   const [composerOpen, setComposerOpen] = useState(() => new URLSearchParams(window.location.search).get("compose") === "1");
   useEffect(() => {
     if (new URLSearchParams(routeSearch).get("compose") === "1") queueMicrotask(() => setComposerOpen(true));
@@ -527,7 +532,7 @@ export function CommunityExperience() {
       : "");
     try {
       await communityApi.createPost({
-        body: openingMode ? openingPostBody(submittedValue.body) : launchFeedbackBody(submittedValue.body, feedbackMode),
+        body: openingMode ? openingPostBody(submittedValue.body) : launchFeedbackBody(submittedValue.body, feedbackMode, feedbackType),
         topic: submittedValue.topic || null,
         purpose: submittedValue.purpose,
       });
@@ -806,7 +811,7 @@ export function CommunityExperience() {
           </section>
 
           <form id="community-composer" hidden={!composerOpen} className="community-composer" onSubmit={createPost}>
-            {feedbackMode && <div className="community-feedback-context" role="region" aria-label="위브 이용 피드백 작성"><strong>위브를 써본 이야기를 들려주세요</strong><p>좋았던 점, 불편했던 점, 있으면 좋을 기능을 적어주세요. 글에는 ‘위브 피드백’ 말머리가 붙습니다.</p><button className="button button-ghost" type="button" onClick={() => { setSearch(FEEDBACK_MARKER); setComposerOpen(false); composerTriggerRef.current?.focus(); }}>다른 피드백 보고 댓글 남기기</button></div>}
+            {feedbackMode && <div className="community-feedback-context" role="region" aria-label="위브 이용 피드백 작성"><strong>{feedbackType === "problem" ? "어떤 점이 불편했나요?" : feedbackType === "idea" ? "어떤 기능이 있으면 좋을까요?" : feedbackType === "thanks" ? "어떤 점이 좋았나요?" : "위브를 써본 이야기를 들려주세요"}</strong><p>좋았던 점, 불편했던 점, 있으면 좋을 기능을 적어주세요. 글에는 ‘위브 피드백’ 말머리가 붙습니다.</p><button className="button button-ghost" type="button" onClick={() => { setSearch(FEEDBACK_MARKER); setComposerOpen(false); composerTriggerRef.current?.focus(); }}>다른 피드백 보고 댓글 남기기</button></div>}
             <DraftRecoveryPanel
               state={articleDraft.state}
               recovery={articleDraft.recovery}

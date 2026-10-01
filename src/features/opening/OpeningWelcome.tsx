@@ -1,7 +1,7 @@
 import { OPENING_HREF } from "../community/opening-community-model";
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, X } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ArrowRight, CircleHelp, X } from 'lucide-react';
 import { WeaveLogoLockup } from '../../components/WeaveLogoLockup';
 import styles from './OpeningWelcome.module.css';
 
@@ -16,6 +16,7 @@ const features = [
 ];
 
 export function OpeningWelcome() {
+  const { pathname } = useLocation();
   const dialog = useRef<HTMLDialogElement>(null);
   const reopen = useRef<HTMLButtonElement>(null);
   const [step, setStep] = useState(-1);
@@ -29,14 +30,14 @@ export function OpeningWelcome() {
     let seen = dismissedInSession;
     try { seen ||= localStorage.getItem(seenKey) === '1'; } catch { /* Storage may be unavailable. */ }
     const node = dialog.current;
-    if (!seen) node?.showModal();
+    if (!seen && pathname === "/") node?.showModal();
     return () => { node?.close(); };
-  }, []);
+  }, [pathname]);
   const encouragement = encouragementHref
     ? <Link to={encouragementHref} onClick={close}>응원의 한마디 남기기 <ArrowRight size={16} aria-hidden="true" /></Link>
     : <span className={styles.pending} aria-disabled="true">응원의 한마디 남기기 <small>준비 중</small></span>;
   return <>
-    <div className={styles.entry}><button ref={reopen} type="button" onClick={() => { setStep(-1); dialog.current?.showModal(); }}>위브 오픈 안내 다시 보기 <ArrowRight size={16} aria-hidden="true" /></button></div>
+    <div className={styles.entry}><button ref={reopen} type="button" onClick={() => { setStep(-1); dialog.current?.showModal(); }}><CircleHelp size={16} aria-hidden="true" /> 위브 사용 안내</button></div>
     <dialog ref={dialog} className={styles.dialog} aria-labelledby="weave-opening-title" onCancel={event => { event.preventDefault(); close(); }}>
       <button className={styles.close} type="button" aria-label="오픈 안내 닫기" onClick={close}><X size={22} aria-hidden="true" /></button>
       <WeaveLogoLockup className={styles.logo} />

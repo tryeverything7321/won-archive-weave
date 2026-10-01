@@ -19,3 +19,11 @@ test('feedback marking preserves the draft and the server body limit',()=>{
  assert.equal(launchFeedbackBody(FEEDBACK_PREFIX+body,true),FEEDBACK_PREFIX+body);
  assert.equal(launchFeedbackBody('x'.repeat(2000-FEEDBACK_PREFIX.length),true).length,2000);
 });
+
+test('feedback category survives the handoff without duplicating an existing marker', () => {
+  assert.equal(launchFeedbackBody('내용', true, 'problem'), '[위브 피드백] 불편해요\n\n내용');
+  assert.equal(launchFeedbackBody('내용', true, 'idea'), '[위브 피드백] 이런 기능 원해요\n\n내용');
+  assert.equal(launchFeedbackBody('내용', true, 'thanks'), '[위브 피드백] 좋았어요\n\n내용');
+  assert.equal(launchFeedbackBody('내용', true, 'unknown'), '[위브 피드백]\n\n내용');
+  assert.equal(launchFeedbackBody('[위브 피드백] 기존', true, 'thanks'), '[위브 피드백] 기존');
+});

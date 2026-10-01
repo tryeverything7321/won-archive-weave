@@ -55,3 +55,8 @@
   .content { padding: 22px; }
   .message { align-items: start; flex-direction: column; }
 }
+
+.card { text-decoration:none; color:inherit; position:relative; }
+.card:focus-visible { outline:3px solid #146fa8; outline-offset:4px; }
+.card:hover .detailLink { background:#1d557a; }
+.card .detailLink { display:inline-flex; align-items:center; justify-content:center; align-self:start; min-height:44px; width:fit-content; padding:10px 18px; border-radius:10px; background:#143957; color:#fff; font-weight:700; }
