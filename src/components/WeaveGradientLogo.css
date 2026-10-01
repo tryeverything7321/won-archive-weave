@@ -1,0 +1,150 @@
+.weave-gradient-logo {
+  --weave-logo-mask: url("/brand/weave-logo-mask.svg");
+  position: relative;
+  display: inline-grid;
+  width: min(100%, 35.14rem);
+  aspect-ratio: 562.248692 / 156.594989;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.weave-gradient-logo__layer {
+  position: absolute;
+  inset: 0;
+  -webkit-mask: var(--weave-logo-mask) center / contain no-repeat;
+  mask: var(--weave-logo-mask) center / contain no-repeat;
+}
+
+.weave-gradient-logo__zero {
+  z-index: 1;
+  background: linear-gradient(
+    104deg,
+    #102b46 0%,
+    #146fa8 34%,
+    #47b8ed 68%,
+    #2d95d3 100%
+  );
+  animation: weave-logo-zero 2200ms cubic-bezier(0.65, 0, 0.35, 1) 100ms both;
+}
+
+.weave-gradient-logo__tide {
+  z-index: 2;
+  opacity: 0;
+  background: linear-gradient(
+    104deg,
+    #102b46 0%,
+    #146fa8 24%,
+    #53c8f2 50%,
+    #2d95d3 74%,
+    #102b46 100%
+  );
+  animation: weave-logo-tide 2200ms cubic-bezier(0.65, 0, 0.35, 1) 100ms both;
+}
+
+.weave-gradient-logo__beam {
+  z-index: 3;
+  opacity: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 42%,
+    #59cef1 47%,
+    #bcefff 50%,
+    #59cef1 53%,
+    transparent 58%,
+    transparent 100%
+  );
+  background-position: 100% 50%;
+  background-size: 310% 100%;
+  animation: weave-logo-beam 2200ms cubic-bezier(0.55, 0, 0.25, 1) 100ms both;
+}
+
+.weave-gradient-logo__focus {
+  z-index: 4;
+  opacity: 0;
+  background: radial-gradient(
+    circle at 58% 52%,
+    rgba(209, 247, 255, 0.98) 0%,
+    rgba(101, 210, 244, 0.92) 12%,
+    rgba(83, 200, 242, 0.38) 28%,
+    transparent 48%
+  );
+  animation: weave-logo-focus 2200ms cubic-bezier(0.65, 0, 0.35, 1) 100ms both;
+}
+
+@keyframes weave-logo-zero {
+  0%,
+  62% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes weave-logo-tide {
+  0%,
+  58% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes weave-logo-beam {
+  0% {
+    opacity: 0;
+    background-position: 100% 50%;
+  }
+
+  10% {
+    opacity: 0.86;
+  }
+
+  66% {
+    opacity: 1;
+    background-position: 51% 50%;
+  }
+
+  78% {
+    opacity: 1;
+    background-position: 45% 50%;
+  }
+
+  100% {
+    opacity: 0;
+    background-position: 41% 50%;
+  }
+}
+
+@keyframes weave-logo-focus {
+  0%,
+  46% {
+    opacity: 0;
+  }
+
+  68% {
+    opacity: 0.82;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weave-gradient-logo__zero,
+  .weave-gradient-logo__beam,
+  .weave-gradient-logo__focus {
+    display: none;
+    animation: none;
+  }
+
+  .weave-gradient-logo__tide {
+    opacity: 1;
+    animation: none;
+  }
+}

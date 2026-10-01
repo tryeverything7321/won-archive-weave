@@ -1,0 +1,229 @@
+.page {
+  display: grid;
+  gap: 28px;
+}
+
+.heading,
+.sectionHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.heading h2,
+.sectionHeading h3 {
+  margin: 0;
+  color: var(--weave-navy, #123a5a);
+  letter-spacing: -0.025em;
+  word-break: keep-all;
+}
+
+.heading h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); }
+.sectionHeading h3 { font-size: 1.25rem; }
+
+.heading p,
+.sectionHeading p,
+.muted {
+  margin: 8px 0 0;
+  color: var(--weave-muted, #607381);
+  line-height: 1.6;
+}
+
+.refresh {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.card {
+  display: grid;
+  min-height: 124px;
+  align-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--weave-border, #d9e4e3);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--weave-navy, #123a5a);
+  text-align: left;
+  cursor: pointer;
+}
+
+.card:hover,
+.card:focus-visible,
+.cardActive {
+  border-color: #80cfc4;
+  background: #effaf7;
+}
+
+.card span { font-weight: 700; }
+.card strong { font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+
+.surface {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--weave-border, #d9e4e3);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 12px;
+}
+
+.filters label {
+  display: grid;
+  gap: 7px;
+  color: var(--weave-navy, #123a5a);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.filters select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--weave-border, #d9e4e3);
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.state {
+  margin: 0;
+  padding: 22px;
+  border-radius: 12px;
+  background: var(--surface-quiet, #f5f9f8);
+  color: var(--weave-muted, #607381);
+  line-height: 1.6;
+}
+
+.error {
+  border: 1px solid #efc8c5;
+  background: #fff6f5;
+  color: #7c302a;
+}
+
+.queue,
+.health,
+.auditList {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--weave-border, #d9e4e3);
+}
+
+.queueItem,
+.healthItem,
+.auditItem {
+  display: grid;
+  gap: 8px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--weave-border, #d9e4e3);
+}
+
+.queueItem {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.queueMeta,
+.badges,
+.auditMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.queueItem h4,
+.auditItem h4 {
+  margin: 0;
+  color: var(--weave-navy, #123a5a);
+  font-size: 1.05rem;
+  letter-spacing: -0.015em;
+}
+
+.badge {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #edf3f3;
+  color: #486270;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.badgeUrgent { background: #fff0ee; color: #9b3a31; }
+.badgeOverdue { background: #fff7df; color: #755500; }
+
+.queueItem time,
+.auditItem time,
+.healthItem small {
+  color: var(--weave-muted, #607381);
+  font-size: .85rem;
+}
+
+.queueLink,
+.healthLink {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 6px;
+  color: var(--weave-navy, #123a5a);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.healthItem {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.healthItem p { margin: 0; color: var(--weave-navy, #123a5a); font-weight: 700; }
+.healthStatus { color: #486270; }
+.healthDisconnected { color: #8a6500; }
+
+.more {
+  justify-self: start;
+}
+
+@media (max-width: 860px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .page { gap: 20px; }
+  .heading,
+  .sectionHeading { display: grid; }
+  .refresh { justify-self: start; }
+  .cards { grid-template-columns: 1fr 1fr; }
+  .card { min-height: 108px; padding: 16px; }
+  .card strong { font-size: 1.65rem; }
+  .filters { grid-template-columns: 1fr; }
+  .queueItem,
+  .healthItem { grid-template-columns: 1fr; }
+  .queueLink,
+  .healthLink { justify-self: start; }
+}
+
+@media (max-width: 380px) {
+  .cards { grid-template-columns: 1fr; }
+}

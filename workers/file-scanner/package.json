@@ -1,0 +1,12 @@
+{
+  "name": "weave-file-scanner",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test src/*.test.js"
+  }
+}

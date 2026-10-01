@@ -1,0 +1,127 @@
+:root {
+  /* Primitive: color */
+  --weave-canvas: #F7FAF9;
+  --weave-surface: #FFFFFF;
+  --weave-navy: #143957;
+  --weave-ink: #243946;
+  --weave-muted: #566B75;
+  --weave-border: #DCE5E2;
+  --weave-mint: #BFE9DF;
+  --weave-yellow: #F2CA52;
+  --weave-info: #146FA8;
+  --weave-pending: #6B5A18;
+  --weave-working: #146FA8;
+  --weave-warning: #8A4B08;
+  --weave-error: #B42318;
+  --weave-success: #2F6F5E;
+  --weave-restricted: #5B4A72;
+  --weave-format-pdf: #B42318;
+  --weave-format-pptx: #A84416;
+  --weave-format-docx: #185ABD;
+  --weave-format-hwp: #6941C6;
+  --weave-format-xlsx: #217346;
+  --weave-format-link: #087E8B;
+  --weave-transparent: transparent;
+
+  /* Primitive: typography */
+  --font-family-display-primitive: "SUITE Variable", "SUITE", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --font-family-body-primitive: "SUIT Variable", "SUIT", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --font-weight-regular: 450;
+  --font-weight-medium: 600;
+  --font-weight-bold: 720;
+  --font-size-label: 0.8125rem;
+  --font-size-small: 0.875rem;
+  --font-size-body: 1rem;
+  --font-size-heading-3: 1.375rem;
+  --font-size-heading-2: 2rem;
+  --font-size-heading-1: 3rem;
+  --font-size-display: 4rem;
+
+  /* Primitive: space, shape, motion */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --radius-small: 0.5rem;
+  --radius-medium: 0.875rem;
+  --radius-large: 1.25rem;
+  --radius-pill: 999px;
+  --shadow-quiet: 0 12px 36px rgb(20 57 87 / 0.08);
+  --duration-fast: 180ms;
+  --duration-shared: 320ms;
+  --logo-minimum-height-primitive: 56px;
+  --logo-clear-space-primitive: 25%;
+
+  /* Semantic */
+  --color-canvas: var(--weave-canvas);
+  --color-surface: var(--weave-surface);
+  --color-heading: var(--weave-navy);
+  --color-text: var(--weave-ink);
+  --color-text-muted: var(--weave-muted);
+  --color-border: var(--weave-border);
+  --color-brand-primary: var(--weave-navy);
+  --color-brand-field: var(--weave-mint);
+  --color-brand-signal: var(--weave-yellow);
+  --color-link: var(--weave-info);
+  --color-focus: var(--weave-info);
+  --color-selected: var(--weave-mint);
+  --color-new: var(--weave-yellow);
+  --color-danger: var(--weave-error);
+  --color-success: var(--weave-success);
+  --color-pending: var(--weave-pending);
+  --color-working: var(--weave-working);
+  --color-warning: var(--weave-warning);
+  --color-restricted: var(--weave-restricted);
+  --color-on-primary: var(--weave-surface);
+  --color-on-accent: var(--weave-navy);
+  --font-display: var(--font-family-display-primitive);
+  --font-body: var(--font-family-body-primitive);
+  --spacing-control-x: var(--space-4);
+  --spacing-control-y: var(--space-3);
+  --spacing-card: var(--space-6);
+  --spacing-section: var(--space-16);
+  --shadow-surface: var(--shadow-quiet);
+  --logo-minimum-height-semantic: var(--logo-minimum-height-primitive);
+  --logo-clear-space-semantic: var(--logo-clear-space-primitive);
+
+  /* Component */
+  --page-background: var(--color-canvas);
+  --page-foreground: var(--color-text);
+  --surface-background: var(--color-surface);
+  --surface-border: var(--color-border);
+  --surface-shadow: var(--shadow-surface);
+  --button-primary-background: var(--color-brand-primary);
+  --button-primary-foreground: var(--color-on-primary);
+  --button-primary-focus: var(--color-focus);
+  --button-secondary-background: var(--color-surface);
+  --button-secondary-foreground: var(--color-brand-primary);
+  --button-secondary-border: var(--color-border);
+  --field-background: var(--color-surface);
+  --field-foreground: var(--color-text);
+  --field-border: var(--color-border);
+  --field-focus: var(--color-focus);
+  --badge-new-background: var(--color-new);
+  --badge-new-foreground: var(--color-on-accent);
+  --selection-background: var(--color-selected);
+  --selection-foreground: var(--color-on-accent);
+  --badge-format-pdf: var(--weave-format-pdf);
+  --badge-format-pptx: var(--weave-format-pptx);
+  --badge-format-docx: var(--weave-format-docx);
+  --badge-format-hwp: var(--weave-format-hwp);
+  --badge-format-xlsx: var(--weave-format-xlsx);
+  --badge-format-link: var(--weave-format-link);
+  --badge-pending: var(--color-pending);
+  --badge-working: var(--color-working);
+  --badge-warning: var(--color-warning);
+  --badge-success: var(--color-success);
+  --badge-danger: var(--color-danger);
+  --badge-restricted: var(--color-restricted);
+  --logo-primary-background: var(--color-canvas);
+  --logo-reverse-background: var(--color-brand-primary);
+  --logo-minimum-height: var(--logo-minimum-height-semantic);
+  --logo-clear-space: var(--logo-clear-space-semantic);
+}

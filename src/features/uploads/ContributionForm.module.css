@@ -1,0 +1,470 @@
+.compactHeading h2 {
+  max-width: 720px;
+  font-size: clamp(1.75rem, 4vw, 2.8rem);
+}
+
+.compactHeading > div > span {
+  max-width: 520px;
+}
+
+.kindChooser {
+  min-width: 0;
+  margin: 0 0 18px;
+  padding: 18px;
+  border: 1px solid #b9d7e3;
+  border-radius: 18px;
+  background: #f7faf9;
+}
+
+.kindChooser legend {
+  padding: 0 6px;
+  color: #143957;
+  font-family: SUITE, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.kindChooser > p {
+  margin: 0 0 12px;
+  color: #566b75;
+  font-size: 0.82rem;
+}
+
+.kindOptions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.kindOption,
+.eventChoice {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 82px;
+  padding: 14px 15px;
+  border: 1px solid #c2dce8;
+  border-radius: 13px;
+  background: #fff;
+  color: #315b70;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.kindOption:hover,
+.eventChoice:hover {
+  border-color: #78b7d2;
+  background: #eef8fc;
+  transform: translateY(-1px);
+}
+
+.kindOption:has(input:checked) {
+  border-color: #46a58e;
+  background: #eef8f5;
+  box-shadow: inset 0 0 0 1px #46a58e;
+  color: #143957;
+}
+
+.kindOption:has(input:focus-visible),
+.eventChoice:focus-visible {
+  outline: 3px solid rgb(20 120 181 / 28%);
+  outline-offset: 2px;
+}
+
+.kindOption:has(input:disabled) {
+  cursor: not-allowed;
+}
+
+.kindOption input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.kindOption > span,
+.eventChoice {
+  align-content: center;
+  gap: 5px;
+}
+
+.kindOption b,
+.eventChoice b {
+  color: inherit;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.kindOption small,
+.eventChoice small {
+  color: #607784;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.eventChoice::after {
+  content: "행사 등록으로 이동 →";
+  margin-top: 3px;
+  color: #146fa8;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.sourceModes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sourceOption {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid #c2dce8;
+  border-radius: 12px;
+  background: #fff;
+  color: #315b70;
+  cursor: pointer;
+}
+
+.sourceOption:hover {
+  border-color: #78b7d2;
+  background: #f7fcff;
+}
+
+.sourceOption:has(.sourceRadio:checked) {
+  border-color: #197db6;
+  background: #eef8fc;
+  box-shadow: 0 0 0 2px rgb(25 125 182 / 12%);
+  color: #146fa8;
+}
+
+.sourceOption:has(.sourceRadio:focus-visible) {
+  outline: 3px solid rgba(45, 149, 211, 0.3);
+  outline-offset: 2px;
+}
+
+.sourceOption:has(.sourceRadio:disabled) {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.sourceModes .sourceRadio[type="radio"] {
+  position: absolute;
+  width: 1px !important;
+  height: 1px;
+  min-height: 0 !important;
+  margin: 0;
+  padding: 0 !important;
+  opacity: 0;
+}
+
+.sourceModes .sourceRadio[type="radio"]:focus-visible {
+  outline: none;
+}
+
+.sourceLabel {
+  min-width: 0;
+  color: inherit !important;
+  font-size: 13px !important;
+  font-weight: 760 !important;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.sourceGuidance {
+  min-height: 24px;
+  margin: 0 0 16px !important;
+  color: #5d7482 !important;
+  font-size: 12px !important;
+  line-height: 1.55;
+}
+
+.filePickerGroup {
+  display: grid;
+  gap: 10px;
+}
+
+.selectedFile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 14px;
+  border: 1px solid #c2dce8;
+  border-radius: 12px;
+  background: #fff;
+  color: #18384b;
+}
+
+.selectedFile div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.selectedFile b,
+.selectedFile span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.selectedFile span,
+.existingFileNotice {
+  color: #5d7482;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.selectedFile button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: #146fa8;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.selectedFile button:focus-visible {
+  outline: 3px solid rgb(45 149 211 / 30%);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.existingFileNotice {
+  margin: 0;
+}
+
+.submitBar {
+  border: 1px solid #c2dce8 !important;
+  background: #f2f7f7 !important;
+  color: #18384b !important;
+  box-shadow: none !important;
+}
+
+.submitBar:hover {
+  background: #f2f7f7 !important;
+}
+
+.submitBar p,
+.submitBar p span {
+  color: #496976;
+}
+
+.submitBar p b {
+  color: #18384b;
+}
+
+.statusBar {
+  border: 1px solid #c2dce8;
+  background: #eef4f5;
+  color: #315b70;
+}
+
+.statusBar:global(.working),
+.statusBar:global(.success) {
+  background: #eef4f5;
+  color: #315b70;
+}
+
+.statusBar:global(.error) {
+  border-color: #f0b9c0;
+  background: #fff0f2;
+  color: #7b2f39;
+}
+
+.successView {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px 16px;
+  padding: clamp(24px, 5vw, 42px);
+  border: 1px solid #b9d8cd;
+  border-radius: 20px;
+  background: #f4fbf8;
+  color: #18384b;
+}
+
+.successView > svg {
+  color: #1f8064;
+}
+
+.successView h3,
+.successView p {
+  margin: 0;
+}
+
+.successView h3 {
+  margin-top: 5px;
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.successView div > p:last-child {
+  margin-top: 10px;
+  color: #496976;
+  line-height: 1.65;
+}
+
+.successEyebrow {
+  color: #1f8064 !important;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.successActions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.successActions a,
+.successActions button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #9fc8ba;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.successPrimary {
+  display: inline-flex;
+  align-items: center;
+  background: #18384b;
+  border-color: #18384b !important;
+  color: #fff;
+}
+
+.successSecondary {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  color: #185e76;
+}
+
+.successActions a:focus-visible,
+.successActions button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--weave-info, #146fa8) 30%, transparent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 520px) {
+  .kindOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .kindOption,
+  .eventChoice {
+    min-height: 72px;
+  }
+
+  .sourceModes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sourceOption {
+    flex-direction: column;
+    gap: 4px;
+    min-height: 60px;
+    padding: 8px 4px;
+  }
+
+  .sourceLabel {
+    font-size: 12px !important;
+  }
+
+  .selectedFile {
+    align-items: flex-start;
+  }
+
+  .successView {
+    grid-template-columns: 1fr;
+  }
+
+  .successActions {
+    grid-column: 1;
+  }
+
+  .successActions a,
+  .successActions button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kindOption,
+  .eventChoice {
+    transition: none;
+  }
+
+  .kindOption:hover,
+  .eventChoice:hover {
+    transform: none;
+  }
+}
+
+/* Keep authoring and editing controls proportional, independent of their parent layout. */
+.form {
+  width: 100%;
+  max-width: 1040px;
+  min-width: 0;
+  margin-inline: auto;
+  font-size: 16px;
+}
+
+.form :global(.contribution-step) select,
+.form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 13px;
+  border: 1px solid #c2dce8;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.sharingSection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+.form .sharingSection :global(.contribution-fields) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.form .sharingSection :global(.contribution-step) { padding: 20px; }
+.form .sharingSection :global(.contribution-step > p) { margin-bottom: 14px; }
+.form .sharingSection :global(.contribution-confirmations) { margin-top: 16px; padding-top: 16px; }
+.form .sharingSection :global(.consent-field) { align-items: start; }
+.form .sharingSection :global(.consent-field input) { margin-top: 3px; }
+
+.submitBar {
+  padding: 20px;
+  gap: 14px;
+  min-height: 88px;
+}
+
+@media (max-width: 900px) {
+  .sharingSection { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .form .sharingSection :global(.contribution-step) { padding: 18px; }
+}

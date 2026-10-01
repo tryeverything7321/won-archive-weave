@@ -1,0 +1,222 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwnUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isActiveMember() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.connected == true
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.termsVersion == '2026-07-20'
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.communityRulesVersion == '2026-07-20';
+    }
+
+    function isModerator() {
+      return signedIn() && request.auth.token.role == 'moderator';
+    }
+
+    function isAdministrator() {
+      return signedIn() && request.auth.token.role == 'administrator';
+    }
+
+    function isOperator() {
+      return isModerator() || isAdministrator();
+    }
+
+    function isPublished() {
+      return resource.data.status == 'published';
+    }
+
+    function isPublicPublished() {
+      return isPublished() && resource.data.visibility == 'public';
+    }
+
+    function isMemberPublished() {
+      return resource.data.visibility == 'member_only'
+        && isActiveMember()
+        && isPublished();
+    }
+
+    function isActiveCommunityRecord() {
+      return resource.data.status == 'active';
+    }
+
+    match /users/{uid} {
+      allow read: if isOwnUser(uid);
+      allow write: if false;
+    }
+
+    match /memberProfiles/{uid} {
+      allow read, write: if false;
+    }
+
+    match /activities/{activityId} {
+      allow read: if isPublicPublished() || isMemberPublished() || isOperator();
+      allow write: if false;
+    }
+
+    match /materials/{materialId} {
+      allow read: if isPublicPublished() || isMemberPublished() || isOperator();
+      allow write: if false;
+    }
+
+    match /calendarEvents/{eventId} {
+      allow read: if isPublicPublished() || isMemberPublished() || isOperator();
+      allow write: if false;
+    }
+
+    match /calendarEventSubmissions/{eventId} {
+      allow read: if (isActiveMember() && resource.data.ownerUid == request.auth.uid)
+        || isOperator();
+      allow write: if false;
+    }
+
+    match /calendarOrganizerTrust/{uid} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    match /calendarSources/{sourceId} {
+      allow read: if (resource.data.status == 'active'
+          && resource.data.visibility == 'public'
+          && resource.data.sourceType == 'timetree_link')
+        || (isActiveMember() && resource.data.ownerUid == request.auth.uid)
+        || isOperator();
+      allow write: if false;
+    }
+
+    match /calendarImportCandidates/{candidateId} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    match /socialConnections/{connectionId} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    match /socialImports/{importId} {
+      allow read: if (resource.data.visible == true
+        && resource.data.reviewStatus == 'approved'
+        && resource.data.sourceStatus == 'active') || isOperator();
+      allow write: if false;
+    }
+
+    match /communityPosts/{postId} {
+      allow read: if isActiveMember() && (isActiveCommunityRecord() || isOperator());
+      allow write: if false;
+
+      match /comments/{commentId} {
+        allow read: if isActiveMember() && (isActiveCommunityRecord() || isOperator());
+        allow write: if false;
+      }
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if (isActiveMember() && resource.data.ownerUid == request.auth.uid)
+        || isOperator();
+      allow write: if false;
+    }
+
+    match /pseudonyms/{pseudonymId} {
+      allow read, write: if false;
+    }
+
+    match /communityPostOwners/{postId} {
+      allow read, write: if false;
+    }
+    match /communityModerationNotices/{noticeId} {
+      allow read, write: if false;
+    }
+
+    match /communityCommentOwners/{commentId} {
+      allow read, write: if false;
+    }
+
+    match /communityReportOwners/{reportId} {
+      allow read, write: if false;
+    }
+
+    match /communityAppealOwners/{appealId} {
+      allow read, write: if false;
+    }
+
+    match /reports/{reportId} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    match /moderationAppeals/{appealId} {
+      allow read: if isOperator();
+      allow write: if false;
+    }
+
+    match /oauthStates/{stateId} {
+      allow read, write: if false;
+    }
+
+    match /oauthStartTickets/{ticketId} {
+      allow read, write: if false;
+    }
+
+    match /oauthStartQuotas/{quotaId} {
+      allow read, write: if false;
+    }
+
+    match /oauthCompletions/{completionId} {
+      allow read, write: if false;
+    }
+
+    match /oauthRateLimits/{rateLimitId} {
+      allow read, write: if false;
+    }
+
+    match /fileScanResults/{resultId} {
+      allow read, write: if false;
+    }
+
+    match /storageCleanupJobs/{jobId} {
+      allow read, write: if false;
+    }
+
+    match /storageCleanupAlerts/{alertId} {
+      allow read, write: if false;
+    }
+
+    match /submissionOperatorExceptions/{exceptionId} {
+      allow read, write: if false;
+    }
+
+    match /submissionChangeRequests/{requestId} {
+      allow read, write: if false;
+    }
+
+    match /communityBlocks/{blockId} {
+      allow read, write: if false;
+    }
+
+    match /communityBlockCounts/{uid} {
+      allow read, write: if false;
+    }
+
+    match /communityReportRateLimits/{rateLimitId} {
+      allow read, write: if false;
+    }
+
+    match /auditEvents/{eventId} {
+      allow read: if isAdministrator();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

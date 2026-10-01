@@ -1,0 +1,21 @@
+.composer, .body { min-width: 0; width: 100%; word-break: keep-all; overflow-wrap: anywhere; }
+.composer { display: grid; gap: 12px; }
+.composer textarea { width: 100%; min-height: clamp(360px, 48vh, 520px); resize: vertical; padding: 16px; font: inherit; line-height: 1.7; box-sizing: border-box; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.toolbar button { min-height: 44px; padding: 8px 16px; border: 1px solid #aecbd4; border-radius: 8px; background: white; color: #163c55; cursor: pointer; }
+.toolbar input { max-width: 100%; }
+.importPicker { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 16px; border: 1px solid #aecbd4; border-radius: 8px; background: #fff; color: #163c55; font-weight: 700; cursor: pointer; }
+.importPicker:hover { background: #eff7fb; }
+.importPicker:focus-within { outline: 3px solid #146fa8; outline-offset: 2px; }
+.importPicker input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.body { line-height: 1.8; text-align: left; }
+.body p { white-space: pre-wrap; }
+.body pre, .importPanel pre { max-width: 100%; overflow: auto; white-space: pre; padding: 16px; background: #edf3f4; }
+.body table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.body th, .body td { padding: 8px 12px; border: 1px solid #c2d5dc; }
+.body ul, .body ol { padding-left: 24px; }
+.body input[type="checkbox"] { display: inline-block; width: 16px; height: 16px; min-height: 0; margin: 0 8px 0 0; vertical-align: middle; }
+.body li:has(> input[type="checkbox"]) { list-style: none; }
+.body a { color: #126694; text-decoration: underline; }
+.importPanel { min-width: 0; padding: 16px; border: 1px solid #b4ced8; }
+@media (max-width: 600px) { .toolbar { align-items: flex-start; } .toolbar label { min-width: 0; max-width: 100%; } .composer textarea { min-height: 320px; } }

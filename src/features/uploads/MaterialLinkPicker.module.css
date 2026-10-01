@@ -1,0 +1,10 @@
+.panel { grid-column: 1 / -1; width: 100%; min-width: 0; padding: 1rem; border: 1px solid var(--line, #cbdde3); border-radius: 1rem; }
+.panel summary { cursor: pointer; font-weight: 700; }
+.content { display: grid; gap: 1rem; padding-top: 1rem; }
+.list { display: grid; gap: .6rem; max-height: 22rem; overflow: auto; }
+.option { display: flex; align-items: flex-start; gap: .75rem; padding: .75rem; background: white; border: 1px solid #d5e2e7; border-radius: .5rem; min-width: 0; }
+.option input { flex: 0 0 1.1rem; width: 1.1rem; height: 1.1rem; min-height: 0; margin-top: .25rem; padding: 0; }
+.option span { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.option small { display: block; color: #4b6475; }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.content button { min-height: 44px; }

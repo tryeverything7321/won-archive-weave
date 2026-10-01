@@ -1,0 +1,66 @@
+.eventHeading h2 {
+  max-width: 760px;
+  font-size: clamp(1.75rem, 4vw, 2.8rem);
+}
+
+.eventHeading p {
+  max-width: 680px;
+  margin: 4px 0 0;
+}
+
+.eventCore {
+  overflow: clip;
+  border: 1px solid #bdddeb;
+  border-radius: 20px;
+  background: #f8fcfe;
+}
+
+.eventCore > :global(.event-editor-step) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.eventCore > :global(.event-editor-step:first-child) {
+  padding-bottom: 22px;
+  border-bottom: 1px solid #d9eaf2;
+}
+
+.eventCore > :global(.event-editor-step:last-child) {
+  padding-top: 22px;
+}
+
+.eventDescription textarea {
+  min-height: 240px;
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.statusBar {
+  border: 1px solid #c2dce8;
+  background: #eef4f5;
+  color: #315b70;
+}
+
+.statusBar:global(.working),
+.statusBar:global(.success) {
+  background: #eef4f5;
+  color: #315b70;
+}
+
+.statusBar:global(.error) {
+  border-color: #f0b9c0;
+  background: #fff0f2;
+  color: #7b2f39;
+}
+
+@media (max-width: 700px) {
+  .eventCore > :global(.event-editor-step) {
+    padding: 18px;
+  }
+
+  .eventDescription textarea {
+    min-height: 220px;
+  }
+}

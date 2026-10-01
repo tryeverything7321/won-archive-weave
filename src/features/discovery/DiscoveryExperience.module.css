@@ -1,0 +1,324 @@
+.resourceWorkbench {
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid rgba(20, 57, 87, 0.16);
+  border-radius: 16px;
+  background: #fff;
+}
+
+/* The legacy resource shell has late !important rules, so this scoped selector
+   deliberately wins only inside the new discovery workbench. */
+.resourceWorkbench.resourceWorkbench {
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: stretch;
+  padding: clamp(20px, 3vw, 34px) !important;
+  border: 1px solid rgba(20, 57, 87, 0.16) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+}
+
+.resourceHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.resourceHeading p,
+.loadedScope {
+  color: #566b75;
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchField {
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid rgba(20, 57, 87, 0.28);
+  border-radius: 10px;
+  background: #f7faf9;
+}
+
+.searchField:focus-within {
+  border-color: #143957;
+  outline: 3px solid rgba(191, 233, 223, 0.72);
+}
+
+.searchField input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #243946;
+  font: inherit;
+}
+
+.filterSection {
+  display: grid;
+  gap: 10px;
+}
+
+.filterLabel {
+  font-weight: 700;
+  color: #243946;
+}
+
+.filterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resourceWorkbench .filterGroup button,
+.moreFormats summary,
+.resetButton {
+  min-height: 44px !important;
+}
+
+.moreFormats {
+  border-top: 1px solid rgba(20, 57, 87, 0.11);
+  padding-top: 10px;
+}
+
+.moreFormats summary {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  color: #143957;
+  font-weight: 700;
+}
+
+.moreFormats[open] summary {
+  margin-bottom: 10px;
+}
+
+.resultStatus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.resultStatus strong {
+  color: #143957;
+}
+
+.formatSummary {
+  border-top: 1px solid rgba(20, 57, 87, 0.11);
+  padding-top: 12px;
+}
+
+.formatSummary summary {
+  min-height: 44px;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  color: #143957;
+  font-weight: 700;
+}
+
+.formatSummaryCopy {
+  margin: 10px 0 14px;
+  color: #566b75;
+}
+
+.chartLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.42fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.chartCanvas {
+  min-width: 0;
+  height: clamp(220px, 32vw, 320px);
+}
+
+.chartLegend {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chartLegend li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(20, 57, 87, 0.1);
+  color: #405963;
+}
+
+.chartLegend strong {
+  color: #143957;
+}
+
+.cardTitleLink {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(20, 57, 87, 0.24);
+}
+
+.cardTitleLink:hover,
+.cardTitleLink:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+.activityCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.activityCard :global(.card-content) {
+  order: 1;
+}
+
+.activityCard :global(.card-visual) {
+  order: 2;
+  border-top: 1px solid rgba(20, 57, 87, 0.12);
+}
+
+.fixtureNotice {
+  background: #dcefe8;
+  color: #214e43;
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.completionPanel {
+  display: grid;
+  gap: 18px;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid rgba(20, 57, 87, 0.16);
+  border-radius: 16px;
+  background: #fff;
+  outline: none;
+}
+
+.completionPanel:focus-visible {
+  outline: 3px solid rgba(191, 233, 223, 0.82);
+  outline-offset: 4px;
+}
+
+.completionHeading {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.completionHeading svg {
+  flex: 0 0 auto;
+  color: #2f6f73;
+}
+
+.completionHeading h2,
+.completionHeading p {
+  margin: 0;
+}
+
+.completionHeading p {
+  margin-top: 7px;
+  color: #566b75;
+  line-height: 1.65;
+}
+
+.completionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.completionActions a {
+  min-height: 44px;
+}
+
+.materialExcerpt {
+  margin: 8px 0 12px;
+  color: #405963;
+  line-height: 1.7;
+}
+
+.materialBody {
+  margin-top: 12px;
+  border-top: 1px solid rgba(20, 57, 87, 0.12);
+  padding-top: 10px;
+}
+
+.agendaCard :global(.calendar-event-media-agenda) {
+  margin-top: 14px;
+  margin-bottom: 0 !important;
+}
+
+.eventActionState {
+  width: max-content;
+  margin: 10px 0 0;
+  padding: 5px 9px;
+  border: 1px solid rgba(20, 57, 87, 0.2);
+  border-radius: 999px;
+  color: #143957;
+  background: rgba(191, 233, 223, 0.34);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.detailEssentials {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 18px;
+  align-items: stretch;
+  margin: 0 clamp(4px, 4vw, 54px) clamp(28px, 4vw, 48px);
+}
+
+.detailEssentials :global(.calendar-detail-meta),
+.detailEssentials :global(.calendar-detail-actions) {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .resourceHeading,
+  .searchRow,
+  .detailEssentials {
+    grid-template-columns: 1fr;
+  }
+
+  .resourceHeading {
+    display: grid;
+    align-items: start;
+  }
+
+  .searchRow a,
+  .resetButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .chartLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .completionActions a {
+    width: 100%;
+    justify-content: center;
+  }
+}

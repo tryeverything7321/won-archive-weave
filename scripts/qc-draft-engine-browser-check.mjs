@@ -1,0 +1,50 @@
+async (page) => {
+  const base='http://127.0.0.1:4191';
+  const results=[];
+  const check=(ok,label)=>{if(!ok)throw new Error(label);results.push(label)};
+  await page.route('**/*',r=>r.request().url().startsWith(base+'/')?r.continue():r.abort());
+  await page.goto(base+'/draft-test');
+  await page.evaluate(()=>sessionStorage.clear());
+  await page.reload();
+  const input=page.getByRole('textbox',{name:'검증 본문'});
+  await input.waitFor();
+  await page.reload();
+  await input.waitFor();
+  check(await page.getByRole('button',{name:'계속 작성',exact:true}).count()===0,'untouched form does not create empty recovery draft');
+  await input.fill('바로 이동해도 남아야 하는 초안');
+  await page.getByRole('link',{name:'다른 화면으로 이동'}).click();
+  await page.goBack();
+  await page.getByRole('button',{name:'계속 작성',exact:true}).waitFor({timeout:2000});
+  await page.getByRole('button',{name:'계속 작성',exact:true}).click();
+  check(await input.inputValue()==='바로 이동해도 남아야 하는 초안','navigation before debounce preserves current input');
+  await input.fill('새로고침해도 남아야 하는 초안');
+  await page.reload();
+  await page.getByRole('button',{name:'계속 작성',exact:true}).click();
+  check(await input.inputValue()==='새로고침해도 남아야 하는 초안','immediate reload preserves latest revision');
+  await page.reload();
+  await page.evaluate(()=>{window.confirm=()=>false});
+  await page.getByRole('button',{name:'새로 작성',exact:true}).click();
+  check(await page.getByRole('button',{name:'계속 작성',exact:true}).count()===1,'cancel discard preserves recoverable draft');
+  await page.evaluate(()=>{window.confirm=()=>true});
+  await page.evaluate(()=>{
+    window.__weaveTest.originalStorageRemove=Storage.prototype.removeItem;
+    Storage.prototype.removeItem=function(key){
+      if(key.startsWith('weave:form-draft:'))throw new DOMException('synthetic denied','SecurityError');
+      return window.__weaveTest.originalStorageRemove.call(this,key);
+    };
+  });
+  await page.getByRole('button',{name:'초안 삭제',exact:true}).click();
+  check(await page.getByRole('button',{name:'계속 작성',exact:true}).count()===1,'failed deletion keeps recoverable draft');
+  await page.getByRole('alert').waitFor({timeout:2000});
+  check(true,'failed deletion is visible while recovery panel remains');
+  await page.evaluate(()=>{Storage.prototype.removeItem=window.__weaveTest.originalStorageRemove});
+  await page.getByRole('button',{name:'초안 삭제',exact:true}).click();
+  await input.fill('삭제 후 다시 쓰는 초안');
+  await page.reload();
+  await page.getByRole('button',{name:'계속 작성',exact:true}).click();
+  check(await input.inputValue()==='삭제 후 다시 쓰는 초안','discard does not disable future autosave');
+  await page.getByRole('link',{name:'다른 화면으로 이동'}).click();
+  await page.evaluate(()=>window.__weaveTest.switchUser(null));
+  check(await page.evaluate(()=>Object.keys(sessionStorage).filter(k=>k.startsWith('weave:form-draft:')).length)===0,'logout outside form clears tab drafts');
+  return {results,qualification:'actual shared hook/global auth, synthetic account only'};
+}

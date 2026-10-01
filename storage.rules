@@ -1,0 +1,120 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isActiveMember() {
+      return signedIn()
+        && firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.connected == true
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.termsVersion == '2026-07-20'
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.communityRulesVersion == '2026-07-20';
+    }
+
+    function isOperator() {
+      return signedIn()
+        && (request.auth.token.role == 'moderator' || request.auth.token.role == 'administrator');
+    }
+
+    function validUpload(fileName) {
+      return request.resource.size > 0
+        && request.resource.size <= 20 * 1024 * 1024
+        && (
+          request.resource.contentType.matches('application/pdf|application/vnd.openxmlformats-officedocument.*|text/plain|text/csv|image/.*')
+          || (
+            fileName.matches('.*\\.[mM][dD]')
+            && request.resource.contentType == 'text/markdown'
+          )
+          || (
+            fileName.matches('.*\\.[hH][wW][pP]')
+            && request.resource.contentType.matches('application/x-hwp|application/haansofthwp|application/vnd.hancom.hwp')
+          )
+          || (
+            fileName.matches('.*\\.[hH][wW][pP][xX]')
+            && request.resource.contentType.matches('application/hwp\\+zip|application/vnd.hancom.hwpx|application/haansofthwpx')
+          )
+        );
+    }
+
+    function hasUploadReservation(uid, submissionId, fileName) {
+      let metadata = request.resource.metadata;
+      let reservation = firestore.get(/databases/(default)/documents/uploadReservations/$(metadata.reservationId)).data;
+      let file = reservation.files[fileName];
+      return reservation.ownerUid == uid
+        && reservation.submissionId == submissionId
+        && reservation.requestId == metadata.requestId
+        && reservation.status == 'active'
+        && reservation.expiresAtMs > request.time.toMillis()
+        && file.size == request.resource.size
+        && file.contentType == request.resource.contentType
+        && file.sha256 == metadata.weaveSha256;
+    }
+
+    match /quarantined/{uid}/{submissionId}/{fileName} {
+      allow create: if isActiveMember() && request.auth.uid == uid && validUpload(fileName)
+        && hasUploadReservation(uid, submissionId, fileName);
+      allow read: if isOperator();
+      allow update, delete: if false;
+    }
+
+    match /quarantined/{uid}/calendar-events/{eventId}/{fileName} {
+      allow create: if isActiveMember()
+        && request.auth.uid == uid
+        && request.resource.size > 0
+        && request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/jpeg|image/png|image/webp')
+        && request.resource.metadata.ownerUid == uid
+        && request.resource.metadata.eventId == eventId
+        && request.resource.metadata.role.matches('thumbnail|gallery')
+        && request.resource.metadata.alt.size() >= 2
+        && request.resource.metadata.alt.size() <= 180;
+      allow read: if isOperator();
+      allow update, delete: if false;
+    }
+
+    match /profile-photos/{uid}/{fileName} {
+      allow get, list: if isActiveMember() && request.auth.uid == uid;
+      allow create, update: if isActiveMember()
+        && request.auth.uid == uid
+        && fileName == 'avatar'
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/jpeg|image/png|image/webp')
+        && request.resource.metadata.ownerUid == uid;
+      allow delete: if isActiveMember() && request.auth.uid == uid && fileName == 'avatar';
+    }
+
+    function readableEventMedia(eventId, visibility) {
+      return firestore.exists(/databases/(default)/documents/calendarEvents/$(eventId))
+        && firestore.get(/databases/(default)/documents/calendarEvents/$(eventId)).data.status == 'published'
+        && firestore.get(/databases/(default)/documents/calendarEvents/$(eventId)).data.visibility == visibility;
+    }
+
+    match /approved/public/calendar-events/{eventId}/{fileName} {
+      allow get: if readableEventMedia(eventId, 'public');
+      allow write: if false;
+    }
+
+    match /approved/members/calendar-events/{eventId}/{fileName} {
+      allow get: if isActiveMember() && readableEventMedia(eventId, 'member_only');
+      allow write: if false;
+    }
+
+    match /approved/public/{category}/{allPaths=**} {
+      allow read: if category != 'calendar-events';
+      allow write: if false;
+    }
+
+    match /approved/members/{category}/{allPaths=**} {
+      allow read: if category != 'calendar-events' && isActiveMember();
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+async (page) => {
+  const base = 'http://127.0.0.1:4191';
+  const results = [];
+  const check = (ok, label) => { if (!ok) throw new Error(label); results.push(label); };
+  await page.route('**/*', route => route.request().url().startsWith(base + '/') ? route.continue() : route.abort());
+  await page.goto(base + '/thread-test');
+  await page.evaluate(() => sessionStorage.clear());
+  await page.reload();
+  const toggle = page.getByRole('button', { name: '댓글 0', exact: true });
+  await toggle.click();
+  const reply = page.getByRole('textbox', { name: '댓글', exact: true });
+  await reply.fill('접어도 유지할 댓글 초안');
+  await toggle.click();
+  await toggle.click();
+  check(await reply.inputValue() === '접어도 유지할 댓글 초안', 'reply collapse keeps unfinished content');
+  await page.reload();
+  await toggle.click();
+  await page.getByRole('button', { name: '계속 작성', exact: true }).click();
+  check(await reply.inputValue() === '접어도 유지할 댓글 초안', 'reply reload restores same post draft');
+  await page.getByRole('button', { name: '글 수정', exact: true }).click();
+  const edit = page.getByRole('textbox', { name: '글 내용 수정', exact: true });
+  await edit.fill('고치던 글의 수정 초안');
+  await page.reload();
+  await page.getByRole('button', { name: '글 수정', exact: true }).click();
+  await page.getByRole('button', { name: '계속 작성', exact: true }).click();
+  check(await edit.inputValue() === '고치던 글의 수정 초안', 'post edit restores independently from reply');
+  await page.evaluate(() => window.__weaveTest.switchUser('synthetic-b'));
+  await page.getByRole('button', { name: '글 수정', exact: true }).click();
+  check(await edit.inputValue() === '합성 원본 글', 'new owner cannot restore previous edit draft');
+  return { results, qualification: 'actual PostThread with synthetic owner and post, no server writes' };
+}

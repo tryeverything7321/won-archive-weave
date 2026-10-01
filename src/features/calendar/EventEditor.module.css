@@ -1,0 +1,128 @@
+.mediaRow.mediaRow {
+  display: grid;
+  grid-template-columns: minmax(96px, 180px) minmax(0, 1fr) auto;
+  gap: 12px 16px;
+  align-items: start;
+  padding: 14px;
+}
+
+.preview,
+.savedPreview {
+  grid-column: 1;
+  grid-row: 1 / span 4;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  background: #f7faf9;
+  overflow: hidden;
+}
+
+.savedPreview em {
+  font-style: normal;
+}
+
+.preview > img {
+  width: 100%;
+  height: 100%;
+}
+
+.savedPreview {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  color: #536e80;
+  border: 1px solid #c8dce6;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.identity {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  min-width: 0;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.identity b {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.state {
+  grid-column: 2;
+  grid-row: 2;
+  display: inline-flex;
+  width: fit-content;
+  color: #38576a;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.displayControl {
+  grid-column: 2;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: auto minmax(240px, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: min(100%, 340px) !important;
+  max-width: 100%;
+}
+
+.displayControl select {
+  width: 100%;
+  min-width: 240px;
+}
+
+.description {
+  grid-column: 2;
+  grid-row: 4;
+  width: 100%;
+}
+
+.remove {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+}
+
+@media (max-width: 680px) {
+  .mediaRow.mediaRow {
+    grid-template-columns: 88px minmax(0, 1fr) 44px;
+  }
+
+  .preview,
+  .savedPreview {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .mediaRow .state {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .displayControl {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .displayControl {
+    grid-template-columns: 1fr;
+    min-width: 0 !important;
+  }
+
+  .displayControl select {
+    min-width: 0;
+  }
+
+  .mediaRow .description {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
+}

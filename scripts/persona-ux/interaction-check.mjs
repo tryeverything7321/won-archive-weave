@@ -1,0 +1,36 @@
+async (page) => {
+  const origin='http://127.0.0.1:4193';const results=[];
+  const check=(name,ok,detail)=>{results.push({name,status:ok?'PASS':'FAIL',detail});if(!ok)throw new Error(name+' '+JSON.stringify(detail))};
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.setViewportSize({width:390,height:844});await page.goto(origin+'/');
+  await page.getByRole('button',{name:'만들기',exact:true}).filter({visible:true}).click();
+  const links=page.getByRole('navigation',{name:'만들 콘텐츠 선택'}).getByRole('link');check('mobile 4 create choices',await links.count()===4);
+  const panel=await page.getByRole('navigation',{name:'만들 콘텐츠 선택'}).boundingBox();check('mobile chooser within viewport',panel.x>=0&&panel.x+panel.width<=390&&panel.y>=0,panel);
+  await page.keyboard.press('Escape');
+  await page.goto(origin+'/contribute?intent=material');
+  await page.locator('#contribution-first-input').fill('합성 자료 초안');
+  await page.locator('input[type=radio][name=contribution-kind][value="활동 기록"]').check();
+  await page.waitForURL(url=>url.searchParams.get('intent')==='activity');
+  check('activity starts separately',await page.locator('#contribution-first-input').inputValue()==='');
+  await page.locator('#contribution-first-input').fill('합성 활동 초안');
+  await page.locator('input[type=radio][name=contribution-kind][value="자료"]').check();
+  await page.waitForURL(url=>url.searchParams.get('intent')==='material');
+  const recovery=page.getByRole('button',{name:/이어서|계속 작성|초안 이어/});
+  if(await recovery.count())await recovery.first().click();
+  check('material draft restore',await page.locator('#contribution-first-input').inputValue()==='합성 자료 초안');
+  await page.getByRole('navigation',{name:'작성 순서'}).getByRole('link').nth(1).click();
+  check('in-page content stays mounted',await page.locator('#contribution-first-input').count()===1);
+  await page.goto(origin+'/calendar/new');
+  const field=page.locator('.event-editor textarea').first();
+  const style=await field.evaluate(el=>({height:el.getBoundingClientRect().height,font:getComputedStyle(el).fontSize,resize:getComputedStyle(el).resize}));
+  check('event readable resizable description',style.height>=240&&parseFloat(style.font)>=16&&style.resize!=='none',style);
+  await page.goto(origin+'/resources?type=CSV');
+  check('rare active filter visible',await page.getByRole('button',{name:'표 데이터만 보기'}).isVisible());
+  check('CSV results one',await page.getByRole('heading',{name:'참가 준비 체크표',exact:true}).count()===1);
+  await page.getByRole('heading',{name:'참가 준비 체크표',exact:true}).getByRole('link').click();
+  await page.waitForURL('**/materials/synthetic-material-2');check('title opens detail',await page.getByRole('heading',{name:'참가 준비 체크표',exact:true,level:1}).isVisible());
+  await page.goto(origin+'/profile');
+  const save=page.getByRole('button',{name:'내 정보 저장하기'});await save.waitFor();
+  check('profile save only button primary',await save.evaluate(el=>getComputedStyle(el.parentElement).backgroundColor!==getComputedStyle(el).backgroundColor));
+  return {synthetic:true,results};
+}

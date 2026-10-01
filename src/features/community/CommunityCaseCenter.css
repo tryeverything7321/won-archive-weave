@@ -1,0 +1,69 @@
+.community-case-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.community-case-center {
+  overflow-wrap: anywhere;
+}
+
+.community-case-center > summary {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+}
+
+.community-case-list {
+  display: grid;
+  gap: 12px;
+  padding-block: 12px;
+}
+
+.community-case-item {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #c2dce8;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.community-case-item p,
+.community-case-item blockquote {
+  margin: 0;
+  line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.community-case-item blockquote {
+  padding-inline-start: 12px;
+  border-inline-start: 3px solid #c2dce8;
+  color: #506b7b;
+}
+
+.community-case-appeal {
+  display: grid;
+  gap: 12px;
+}
+
+.community-case-appeal label,
+.community-case-appeal label > span {
+  display: grid;
+  gap: 8px;
+}
+
+.community-case-appeal textarea {
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+}
+
+.community-case-appeal > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

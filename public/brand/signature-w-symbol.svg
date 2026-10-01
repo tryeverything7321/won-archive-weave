@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Signature W app-icon geometry exploration</title>
+  <desc id="desc">A single open monoline gesture with an inward opening hook, tall first rise and two soft lower turns</desc>
+  <path d="M27 52 C18 46 18 34 26 27 C36 18 49 22 52 33 C55 44 49 62 45 78 C41 95 45 114 59 118 C72 122 82 105 87 84 C92 105 101 122 114 118 C130 113 139 91 134 62" fill="none" stroke="#000000" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

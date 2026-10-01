@@ -1,0 +1,135 @@
+.moderationNotice {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--weave-border, #dce5e2);
+  border-radius: 12px;
+  background: var(--surface-quiet, #f7faf9);
+  color: var(--weave-muted, #566b75);
+}
+
+.moderationNoticeHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+
+.moderationNoticeHeader strong {
+  color: var(--weave-navy, #143957);
+  font-size: 14px;
+}
+
+.moderationNoticeHeader time {
+  color: var(--weave-muted, #566b75);
+  font-size: 14px;
+}
+
+.moderationNotice p {
+  margin: 0;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.moderationNoticeReason {
+  color: var(--weave-ink, #243946) !important;
+  font-weight: 650;
+}
+
+.statusGroup {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.statusLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--weave-border, #dce5e2);
+  border-radius: 10px;
+  background: var(--weave-surface, #fff);
+}
+
+.statusLine strong {
+  display: block;
+  color: var(--weave-navy, #143957);
+  font-size: 14px;
+}
+
+.statusLine p,
+.withdrawalNote {
+  margin: 2px 0 0;
+  color: var(--weave-muted, #566b75);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.ownerAttachment {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--weave-border, #dce5e2);
+  border-radius: 10px;
+  background: var(--weave-surface, #fff);
+}
+
+.ownerAttachment > strong {
+  color: var(--weave-navy, #143957);
+}
+
+.ownerAttachment > p,
+.ownerAttachment div > p {
+  margin: 4px 0 10px;
+  color: var(--weave-muted, #566b75);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.ownerAttachment div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ownerAttachment div > p {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+}
+
+.statusLine.error {
+  border-color: color-mix(in srgb, var(--weave-error, #b42318) 35%, var(--weave-border, #dce5e2));
+}
+
+.statusLine.error strong {
+  color: var(--weave-error, #b42318);
+}
+
+.statusLine.working strong {
+  color: var(--weave-info, #146fa8);
+}
+
+.statusLine.success strong {
+  color: var(--weave-success, #2f6f5e);
+}
+
+.withdrawalNote {
+  padding: 10px 12px;
+  border-left: 3px solid var(--weave-border, #dce5e2);
+}
+
+@media (max-width: 520px) {
+  .statusLine {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .statusLine button {
+    align-self: flex-start;
+  }
+}

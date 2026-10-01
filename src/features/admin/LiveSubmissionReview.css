@@ -1,0 +1,104 @@
+.operator-exception-state {
+  display: flex;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.operator-exception-empty {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: clamp(20px, 4vw, 40px);
+  border: 1px solid #c2dce8;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.operator-exception-empty h2,
+.operator-exception-empty p {
+  margin: 0;
+  word-break: keep-all;
+}
+
+.operator-exception-queue {
+  min-width: 0;
+}
+
+.operator-exception-queue > button {
+  overflow-wrap: anywhere;
+}
+
+.operator-exception-more {
+  width: calc(100% - 20px);
+  margin: 10px;
+}
+
+.operator-exception-detail {
+  min-width: 0;
+}
+
+.operator-exception-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.operator-exception-facts > div,
+.operator-exception-guidance {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #d7e6ed;
+  border-radius: 12px;
+  background: #f8fbfc;
+}
+
+.operator-exception-facts dt {
+  color: #506b7b;
+  font-size: 0.78rem;
+}
+
+.operator-exception-facts dd {
+  margin: 5px 0 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.operator-exception-guidance h3,
+.operator-exception-guidance p {
+  margin: 0;
+}
+
+.operator-exception-guidance p {
+  margin-top: 8px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.operator-exception-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.operator-exception-actions button,
+.operator-exception-more {
+  min-height: 44px;
+}
+
+@media (max-width: 767px) {
+  .operator-exception-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .operator-exception-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .operator-exception-actions button {
+    width: 100%;
+  }
+}

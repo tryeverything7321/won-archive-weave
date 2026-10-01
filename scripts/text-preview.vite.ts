@@ -1,0 +1,4 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+// Local component verification only: do not load environment files or connect Firebase.
+export default defineConfig({ envDir: false, plugins: [react()], server: { host: '127.0.0.1', port: 4187, strictPort: true } });

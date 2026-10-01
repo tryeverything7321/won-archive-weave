@@ -1,0 +1,25 @@
+.nudge {
+  position: fixed;
+  z-index: 18;
+  right: 24px;
+  bottom: 24px;
+  width: min(340px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 22px;
+  border: 1px solid #86beb3;
+  border-radius: 18px;
+  background: #f1fbf8;
+  color: #143957;
+  box-shadow: 0 8px 28px rgb(20 57 87 / 12%);
+  animation: glow 8s ease-in-out 3;
+  word-break: keep-all;
+}
+.nudge p { display: flex; align-items: center; gap: 7px; margin: 0 30px 10px 0; font-size: 13px; font-weight: 700; }
+.nudge strong { display: block; font-family: SUITE, sans-serif; font-size: 22px; }
+.nudge > span { display: block; margin: 8px 0 12px; color: #42606a; font-size: 14px; line-height: 1.6; }
+.nudge a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: #143957; font-weight: 800; }
+.close { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; background: transparent; color: #143957; cursor: pointer; }
+.nudge :is(a,button):focus-visible { outline: 3px solid #146fa8; outline-offset: 2px; border-radius: 6px; }
+@keyframes glow { 0%, 30%, 100% { box-shadow: 0 8px 28px rgb(20 57 87 / 12%); } 15% { box-shadow: 0 0 0 4px rgb(191 233 223 / 65%), 0 8px 28px rgb(20 57 87 / 16%); } }
+@media (max-width: 1100px) { .nudge { right: 16px; bottom: calc(88px + env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) { .nudge { animation: none; } }

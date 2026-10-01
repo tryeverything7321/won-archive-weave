@@ -1,0 +1,24 @@
+.approved-pdf-dialog {
+  width: min(1100px, calc(100vw - 32px)); max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px); margin: auto; padding: 20px;
+  border: 1px solid var(--weave-border); border-radius: 12px;
+  background: var(--weave-surface, white); color: var(--weave-ink); box-sizing: border-box;
+}
+.approved-pdf-dialog::backdrop { background: rgb(10 25 40 / 65%); }
+.approved-pdf-dialog header { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.approved-pdf-dialog h2 { margin: 0; font-size: 20px; line-height: 1.45; overflow-wrap: anywhere; }
+.approved-pdf-dialog p { font-size: 16px; line-height: 1.65; }
+.approved-pdf-dialog button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; min-height: 44px; padding: 8px 12px; background: white; color: var(--weave-navy); border: 1px solid var(--weave-border); border-radius: 8px; }
+.approved-pdf-dialog iframe { display: block; width: 100%; height: min(68dvh, 800px); border: 1px solid var(--weave-border); background: #f4f6f7; }
+.approved-preview-image { display: block; max-width: 100%; max-height: 70dvh; object-fit: contain; margin: 16px auto; }
+.approved-preview-image-wrap { max-height: 70dvh; overflow: auto; }
+.approved-preview-image-wrap.is-expanded img { max-width: none; max-height: none; }
+.approved-preview-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 68dvh; overflow: auto; font: inherit; line-height: 1.7; }
+.approved-preview-table { max-width: 100%; max-height: 68dvh; overflow: auto; }
+.approved-preview-table table { border-collapse: collapse; }
+.approved-preview-table td { border: 1px solid var(--weave-border); padding: 8px; min-width: 90px; max-width: 300px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.approved-pdf-dialog > a { display: inline-flex; align-items: center; min-height: 44px; color: var(--weave-info); text-decoration: underline; }
+.approved-preview-error { margin-top: 16px; padding: 16px; border: 1px solid color-mix(in srgb, var(--weave-error, #b42318) 35%, var(--weave-border)); border-radius: 10px; }
+.approved-preview-error strong { color: var(--weave-error, #b42318); }
+.approved-preview-error p { margin: 6px 0 12px; }
+@media (max-width: 520px) { .approved-pdf-dialog { padding: 14px; } .approved-pdf-dialog h2 { font-size: 18px; } }
