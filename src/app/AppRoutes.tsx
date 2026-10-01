@@ -39,6 +39,7 @@ const ResourcesPage = lazy(() =>
   ),
 );
 const MaterialDetailPage = lazy(() => importWithReload(() => import('../routes/MaterialDetailPage').then((m) => ({ default: m.MaterialDetailPage })), 'material-detail'));
+const BundleDetailPage = lazy(() => importWithReload(() => import("../features/bundles/BundleDetailPage").then(m => ({ default: m.BundleDetailPage })), "bundle-detail"));
 const StartPage = lazy(() =>
   importWithReload(
     () =>
@@ -169,6 +170,14 @@ const NotFoundPage = lazy(() =>
   ),
 );
 
+const PastArchiveEventCreatePage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.PastArchiveEventCreatePage })), "PastArchiveEventCreatePage"));
+const ArchiveEventDetailPage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.ArchiveEventDetailPage })), "ArchiveEventDetailPage"));
+const ArchiveCollectionsPage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.ArchiveCollectionsPage })), "ArchiveCollectionsPage"));
+const ArchiveCollectionCreatePage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.ArchiveCollectionCreatePage })), "ArchiveCollectionCreatePage"));
+const ArchiveCollectionDetailPage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.ArchiveCollectionDetailPage })), "ArchiveCollectionDetailPage"));
+const ArchiveCollectionEditPage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.ArchiveCollectionEditPage })), "ArchiveCollectionEditPage"));
+const ArchiveRelationCreatePage = lazy(() => importWithReload(() => import("../features/event-archive/EventArchivePages").then(m => ({ default: m.ArchiveRelationCreatePage })), "ArchiveRelationCreatePage"));
+
 export function AppRoutes() {
   const location = useLocation();
 
@@ -183,8 +192,16 @@ export function AppRoutes() {
             <Route path="/brand" element={<Navigate replace to="/about#weave-story" />} />
             <Route path="/archive" element={<ArchivePage />} />
             <Route path="/activities/:slug" element={<ActivityPage />} />
+            <Route path="/archive-events/new" element={<PastArchiveEventCreatePage />} />
+            <Route path="/archive-events/:eventId" element={<ArchiveEventDetailPage />} />
+            <Route path="/collections" element={<ArchiveCollectionsPage />} />
+            <Route path="/collections/new" element={<ArchiveCollectionCreatePage />} />
+            <Route path="/collections/:collectionId" element={<ArchiveCollectionDetailPage />} />
+            <Route path="/collections/:collectionId/edit" element={<ArchiveCollectionEditPage />} />
+            <Route path="/archive-relations/new" element={<ArchiveRelationCreatePage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/materials/:id" element={<MaterialDetailPage />} />
+            <Route path="/bundles/:bundleId" element={<BundleDetailPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/calendar/new" element={<CalendarEventCreatePage />} />
             <Route path="/calendar/connect" element={<CalendarConnectPage />} />

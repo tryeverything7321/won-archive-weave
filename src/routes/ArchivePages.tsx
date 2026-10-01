@@ -272,7 +272,8 @@ export function ArchivePage() {
 }
 
 export function ActivityPage() {
-  const { state } = useLocation();
+  const location = useLocation();
+  const { state } = location;
   const candidateReturn = state?.archiveReturn;
   const returnTo = typeof candidateReturn === "string" && /^\/(archive|resources)(\?[^#]*)?$/.test(candidateReturn)
     ? candidateReturn : "/archive";
@@ -425,7 +426,10 @@ export function ActivityPage() {
           <p>{sentence(activity.summary)}</p>
         </div>
       </div>
-      {visiblePublishedActivity && <OwnedSubmissionActions id={visiblePublishedActivity.slug} returnTo={returnTo} kind="activity" />}
+      {visiblePublishedActivity && <>
+        <OwnedSubmissionActions id={visiblePublishedActivity.slug} returnTo={returnTo} kind="activity" />
+        <Link className="button button-secondary" to={`/archive-relations/new?targetType=activity&targetId=${encodeURIComponent(visiblePublishedActivity.id ?? visiblePublishedActivity.slug)}&returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`}>이 기록을 행사에 연결</Link>
+      </>}
       <div className="detail-layout">
         <section>
           <h2>활동 이야기</h2>

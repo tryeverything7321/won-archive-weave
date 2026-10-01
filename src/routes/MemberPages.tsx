@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import experienceStyles from "../features/experience/Experience.module.css";
 import { useOperatorAccess } from "../features/auth/useOperatorAccess";
 import { PageFrame } from "../components/PageFrame";
@@ -47,6 +47,7 @@ const ContributionForm = lazy(() =>
     default: m.ContributionForm,
   })),
 );
+const BundleContributionForm = lazy(() => import("../features/bundles/BundleContributionForm").then(m => ({ default: m.BundleContributionForm })));
 const CommunityExperience = lazy(() =>
   import("../features/community/CommunityExperience").then((m) => ({
     default: m.CommunityExperience,
@@ -57,6 +58,7 @@ const SubmissionManager = lazy(() =>
     default: m.SubmissionManager,
   })),
 );
+const MyBundleManager = lazy(() => import("../features/bundles/MyBundleManager").then(m => ({ default: m.MyBundleManager })));
 const EventManager = lazy(() =>
   import("../features/calendar/EventManager").then((m) => ({
     default: m.EventManager,
@@ -69,6 +71,10 @@ const EventEditor = lazy(() =>
 );
 
 export function ContributePage() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const useBundle = !params.get('submissionId') && params.get('legacy') !== '1'
+    && (params.get('kind') === 'material' || params.get('intent') === 'material');
   return (
     <PageFrame
       eyebrow="등록하기"
@@ -80,7 +86,7 @@ export function ContributePage() {
       description="활동 후기나 공유할 자료를 남겨 주세요. 공개 범위를 직접 선택하고, 등록 후에는 내 위브에서 게시 상태와 관리 메뉴를 확인할 수 있어요."
     >
       <Suspense fallback={<RouteLoading />}>
-        <ContributionForm />
+        {useBundle ? <BundleContributionForm /> : <ContributionForm />}
       </Suspense>
     </PageFrame>
   );
@@ -492,6 +498,7 @@ export function ProfilePage() {
             <div id="management-submissions" hidden={managementView !== 'submissions'}>
               <div className={experienceStyles.managementLinks}><Link to="/contribute?intent=activity">활동 기록 남기기</Link><Link to="/contribute?intent=material">자료 나누기</Link></div>
             <Suspense fallback={<RouteLoading />}>
+              <MyBundleManager key={`bundles-${user?.uid}`} />
               <SubmissionManager key={user?.uid} />
             </Suspense>
             </div>

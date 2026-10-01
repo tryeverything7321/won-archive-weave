@@ -60,6 +60,38 @@ service firebase.storage {
       allow update, delete: if false;
     }
 
+    function hasBundleUploadReservation(uid, bundleId, fileId, fileName) {
+      let metadata = request.resource.metadata;
+      let reservation = firestore.get(/databases/(default)/documents/materialBundleUploadReservations/$(metadata.reservationId)).data;
+      let file = reservation.files[fileName];
+      let bundle = firestore.get(/databases/(default)/documents/materialBundles/$(bundleId)).data;
+      let currentFile = bundle.files[fileId];
+      return bundle.ownerUid == uid
+        && bundle.status in ['draft', 'active']
+        && currentFile.status == 'upload_pending'
+        && currentFile.revision == file.revision
+        && currentFile.storagePath == 'quarantined/' + uid + '/material-bundles/' + bundleId + '/' + fileId + '/' + fileName
+        && reservation.ownerUid == uid
+        && reservation.bundleId == bundleId
+        && reservation.requestId == metadata.requestId
+        && reservation.status == 'active'
+        && reservation.expiresAtMs > request.time.toMillis()
+        && metadata.bundleId == bundleId
+        && metadata.fileId == fileId
+        && file.fileId == fileId
+        && metadata.revision == string(file.revision)
+        && file.targetName == fileName
+        && file.sizeBytes == request.resource.size
+        && file.contentType == request.resource.contentType
+        && file.sha256 == metadata.weaveSha256;
+    }
+
+    match /quarantined/{uid}/material-bundles/{bundleId}/{fileId}/{fileName} {
+      allow create: if resource == null && isActiveMember() && request.auth.uid == uid && validUpload(fileName)
+        && hasBundleUploadReservation(uid, bundleId, fileId, fileName);
+      allow read, update, delete: if false;
+    }
+
     match /quarantined/{uid}/calendar-events/{eventId}/{fileName} {
       allow create: if isActiveMember()
         && request.auth.uid == uid

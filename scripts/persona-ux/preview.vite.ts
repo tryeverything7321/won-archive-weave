@@ -36,10 +36,11 @@ export async function getDocs(source){const values=source.path==='materials'?sta
 export const getDocFromServer=getDoc; export const getDocsFromServer=getDocs;
 export function onSnapshot(...args){const callbacks=args.filter(x=>typeof x==='function');const cb=callbacks[0];const path=args[0]?.path;if(state.snapshotErrors?.includes(path)){queueMicrotask(()=>callbacks[1]?.(new Error('synthetic read failure')));return ()=>{}}const docs=state.snapshotRows?.[path]?.map(materialSnapshot)??(path==='communityPosts'?state.posts.map((p,i)=>({id:'synthetic-post-'+i,data:()=>({...p,createdAt:{toMillis:()=>1}})})):[]);queueMicrotask(()=>cb({...snapshot,docs,size:docs.length,empty:!docs.length}));return ()=>{}}
 `,
-  functions: `import {adminFixture} from '/scripts/persona-ux/admin-fixtures.mjs'; export * from ${real('firebase/functions')}; import {state,sleep} from 'weave-test:state';
+  functions: `import {bundleFixture} from '/scripts/persona-ux/bundle-fixtures.mjs'; import {adminFixture} from '/scripts/persona-ux/admin-fixtures.mjs'; export * from ${real('firebase/functions')}; import {state,sleep} from 'weave-test:state';
 export function httpsCallable(_functions,name){return async(input)=>{
  state.calls.push({name,input});
  if(state.callableResponses?.[name])return {data:await state.callableResponses[name](input)};
+ const bundleData=bundleFixture(name,input,state);if(bundleData!==undefined)return {data:bundleData};
  const adminData=await adminFixture(name,input);if(adminData!==undefined)return {data:adminData};
  if(name==='getMyMemberProfile'){
   const mode=state.profile, uid=state.user?.uid; await sleep(state.profileDelay);
@@ -59,10 +60,11 @@ export function httpsCallable(_functions,name){return async(input)=>{
  return {data:{postIds:[],hiddenPostIds:[],reports:[],appeals:[],blocks:[],items:[],submitted:0,duplicates:0}};
 }}
 `,
-  storage: `export * from ${real('firebase/storage')}; import {state,sleep} from 'weave-test:state';
+  storage: `import {syntheticBundleUpload} from '/scripts/persona-ux/bundle-fixtures.mjs'; export * from ${real('firebase/storage')}; import {state,sleep} from 'weave-test:state';
 export const ref=(_storage,path)=>({path});
 export async function listAll(){const mode=state.photo; await sleep(state.photoDelay); if(mode==='error')throw Object.assign(new Error('synthetic'),{code:'storage/unknown'});return {items:mode==='none'?[]:[{name:'avatar'}]}}
 export async function getBlob(){const mode=state.photo; await sleep(state.photoDelay); if(mode==='error')throw Object.assign(new Error('synthetic'),{code:'storage/unknown'});if(mode==='denied')throw Object.assign(new Error('synthetic'),{code:'storage/unauthorized'});if(mode==='none')throw Object.assign(new Error('synthetic'),{code:'storage/object-not-found'});return new Blob(['synthetic'],{type:'image/png'})}
+export function uploadBytesResumable(reference,file){return {on(_event,next,error,done){queueMicrotask(()=>syntheticBundleUpload(reference,file,state,next,error,done));return ()=>{}}}}
 export async function uploadBytes(){return {}} export async function deleteObject(){}
 `,
   calendar: `import {state,sleep} from 'weave-test:state';
@@ -73,7 +75,9 @@ export const firestoreCalendarRepository={async listMonth(options){state.calenda
 import React,{useState,useEffect} from 'react';import {createRoot} from 'react-dom/client';
 import {BrowserRouter,Routes,Route,Link} from 'react-router-dom';
 import {AuthCompletePage} from '/src/features/auth/AuthCompletePage.tsx';
+import {BundleDetailPage} from '/src/features/bundles/BundleDetailPage.tsx';
 import {AdminPage} from '/src/routes/AdminPages.tsx';
+import {PastArchiveEventCreatePage,ArchiveEventDetailPage,ArchiveCollectionsPage,ArchiveCollectionCreatePage,ArchiveCollectionDetailPage,ArchiveCollectionEditPage,ArchiveRelationCreatePage} from '/src/features/event-archive/EventArchivePages.tsx';
 import {AdminAccessGuard} from '/src/features/auth/AdminAccessGuard.tsx';
 import {SiteLayout} from '/src/app/SiteLayout.tsx';
 import {ArchivePage,ActivityPage as ActivityDetailPage} from '/src/routes/ArchivePages.tsx';
@@ -113,7 +117,7 @@ const draftCodec={encode:value=>({body:value.body}),decode:value=>{if(!value||ty
 function DraftTest(){const [value,setValue]=useState({body:''});const [user,setUser]=useState(state.user);useEffect(()=>{state.listeners.push(setUser);return ()=>{state.listeners=state.listeners.filter(x=>x!==setUser)}},[]);const draft=useFormDraft({identity:{ownerId:user?.uid??'signedout',kind:'synthetic',documentId:'new'},value,codec:draftCodec,onRestore:setValue});return h('section',null,h('h1',null,'초안 검증'),h(DraftRecoveryPanel,{state:draft.state,recovery:draft.recovery,onContinue:draft.continueDraft,onStartNew:draft.startNew,onDelete:draft.deleteDraft,onRetry:draft.retry}),h('label',null,'검증 본문',h('textarea',{value:value.body,onChange:e=>setValue({body:e.target.value})})),h(Link,{to:'/profile'},'다른 화면으로 이동'))}
 const AdminPreview=({section})=>h(AdminAccessGuard,{members:section==='members'},h(AdminPage,{section}));
 const nav=h('p',{style:{padding:'8px 24px',margin:0,fontSize:'13px',background:'#e9f6f2'}},'합성 검증 화면 · 운영 데이터와 연결되지 않음');
-createRoot(document.getElementById('root')).render(h(BrowserRouter,null,h(SiteLayout,null,nav,h(Routes,null,...['home','members','audit','submissions','community','calendar'].map(section=>h(Route,{key:section,path:section==='home'?'/admin':'/admin/'+section,element:h(AdminPreview,{section})})),h(Route,{path:'/admin/members/:memberId',element:h(AdminPreview,{section:'members'})}),...[['/auth/complete',AuthCompletePage],['/',HomePage],['/about',AboutPage],['/policies/:policy',PolicyPage],['/pdf-test',PdfPreviewTest],['/archive',ArchivePage],['/resources',ResourcesPage],['/materials/:id',MaterialDetailPage],['/member-test',ProfilePage],['/activities/:slug',ActivityDetailPage],['/community',CommunityExperience],['/calendar',CalendarPage],['/calendar/new',CalendarEventCreatePage],['/calendar/connect',CalendarConnectPage],['/events/:eventId',CalendarEventPage],['/google',GoogleCalendarImport],['/profile',ProfilePage],['/management',Management],['/draft-test',DraftTest],['/contribute',ContributePage],['/thread-test',ThreadTest]].map(([path,Component])=>h(Route,{key:path,path,element:h(Component)}))))));
+createRoot(document.getElementById('root')).render(h(BrowserRouter,null,h(SiteLayout,null,nav,h(Routes,null,...['home','members','audit','submissions','community','calendar'].map(section=>h(Route,{key:section,path:section==='home'?'/admin':'/admin/'+section,element:h(AdminPreview,{section})})),h(Route,{path:'/admin/members/:memberId',element:h(AdminPreview,{section:'members'})}),...[['/archive-events/new',PastArchiveEventCreatePage],['/archive-events/:eventId',ArchiveEventDetailPage],['/collections',ArchiveCollectionsPage],['/collections/new',ArchiveCollectionCreatePage],['/collections/:collectionId',ArchiveCollectionDetailPage],['/collections/:collectionId/edit',ArchiveCollectionEditPage],['/archive-relations/new',ArchiveRelationCreatePage],['/auth/complete',AuthCompletePage],['/',HomePage],['/about',AboutPage],['/policies/:policy',PolicyPage],['/pdf-test',PdfPreviewTest],['/archive',ArchivePage],['/resources',ResourcesPage],['/materials/:id',MaterialDetailPage],['/bundles/:bundleId',BundleDetailPage],['/member-test',ProfilePage],['/activities/:slug',ActivityDetailPage],['/community',CommunityExperience],['/calendar',CalendarPage],['/calendar/new',CalendarEventCreatePage],['/calendar/connect',CalendarConnectPage],['/events/:eventId',CalendarEventPage],['/google',GoogleCalendarImport],['/profile',ProfilePage],['/management',Management],['/draft-test',DraftTest],['/contribute',ContributePage],['/thread-test',ThreadTest]].map(([path,Component])=>h(Route,{key:path,path,element:h(Component)}))))));
 `,
 }
 

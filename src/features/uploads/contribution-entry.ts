@@ -21,14 +21,26 @@ function entryIntent(value: string | null): ContributionEntryIntent | null {
 export function readContributionEntry(search: string): {
   submissionId: string;
   initialKind: ContributionKind;
+  calendarEventId: string;
+  archiveEventId: string;
+  returnTo: string;
 } {
   const params = new URLSearchParams(search);
   const submissionId = params.get("submissionId")?.trim() ?? "";
-  if (submissionId) return { submissionId, initialKind: defaultKind };
+  const rawEventId = (params.get("calendarEventId") ?? params.get("eventId") ?? "").trim();
+  const calendarEventId = rawEventId.length <= 120 && !/[/?#]/u.test(rawEventId) ? rawEventId : "";
+  const rawArchiveEventId = params.get("archiveEventId")?.trim() ?? "";
+  const archiveEventId = rawArchiveEventId.length <= 120 && !/[/?#]/u.test(rawArchiveEventId) ? rawArchiveEventId : "";
+  const rawReturnTo = params.get("returnTo")?.trim() ?? "";
+  const returnTo = rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : "";
+  if (submissionId) return { submissionId, initialKind: defaultKind, calendarEventId: archiveEventId ? "" : calendarEventId, archiveEventId, returnTo };
 
   return {
     submissionId: "",
     initialKind: entryIntent(params.get("intent")) === "material" ? "자료" : defaultKind,
+    calendarEventId: archiveEventId ? "" : calendarEventId,
+    archiveEventId,
+    returnTo,
   };
 }
 
@@ -37,11 +49,17 @@ export function contributionReturnTo(search: string, hash: string): string {
   const safe = new URLSearchParams();
   const submissionId = current.get("submissionId")?.trim() ?? "";
   const intent = entryIntent(current.get("intent"));
+  const calendarEventId = (current.get("calendarEventId") ?? current.get("eventId") ?? "").trim();
+  const archiveEventId = current.get("archiveEventId")?.trim() ?? "";
+  const returnTo = current.get("returnTo")?.trim() ?? "";
 
   if (submissionId && submissionId.length <= 128 && !/[/?#]/u.test(submissionId)) {
     safe.set("submissionId", submissionId);
   }
   if (intent) safe.set("intent", intent);
+  if (archiveEventId && archiveEventId.length <= 120 && !/[/?#]/u.test(archiveEventId)) safe.set("archiveEventId", archiveEventId);
+  else if (calendarEventId && calendarEventId.length <= 120 && !/[/?#]/u.test(calendarEventId)) safe.set("calendarEventId", calendarEventId);
+  if (returnTo.startsWith("/") && !returnTo.startsWith("//") && returnTo.length <= 500) safe.set("returnTo", returnTo);
 
   const query = safe.size ? `?${safe.toString()}` : "";
   const safeHash = /^#[\p{L}\p{N}_-]{1,64}$/u.test(hash) ? hash : "";

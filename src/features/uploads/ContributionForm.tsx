@@ -23,6 +23,7 @@ import { startOAuthLogin } from "../auth/api";
 import { ProviderLoginButton } from "../auth/ProviderLoginButton";
 import { AuthoringFlow } from "../authoring/AuthoringFlow";
 import { contributionIntentHref, type NewContributionKind } from "../authoring/authoring-intent";
+import { ensureCalendarArchiveEvent, linkArchiveTarget } from "../bundles/bundle-api";
 import { DraftRecoveryPanel } from "../drafts/DraftRecoveryPanel";
 import { useFormDraft } from "../drafts/useFormDraft";
 import { InstagramPostAttachment } from "../social/InstagramPostAttachment";
@@ -174,6 +175,12 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
   const [sensitiveDataReviewed, setSensitiveDataReviewed] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<Status>({ tone: "idle", message: "" });
+  const [calendarEventId, setCalendarEventId] = useState(entry.calendarEventId);
+  const [archiveEventId, setArchiveEventId] = useState(entry.archiveEventId);
+  const [publishedSubmissionId, setPublishedSubmissionId] = useState("");
+  const [relationState, setRelationState] = useState<"none" | "working" | "linked" | "failed">("none");
+  const archiveEventRequestId = useRef(crypto.randomUUID());
+  const archiveRelationRequestId = useRef(crypto.randomUUID());
   const [editLoad, setEditLoad] = useState<"loading" | "ready" | "error">(
     editingSubmissionId ? "loading" : "ready",
   );
@@ -436,6 +443,23 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
   useEffect(() => {
     if (status.tone === "success") successHeading.current?.focus();
   }, [status.tone]);
+
+  const connectPublishedSubmission = async (submissionId: string, contributionKind: ContributionKind) => {
+    if ((!calendarEventId && !archiveEventId) || !submissionId) return;
+    setRelationState("working");
+    try {
+      const targetArchiveEventId = archiveEventId || (await ensureCalendarArchiveEvent(calendarEventId, archiveEventRequestId.current)).archiveEventId;
+      await linkArchiveTarget({
+        archiveEventId: targetArchiveEventId,
+        targetType: contributionKind === "자료" ? "material" : "activity",
+        targetId: submissionId,
+        requestId: archiveRelationRequestId.current,
+      });
+      setRelationState("linked");
+    } catch {
+      setRelationState("failed");
+    }
+  };
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -701,6 +725,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
       const submit = httpsCallable<{ submissionId: string }, { status: string }>(services.functions, "submitSubmission");
       const result = await submit({ submissionId: payload.submissionId });
       if (!attemptIsCurrent()) return;
+      setPublishedSubmissionId(payload.submissionId);
       const draftCompletion = capturedDraftRevision
         ? contributionDraft.complete(capturedDraftRevision, {
             ...contributionDraftValue,
@@ -716,6 +741,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
         tone: "success",
         message: contributionSuccessMessage(sourceMode, result.data.status),
       });
+      void connectPublishedSubmission(payload.submissionId, kind);
       if (draftCompletion === "cleared") {
         setFile(null);
         setPreviewFile(null);
@@ -801,6 +827,18 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
           )}
         </div>
       </fieldset>
+      {(archiveEventId || calendarEventId) && (
+        <aside className={styles.eventContext} aria-label="연결할 행사">
+          <div>
+            <b>선택한 행사와 연결</b>
+            <span>이 화면에서 게시한 내용이 행사 기록에 함께 보입니다.</span>
+          </div>
+          <div>
+            {entry.returnTo && <a href={entry.returnTo}>행사 확인</a>}
+            <button type="button" onClick={() => { setArchiveEventId(""); setCalendarEventId(""); setRelationState("none"); }}>행사 연결 없이 작성</button>
+          </div>
+        </aside>
+      )}
       {!services ? (
         <div className="contribution-message error">
           <CircleAlert size={18} />
@@ -845,7 +883,13 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
             {!editingSubmissionId && (
               <button className={styles.successSecondary} type="button" onClick={startNewContribution}>새 글 작성</button>
             )}
+            {relationState === "failed" && publishedSubmissionId && (
+              <button className={styles.successSecondary} type="button" onClick={() => void connectPublishedSubmission(publishedSubmissionId, kind)}>행사 연결 다시 시도</button>
+            )}
           </div>
+          {relationState === "working" && <p role="status">게시한 내용을 행사 기록에 연결하고 있어요.</p>}
+          {relationState === "linked" && <p>행사 기록에도 연결했어요.</p>}
+          {relationState === "failed" && <p>게시물은 등록됐습니다. 행사 연결만 다시 시도해 주세요.</p>}
         </section>
       ) : (
         <form className={`contribution-form ${styles.form}`} onSubmit={onSubmit}>

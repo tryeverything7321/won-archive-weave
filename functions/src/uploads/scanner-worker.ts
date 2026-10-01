@@ -15,6 +15,11 @@ import {
   recordAndPublishAutomatedEventScan,
   recordAutomatedEventScanFailure,
 } from '../calendar/event-management.js'
+import {
+  recordMaterialBundleScanFailure,
+  recordMaterialBundleScanResult,
+  recordUploadedMaterialBundleObject,
+} from '../bundles/material-bundles.js'
 
 if (!getApps().length) initializeApp()
 
@@ -75,8 +80,20 @@ export function shouldResumeCleanScanPublication(
 export function quarantinedSubmissionPath(path: string):
   | { kind: 'submission'; ownerUid: string; submissionId: string }
   | { kind: 'calendar_event'; ownerUid: string; eventId: string }
+  | { kind: 'material_bundle'; ownerUid: string; bundleId: string; fileId: string }
   | null {
   const segments = path.split('/')
+  if (
+    segments.length === 6
+    && segments[0] === 'quarantined'
+    && segments[1]
+    && segments[2] === 'material-bundles'
+    && segments[3]
+    && segments[4]
+    && segments[5]
+  ) {
+    return { kind: 'material_bundle', ownerUid: segments[1], bundleId: segments[3], fileId: segments[4] }
+  }
   if (
     segments.length >= 5
     && segments[0] === 'quarantined'
@@ -496,7 +513,11 @@ export const scanQuarantinedUpload = onObjectFinalized(
     const resultRef = getFirestore().collection('fileScanResults').doc(resultId)
     if ((await resultRef.get()).exists) {
       if (target.kind === 'calendar_event') await aggregateEventScan(data.bucket, target.ownerUid, target.eventId)
-      else await aggregateSubmissionScan(data.bucket, target.ownerUid, target.submissionId)
+      else if (target.kind === 'submission') await aggregateSubmissionScan(data.bucket, target.ownerUid, target.submissionId)
+      else await recordMaterialBundleScanResult({
+        ownerUid: target.ownerUid, bundleId: target.bundleId, fileId: target.fileId,
+        path: data.name, generation, scanId: resultId, verdict: (await resultRef.get()).get('verdict') === 'clean' ? 'clean' : 'blocked',
+      })
       return
     }
 
@@ -511,14 +532,34 @@ export const scanQuarantinedUpload = onObjectFinalized(
     if (bytes.length !== size) throw new Error('scan_object_size_changed')
 
     const sha256 = createHash('sha256').update(bytes).digest('hex')
+    const custom = metadata.metadata && typeof metadata.metadata === 'object'
+      ? metadata.metadata as Record<string, unknown>
+      : {}
     if (target.kind === 'submission') {
-      const custom = metadata.metadata && typeof metadata.metadata === 'object'
-        ? metadata.metadata as Record<string, unknown>
-        : {}
       const accepted = await recordUploadedReservationObject({
         ownerUid: target.ownerUid,
         submissionId: target.submissionId,
         targetName: data.name.split('/').at(-1) ?? '',
+        size,
+        contentType: String(metadata.contentType ?? ''),
+        reservationId: typeof custom.reservationId === 'string' ? custom.reservationId : '',
+        requestId: typeof custom.requestId === 'string' ? custom.requestId : '',
+        sha256,
+      })
+      if (!accepted) {
+        await file.delete({ ignoreNotFound: true, ifGenerationMatch: generation })
+        return
+      }
+    } else if (target.kind === 'material_bundle') {
+      const revision = Number(custom.revision)
+      const accepted = await recordUploadedMaterialBundleObject({
+        ownerUid: target.ownerUid,
+        bundleId: target.bundleId,
+        fileId: target.fileId,
+        revision,
+        targetName: data.name.split('/').at(-1) ?? '',
+        storagePath: data.name,
+        generation,
         size,
         contentType: String(metadata.contentType ?? ''),
         reservationId: typeof custom.reservationId === 'string' ? custom.reservationId : '',
@@ -545,7 +586,11 @@ export const scanQuarantinedUpload = onObjectFinalized(
     } catch (error) {
       const code = error instanceof Error ? error.message : 'scanner_unavailable'
       if (target.kind === 'calendar_event') await recordAutomatedEventScanFailure(target.eventId, target.ownerUid, code)
-      else await recordScannerFailure(target.submissionId, target.ownerUid, data.name, generation, code)
+      else if (target.kind === 'submission') await recordScannerFailure(target.submissionId, target.ownerUid, data.name, generation, code)
+      else await recordMaterialBundleScanFailure({
+        ownerUid: target.ownerUid, bundleId: target.bundleId, fileId: target.fileId,
+        path: data.name, generation, code,
+      })
       throw error
     }
     const scannedAtMs = Date.now()
@@ -577,7 +622,11 @@ export const scanQuarantinedUpload = onObjectFinalized(
       expiresAt: Timestamp.fromMillis(scannedAtMs + 90 * 24 * 60 * 60 * 1_000),
     })
     if (target.kind === 'calendar_event') await aggregateEventScan(data.bucket, target.ownerUid, target.eventId)
-    else await aggregateSubmissionScan(data.bucket, target.ownerUid, target.submissionId)
+    else if (target.kind === 'submission') await aggregateSubmissionScan(data.bucket, target.ownerUid, target.submissionId)
+    else await recordMaterialBundleScanResult({
+      ownerUid: target.ownerUid, bundleId: target.bundleId, fileId: target.fileId,
+      path: data.name, generation, scanId: resultId, verdict: scanner.verdict,
+    })
   },
 )
 

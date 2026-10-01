@@ -68,6 +68,7 @@ import {
 } from "../features/calendar/calendar-navigation";
 import { getFirebaseServices, isFirebaseConfigured, isOAuthConfigured } from "../lib/firebase/client";
 import discoveryStyles from "../features/discovery/DiscoveryExperience.module.css";
+import { EventArchivePanel } from "../features/event-archive/EventArchivePanel";
 
 type LoadState = "loading" | "ready" | "error" | "unavailable";
 
@@ -430,7 +431,9 @@ export function CalendarPage() {
         </div>
         <div className="calendar-planner-actions">
           <Link to="/calendar/new">행사 등록하기 <ArrowRight size={18} /></Link>
+          <Link to="/archive-events/new">과거 행사 기록하기 <ArrowRight size={18} /></Link>
           <Link to="/calendar/connect">캘린더 연결하기 <ArrowRight size={18} /></Link>
+          <Link to="/collections">자료 모음 보기 <ArrowRight size={18} /></Link>
           <Link to="/planner">행사 준비 예시 보기 <ArrowRight size={18} /></Link>
         </div>
       </section>
@@ -896,6 +899,7 @@ export function CalendarEventPage() {
         </section>}
         {!presentation.description && event.eventState === "canceled" && <div className="calendar-canceled-note">이 일정은 취소되었습니다. 이동하기 전에 주최 측 안내를 확인해 주세요.</div>}
       </div>
+      <EventArchivePanel event={event} />
       {event.gallery && event.gallery.length > 0 && (
         <section className="calendar-event-gallery" aria-labelledby="calendar-gallery-title" style={{ padding: "0 clamp(4px, 4vw, 54px) clamp(42px, 7vw, 94px)" }}>
           <p className="detail-topic">행사 사진</p>

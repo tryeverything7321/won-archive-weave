@@ -92,3 +92,15 @@ export { listOperatorAuditEvents } from './operations/audit.js'
 export { listAdminMembers, getAdminMemberOverview, listAdminMemberActivity, getAdminMemberPrivateDetails } from './operations/members.js'
 
 export { completeGoogleLogin } from './auth/google-login.js'
+
+export { createMaterialBundle, prepareMaterialBundleFiles, finalizeMaterialBundle, getMaterialBundle, listMyMaterialBundles, updateMaterialBundle, updateMaterialBundleFiles, withdrawMaterialBundleFile, createMaterialBundleFileAccess, cleanupMaterialBundleUploads } from './bundles/material-bundles.js';
+
+export { ensureArchiveEventContext, getEventArchiveOverview } from './archive/events.js';
+
+export { linkArchiveRelation, unlinkArchiveRelation } from './archive/relations.js';
+
+export { upsertArchiveOrganizer, listArchiveOrganizers } from './archive/organizers.js';
+
+export { createArchiveCollection, updateArchiveCollection, replaceArchiveCollectionItems, getArchiveCollection, listArchiveCollections } from './archive/collections.js';
+
+export { searchArchiveDiscovery } from './archive/discovery.js';

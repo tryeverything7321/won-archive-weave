@@ -22,6 +22,7 @@ import {
 } from "../features/discovery/resource-discovery";
 import discoveryStyles from "../features/discovery/DiscoveryExperience.module.css";
 import fixtureStyles from "./FixtureDisclosure.module.css";
+import { ArchiveDiscoveryPanel } from "../features/event-archive/ArchiveDiscoveryPanel";
 
 const MaterialFormatChart = lazy(() => import("../features/discovery/MaterialFormatChart").then((module) => ({ default: module.MaterialFormatChart })));
 
@@ -145,7 +146,7 @@ export function ResourcesPage() {
             <span className="sr-only">불러온 자료 검색</span>
             <input type="search" value={query} onChange={(event) => updateFilter("q", event.target.value || null)} placeholder="제목이나 설명 검색" />
           </label>
-          <Link className="contribute-link" to="/contribute?intent=material">
+          <Link className="contribute-link" to="/contribute?kind=material">
             <FilePenLine size={18} /> 자료 올리기
           </Link>
         </div>
@@ -195,6 +196,7 @@ export function ResourcesPage() {
           </Suspense>}
         </details>}
       </section>
+      <ArchiveDiscoveryPanel />
       <h2 className="sr-only">공유 자료 목록</h2>
       <section className={`resource-collection ${publicCollectionIsEmpty ? "resource-collection-empty" : ""}`} aria-labelledby="published-materials-title">
         <div className={`resource-collection-heading ${publicCollectionIsEmpty ? "sr-only" : ""}`}>
@@ -276,7 +278,7 @@ export function ResourcesPage() {
                   : " 활동에서 남긴 기록과 자료를 나눠 주세요."}
               </span>
             </div>
-            <Link to="/contribute?intent=material">
+            <Link to="/contribute?kind=material">
               자료 올리기 <ArrowRight size={17} />
             </Link>
           </div>

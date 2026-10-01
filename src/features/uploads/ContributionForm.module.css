@@ -468,3 +468,33 @@
 @media (max-width: 520px) {
   .form .sharingSection :global(.contribution-step) { padding: 18px; }
 }
+.eventContext {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 14px 0;
+  padding: 15px 17px;
+  border: 1px solid #b8d9cf;
+  border-radius: 14px;
+  background: #f1faf7;
+  color: #173f52;
+}
+
+.eventContext > div { display: grid; gap: 4px; }
+.eventContext > div:last-child { display: flex; align-items: center; gap: 8px; }
+.eventContext span { color: #566b75; font-size: .88rem; }
+.eventContext a,
+.eventContext button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #146fa8;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .eventContext { flex-direction: column; }
+  .eventContext > div:last-child { align-items: stretch; flex-direction: column; }
+}

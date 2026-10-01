@@ -20,10 +20,16 @@ test("menu entry intent selects the matching new contribution kind", () => {
   assert.deepEqual(readContributionEntry("?intent=activity"), {
     submissionId: "",
     initialKind: "활동 기록",
+    calendarEventId: "",
+    archiveEventId: "",
+    returnTo: "",
   });
   assert.deepEqual(readContributionEntry("?intent=material"), {
     submissionId: "",
     initialKind: "자료",
+    calendarEventId: "",
+    archiveEventId: "",
+    returnTo: "",
   });
 });
 
@@ -36,8 +42,20 @@ test("missing or unknown entry intent safely defaults to an activity record", ()
 test("an owned edit ignores menu entry intent until its saved draft is loaded", () => {
   assert.deepEqual(
     readContributionEntry("?submissionId=submission-123&intent=material"),
-    { submissionId: "submission-123", initialKind: "활동 기록" },
+    { submissionId: "submission-123", initialKind: "활동 기록", calendarEventId: "", archiveEventId: "", returnTo: "" },
   );
+});
+
+test("event context survives login without accepting external return paths", () => {
+  assert.deepEqual(readContributionEntry("?intent=activity&calendarEventId=event-123&returnTo=%2Fcalendar%2Fevent-123"), {
+    submissionId: "", initialKind: "활동 기록", calendarEventId: "event-123", archiveEventId: "", returnTo: "/calendar/event-123",
+  });
+  assert.equal(
+    contributionReturnTo("?intent=activity&calendarEventId=event-123&returnTo=%2Fcalendar%2Fevent-123", ""),
+    "/contribute?intent=activity&calendarEventId=event-123&returnTo=%2Fcalendar%2Fevent-123",
+  );
+  assert.equal(readContributionEntry("?calendarEventId=https://bad.example&returnTo=//bad.example").calendarEventId, "");
+  assert.deepEqual(readContributionEntry("?calendarEventId=calendar-1&archiveEventId=archive-1").archiveEventId, "archive-1");
 });
 
 test("OAuth return keeps valid contribution context on the internal route", () => {

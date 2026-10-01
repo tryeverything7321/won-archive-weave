@@ -7,6 +7,7 @@ import {
   ChevronRight,
   FileText,
   LoaderCircle,
+  Link2,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -221,6 +222,13 @@ export function MaterialRow({
             state={location.pathname === "/resources" ? { resourcesReturn: `${location.pathname}${location.search}` } : undefined}
           >
             자료 자세히 보기 <ArrowRight size={16} />
+          </Link>
+        )}
+        {isPublished && ownedManagement && (
+          <Link
+            to={`/archive-relations/new?targetType=material&targetId=${encodeURIComponent(material.id)}&returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`}
+          >
+            행사에 연결 <Link2 size={16} />
           </Link>
         )}
         {canPreview && <ApprovedPdfPreview key={material.id} materialId={material.id} title={material.title} />}

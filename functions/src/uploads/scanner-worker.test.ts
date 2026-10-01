@@ -12,7 +12,7 @@ import {
   submissionScanApplicationDecision,
 } from './scanner-worker.js'
 
-test('scanner recognizes document and event-image quarantine paths', () => {
+test('scanner recognizes document, bundle-file and event-image quarantine paths', () => {
   assert.deepEqual(quarantinedSubmissionPath('quarantined/member-1/submission-1/file.pdf'), {
     kind: 'submission',
     ownerUid: 'member-1',
@@ -22,6 +22,12 @@ test('scanner recognizes document and event-image quarantine paths', () => {
     kind: 'calendar_event',
     ownerUid: 'member-1',
     eventId: 'event-1',
+  })
+  assert.deepEqual(quarantinedSubmissionPath('quarantined/member-1/material-bundles/bundle-1/file-1/upload.pptx'), {
+    kind: 'material_bundle',
+    ownerUid: 'member-1',
+    bundleId: 'bundle-1',
+    fileId: 'file-1',
   })
   assert.equal(quarantinedSubmissionPath('approved/public/file.pdf'), null)
   assert.equal(quarantinedSubmissionPath('quarantined/member-1/missing-file'), null)
