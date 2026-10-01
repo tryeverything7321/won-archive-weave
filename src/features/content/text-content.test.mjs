@@ -15,3 +15,8 @@ test('reader refuses unknown body formats and unsafe or credential-bearing links
   for (const url of ['javascript:alert(1)', 'data:text/html,test', '//example.com', 'https://user:pass@example.com', '/admin']) assert.equal(safeContentUrl(url), '');
   assert.equal(safeContentUrl('https://example.com/post'), 'https://example.com/post');
 });
+
+test('plain reader preserves spaces, tabs and blank lines without interpreting markup', () => {
+  const body = '\n  이름      역할\n  민규\t진행\n# 그대로 표시\n';
+  assert.deepEqual(readTextContent({ schemaVersion: 1, format: 'plain', body }), { schemaVersion: 1, format: 'plain', body });
+});

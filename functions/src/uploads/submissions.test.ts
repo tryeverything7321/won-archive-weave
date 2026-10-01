@@ -1330,3 +1330,10 @@ test('treats deterministic publication as idempotent and rejects mismatched mate
   assert.equal(approvalReservationDecision({ ...base, materialId: 'submission-1' }), 'published')
   assert.equal(approvalReservationDecision({ ...base, materialId: 'another-material' }), 'invalid')
 })
+
+test('plain text survives submission validation and edit projection', () => {
+  const textContent = { schemaVersion: 1, format: 'plain', body: '\n  이름      역할\n  민규\t진행\n# 제목 기호도 그대로\n' }
+  const input = validateSubmissionInput({ ...validInput, sourceMode: 'text', textContent })
+  assert.deepEqual(input.textContent, textContent)
+  assert.deepEqual(submissionEditableRecord('plain-test', { ...input, ownerUid: 'member-a', status: 'draft' }).textContent, textContent)
+})

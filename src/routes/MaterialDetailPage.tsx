@@ -42,7 +42,7 @@ export function MaterialDetailPage() {
   return <PageFrame eyebrow="자료 나눔" title={material.title} description={material.owner ? `${material.owner} · ${visibilityLabel}` : visibilityLabel}>
     <Link className="back-link" to={returnTo}><ArrowLeft size={17} /> 자료 목록으로 돌아가기</Link>
     {material.updatedAt && <p>최근 수정 <time dateTime={material.updatedAt.toISOString()}>{new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium' }).format(material.updatedAt)}</time></p>}
-    {material.textContent && <section aria-label="자료 본문"><MarkdownBody body={material.textContent.body} /></section>}
+    {material.textContent && <section aria-label="자료 본문"><MarkdownBody format={material.textContent.format} body={material.textContent.body} /></section>}
     {material.type !== 'TEXT' && <section aria-label="첨부 및 원본"><MaterialRow material={{ ...material, textContent: undefined }} showDetail={false} /></section>}
     <InstagramReferenceList attachments={material.instagramAttachments ?? []} />
     <OwnedSubmissionActions id={id} returnTo={returnTo} />

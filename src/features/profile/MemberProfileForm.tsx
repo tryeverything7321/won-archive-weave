@@ -1,3 +1,4 @@
+import { FieldRequirement } from "../../components/forms/FieldRequirement";
 import { useEffect, useId, useRef, useState } from 'react'
 import { Camera, CheckCircle2, CircleAlert, LoaderCircle, Trash2, UserRound } from 'lucide-react'
 import {
@@ -519,7 +520,7 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
 
       <form onSubmit={save}>
 <fieldset className="member-profile-section member-profile-basic-fields"><legend>필수 가입 정보</legend>          <label className="member-profile-field" htmlFor={`${formId}-real-name`}>
-            <span>실명 (필수)</span>
+            <span>실명 <FieldRequirement /></span>
             <input
               id={`${formId}-real-name`}
               value={value.realName}
@@ -529,7 +530,7 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
               onChange={(event) => setField('realName', event.target.value)}
             />
           </label>          <label className="member-profile-field" htmlFor={`${formId}-organization`}>
-            <span>소속 교당·모임 (필수)</span>
+            <span>소속 교당·모임 <FieldRequirement /></span>
             <input
               id={`${formId}-organization`}
               value={value.organization}
@@ -666,9 +667,9 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
         <fieldset className="member-profile-section member-profile-basic-fields">
           <legend>선택 정보</legend>
           <p className="member-profile-section-help">청년회 활동과 프로그램을 준비하기 위한 통계에 사용합니다. 답하지 않아도 위브를 이용할 수 있고, 내 정보에서 언제든 삭제할 수 있습니다. 계정 탈퇴 시 삭제됩니다.</p>
-          <label className="member-profile-field"><span>연령대 (선택)</span><select value={value.ageBand ?? ''} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, ageBand: event.target.value })); }}><option value="">선택하지 않음</option>{Object.entries(ageBandLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-          <label className="member-profile-field member-profile-field--wide"><span><input type="checkbox" checked={value.religionConsentVersion === religionConsentVersion} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, religionConsentVersion: event.target.checked ? religionConsentVersion : undefined, wonBuddhismMembership: event.target.checked ? current.wonBuddhismMembership : undefined })); }} /> 원불교 입교 여부의 수집·이용에 동의합니다 (선택)</span><small>수집 항목: 입교 여부 · 목적: 회원 구성 통계와 활동 기획 · 보유 기간: 동의 철회 또는 계정 탈퇴까지. 동의를 거부해도 서비스 이용에 불이익이 없습니다. 동의를 해제하고 저장하면 기존 응답을 삭제합니다.</small></label>
-          <label className="member-profile-field"><span>원불교 입교 여부 (선택)</span><select disabled={value.religionConsentVersion !== religionConsentVersion} value={value.wonBuddhismMembership ?? ''} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, wonBuddhismMembership: event.target.value })); }}><option value="">선택하지 않음</option>{Object.entries(membershipLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><small>직접 입력하는 정보이며 입교 인증으로 사용하지 않습니다.</small></label>
+          <label className="member-profile-field"><span>연령대 <FieldRequirement optional /></span><select value={value.ageBand ?? ''} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, ageBand: event.target.value })); }}><option value="">선택하지 않음</option>{Object.entries(ageBandLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+          <label className="member-profile-field member-profile-field--wide"><span><input type="checkbox" checked={value.religionConsentVersion === religionConsentVersion} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, religionConsentVersion: event.target.checked ? religionConsentVersion : undefined, wonBuddhismMembership: event.target.checked ? current.wonBuddhismMembership : undefined })); }} /> 원불교 입교 여부의 수집·이용에 동의합니다 <FieldRequirement optional /></span><small>수집 항목: 입교 여부 · 목적: 회원 구성 통계와 활동 기획 · 보유 기간: 동의 철회 또는 계정 탈퇴까지. 동의를 거부해도 서비스 이용에 불이익이 없습니다. 동의를 해제하고 저장하면 기존 응답을 삭제합니다.</small></label>
+          <label className="member-profile-field"><span>원불교 입교 여부 <FieldRequirement optional /></span><select disabled={value.religionConsentVersion !== religionConsentVersion} value={value.wonBuddhismMembership ?? ''} onChange={event => { editRevisionRef.current += 1; setValue(current => ({ ...current, wonBuddhismMembership: event.target.value })); }}><option value="">선택하지 않음</option>{Object.entries(membershipLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><small>직접 입력하는 정보이며 입교 인증으로 사용하지 않습니다.</small></label>
         </fieldset>
         </details>
         <div

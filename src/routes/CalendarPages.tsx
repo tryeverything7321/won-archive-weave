@@ -696,7 +696,7 @@ export function CalendarConnectPage() {
     const services = getFirebaseServices();
     if (!services?.auth.currentUser) {
       setState("error");
-      setMessage("네이버 또는 카카오로 로그인한 뒤 캘린더를 연결해 주세요.");
+      setMessage("로그인한 뒤 캘린더를 연결해 주세요.");
       return;
     }
     setState("submitting");
@@ -755,6 +755,11 @@ export function CalendarConnectPage() {
               disabled={!isOAuthConfigured}
               provider="naver"
               onClick={() => startOAuthLogin("naver", connectReturnTo)}
+            />
+<ProviderLoginButton
+              disabled={!isOAuthConfigured}
+              provider="google"
+              onClick={() => startOAuthLogin("google", connectReturnTo)}
             />
           </div>
           {!isOAuthConfigured && <small>로그인 연결을 준비하고 있어요.</small>}

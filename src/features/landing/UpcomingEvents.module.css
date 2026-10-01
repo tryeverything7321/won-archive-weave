@@ -40,7 +40,7 @@
   .grid[data-count="3"] .featured.withImage .media { width: min(32%, 240px); height: 220px; min-height: 0; flex: none; }
 }
 @media (max-width: 620px) {
-  .section { padding-block: 64px 0; }
+  .section { padding-block: 24px 0; }
   .heading { align-items: start; flex-direction: column; gap: 7px; }
   .grid[data-count] { grid-template-columns: 1fr; }
   .featured { grid-column: auto; }

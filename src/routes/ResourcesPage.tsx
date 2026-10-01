@@ -29,6 +29,7 @@ const MaterialFormatChart = lazy(() => import("../features/discovery/MaterialFor
 export function ResourcesPage() {
   const { audience, ready: audienceReady } = useFirebaseAudience();
   const [search, setSearch] = useSearchParams();
+  const archiveScope = search.get("browse") === "events" || (!search.has("browse") && ["organizer", "heldYear", "uploadYear", "region", "archiveFormat"].some(key => search.has(key)));
   const activeType = search.get("type") ?? "전체";
   const query = search.get("q") ?? "";
   const updateFilter = (key: string, value: string | null) => setSearch(current => {
@@ -123,7 +124,7 @@ export function ResourcesPage() {
   const formatCounts = useMemo(() => countLoadedMaterialFormats(visiblePublishedMaterials), [visiblePublishedMaterials]);
 
   return (
-    <PageFrame
+    <div className={discoveryStyles.resourcePage}><PageFrame
       eyebrow="자료 나눔"
       title={
         <>
@@ -131,14 +132,17 @@ export function ResourcesPage() {
           <br /> 찾고 나눠요
         </>
       }
-      description={showPublicFixtures
-        ? "회의록과 붙여넣은 글, 행사 안내문, 발표 자료, 한글 양식처럼 다시 쓸 수 있는 내용을 찾아보세요."
-        : "회의록과 붙여넣은 글, 행사 안내문, 발표 자료, 한글 양식처럼 다시 쓸 수 있는 내용을 찾아보세요."}
+      description="발표 자료와 모임에 필요한 문서를 찾아보세요."
     >
+      <nav className={discoveryStyles.browseScopes} aria-label="자료 탐색 범위">
+        <button type="button" aria-pressed={!archiveScope} onClick={() => updateFilter("browse", "materials")}>개별 자료</button>
+        <button type="button" aria-pressed={archiveScope} onClick={() => updateFilter("browse", "events")}>행사·자료 묶음·기록</button>
+      </nav>
+      {archiveScope ? <><div className={discoveryStyles.scopeActions}><Link className="button button-primary" to="/contribute?kind=material">자료 올리기</Link><Link className="button button-secondary" to="/collections">자료 모음 보기</Link></div><ArchiveDiscoveryPanel /></> : <>
       <section className={`${discoveryStyles.resourceWorkbench} resource-tools`} aria-labelledby="resource-tools-title">
         <div className={discoveryStyles.resourceHeading}>
           <h2 id="resource-tools-title">자료 찾기</h2>
-          <p>지금까지 불러온 자료의 제목과 설명에서 찾아요</p>
+          <p>불러온 개별 자료의 제목·설명 검색</p>
         </div>
         <div className={discoveryStyles.searchRow}>
           <label className={discoveryStyles.searchField}>
@@ -189,15 +193,8 @@ export function ResourcesPage() {
           <span className={discoveryStyles.loadedScope}>불러온 실제 자료 {publishedMaterials.length}건 중 <strong>{shownPublished.length}건</strong> 표시</span>
           {(query || activeType !== "전체") && <button className={discoveryStyles.resetButton} type="button" onClick={() => setSearch(resetResourceDiscovery, { replace: true, preventScrollReset: true })}><X size={16} /> 검색·형식 초기화</button>}
         </div>
-        {formatCounts.length > 0 && <details className={discoveryStyles.formatSummary} open={showFormatSummary} onToggle={(event) => setShowFormatSummary(event.currentTarget.open)}>
-          <summary>불러온 자료의 형식 분포 <ChevronDown size={17} aria-hidden="true" /></summary>
-          {showFormatSummary && <Suspense fallback={<p role="status">형식 분포를 준비하고 있어요.</p>}>
-            <p className={discoveryStyles.formatSummaryCopy}>현재 권한으로 불러온 실제 자료 {visiblePublishedMaterials.length}개만 집계했습니다. 예시 자료와 아직 불러오지 않은 자료는 포함하지 않습니다.</p>
-            <MaterialFormatChart counts={formatCounts} />
-          </Suspense>}
-        </details>}
+
       </section>
-      <ArchiveDiscoveryPanel />
       <h2 className="sr-only">공유 자료 목록</h2>
       <section className={`resource-collection ${publicCollectionIsEmpty ? "resource-collection-empty" : ""}`} aria-labelledby="published-materials-title">
         <div className={`resource-collection-heading ${publicCollectionIsEmpty ? "sr-only" : ""}`}>
@@ -285,7 +282,15 @@ export function ResourcesPage() {
           </div>
         )}
       </section>
-      {showPublicFixtures && (
+        {formatCounts.length > 0 && <details className={discoveryStyles.formatSummary} open={showFormatSummary} onToggle={(event) => setShowFormatSummary(event.currentTarget.open)}>
+          <summary>불러온 자료의 형식 분포 <ChevronDown size={17} aria-hidden="true" /></summary>
+          {showFormatSummary && <Suspense fallback={<p role="status">형식 분포를 준비하고 있어요.</p>}>
+            <p className={discoveryStyles.formatSummaryCopy}>현재 권한으로 불러온 실제 자료 {visiblePublishedMaterials.length}개만 집계했습니다. 예시 자료와 아직 불러오지 않은 자료는 포함하지 않습니다.</p>
+            <MaterialFormatChart counts={formatCounts} />
+          </Suspense>}
+        </details>}
+      </>}
+      {showPublicFixtures && !archiveScope && (
       <section className="resource-collection fixture-collection" aria-labelledby="fixture-materials-title">
         <h2 className="sr-only" id="fixture-materials-title">자료 사용 예시</h2>
         <details className={fixtureStyles.disclosure} open={search.get("examples") === "1"} onToggle={event => {
@@ -308,6 +313,6 @@ export function ResourcesPage() {
         </details>
       </section>
       )}
-    </PageFrame>
+    </PageFrame></div>
   );
 }

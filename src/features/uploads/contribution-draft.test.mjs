@@ -213,3 +213,13 @@ test("response loss plus reload retries one create with the persisted first payl
   assert.equal(serverCreates.size, 1);
   assert.deepEqual(serverCreates.get("create-request-0911"), expectedPayload);
 });
+
+test("new plain drafts retain layout and legacy drafts retain Markdown semantics", () => {
+  const body = "\n  이름      역할\n  민규\t진행\n";
+  const plain = { ...complete, bodyFormat: "plain", body };
+  assert.deepEqual(contributionDraftCodec.decode(contributionDraftCodec.encode(plain)), plain);
+  assert.equal(emptyContributionDraftValue("작성자", "자료", "마음공부").bodyFormat, "plain");
+  assert.equal(contributionSubmissionPayload(plain).textContent.format, "plain");
+  assert.equal(contributionSubmissionPayload(plain).textContent.body, body);
+  assert.equal(contributionSubmissionPayload(complete).textContent.format, "markdown");
+});

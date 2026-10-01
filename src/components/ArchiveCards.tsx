@@ -211,7 +211,7 @@ export function MaterialRow({
         <p className={discoveryStyles.materialExcerpt}>
           {[showActivity && activity ? activity.title : "", isPublished ? material.owner : "", material.description.trim() ? sentence(material.description) : ""].filter((part) => part.trim()).join(" · ")}
         </p>
-        {textContent && <details className={discoveryStyles.materialBody}><summary>본문 읽기</summary><MarkdownBody body={textContent.body} /></details>}
+        {textContent && <details className={discoveryStyles.materialBody}><summary>본문 읽기</summary><MarkdownBody format={textContent.format} body={textContent.body} /></details>}
       </div>
       <div className="material-action">
         {editState === "error" && <small role="alert">수정 화면을 열지 못했어요. 다시 시도해 주세요.</small>}

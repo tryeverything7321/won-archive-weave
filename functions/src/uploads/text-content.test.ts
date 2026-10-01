@@ -35,3 +35,11 @@ test('bounds text before trimming so oversized blank input cannot evade the limi
   assert.throws(() => normalizeTextContent({ format: 'markdown', body: '가'.repeat(50_001) }), { code: 'invalid-argument' })
   assert.throws(() => normalizeTextContent({ format: 'markdown', body: ' '.repeat(50_001) }), { code: 'invalid-argument' })
 })
+
+test('plain mode preserves positional whitespace including edge blank lines', () => {
+  const body = '\r\n  이름      역할\r\n  민규\t진행  \r\n# 그대로 표시\r\n';
+  assert.deepEqual(normalizeTextContent({ schemaVersion: 1, format: 'plain', body }), {
+    schemaVersion: 1, format: 'plain', body: body.replace(/\r\n/g, '\n'),
+  })
+  assert.equal(normalizeTextContent({ format: 'plain', body: ' \n\t' }), undefined)
+})

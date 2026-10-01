@@ -16,6 +16,7 @@ type InstagramDraftAttachment = {
 export type ContributionDraftFields = {
   sourceMode: typeof sourceModes[number];
   body: string;
+  bodyFormat?: "plain" | "markdown";
   sourceLinkUrl: string;
   instagramAttachments: InstagramDraftAttachment[];
   title: string;
@@ -61,6 +62,7 @@ export function emptyContributionDraftValue(
   return {
     sourceMode: "text",
     body: "",
+    bodyFormat: "plain",
     sourceLinkUrl: "",
     instagramAttachments: [],
     title: "",
@@ -150,6 +152,7 @@ function decodeContributionDraftFields(value: unknown): ContributionDraftFields 
   return {
     sourceMode: oneOf(record, "sourceMode", sourceModes),
     body: stringField(record, "body", 50_000),
+    ...(record.bodyFormat === undefined ? {} : { bodyFormat: oneOf(record, "bodyFormat", ["plain", "markdown"] as const) }),
     sourceLinkUrl: sourceLinkField(record),
     instagramAttachments: instagramField(record),
     title: stringField(record, "title", 120),
@@ -239,7 +242,7 @@ export function contributionSubmissionPayload(value: ContributionDraftFields): R
   return {
     title: value.title,
     sourceMode: value.sourceMode,
-    textContent: { schemaVersion: 1, format: "markdown", body: value.body },
+    textContent: { schemaVersion: 1, format: value.bodyFormat ?? "markdown", body: value.body },
     ...(value.sourceMode === "google_drive_link"
       ? { sourceLinkUrl: value.sourceLinkUrl.trim() }
       : value.sourceMode === "instagram_url" ? { instagramAttachments: value.instagramAttachments } : {}),

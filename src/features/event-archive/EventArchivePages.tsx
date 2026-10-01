@@ -27,6 +27,7 @@ import {
   type ArchiveRelationTarget,
   type EventArchiveOverview,
 } from "./event-archive-model";
+import { AuthorAccessGate } from "../auth/AuthorAccessGate";
 import styles from "./EventArchive.module.css";
 
 function PageHeader({ title, description }: { title: string; description: string }) {
@@ -34,6 +35,10 @@ function PageHeader({ title, description }: { title: string; description: string
 }
 
 export function PastArchiveEventCreatePage() {
+  return <AuthorAccessGate><PastArchiveEventForm /></AuthorAccessGate>;
+}
+
+function PastArchiveEventForm() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [heldYear, setHeldYear] = useState(String(new Date().getFullYear()));
@@ -75,7 +80,7 @@ export function PastArchiveEventCreatePage() {
 
   return <section className={styles.page}>
     <Link className="back-link" to="/calendar"><ArrowLeft size={17} /> 행사 일정으로 돌아가기</Link>
-    <PageHeader title="과거 행사를 기록해요" description="정확한 날짜를 모르면 개최 연도만 저장합니다. 임의 날짜를 채우지 않습니다." />
+    <PageHeader title="과거 행사를 기록해요" description="날짜가 기억나지 않으면 연도만 입력해도 돼요." />
     <form className={styles.form} onSubmit={submit}>
       <div className={styles.formGrid}>
         <label>행사 이름<input required maxLength={120} value={title} onChange={(event) => setTitle(event.target.value)} /></label>
@@ -142,7 +147,7 @@ export function ArchiveCollectionsPage() {
   };
   useEffect(() => { void listArchiveCollections({ limit: 30 }).then((result) => { setItems(result.items); setCursor(result.nextCursor); setState("ready"); }).catch(() => setState("error")); }, []);
   return <section className={styles.page}>
-    <PageHeader title="자료 모음" description="같은 원본을 다시 올리지 않고 행사·자료·기록을 한 목록으로 연결합니다." />
+    <PageHeader title="자료 모음" description="다음에 다시 보고 싶은 행사와 자료를 모아 보세요." />
     <div className={styles.actions}><Link className="button button-primary" to="/collections/new"><Plus size={17} /> 새 모음 만들기</Link></div>
     {state === "loading" && <p className={styles.status} role="status">자료 모음을 불러오고 있어요.</p>}
     {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert">자료 모음을 불러오지 못했어요.</p>}
@@ -167,7 +172,7 @@ function CollectionForm({ existing }: { existing?: ArchiveCollection }) {
   const loadCandidates = useCallback(async (cursor?: string) => {
     setCandidateLoading(true); setCandidateError("");
     try { const result = await searchArchiveDiscovery({ limit: 40, cursor }); setCandidates((current) => [...(cursor ? current : []), ...result.items.map((item, index) => ({ ...item, order: index }))] as ArchiveCollectionItem[]); setCandidateCursor(result.nextCursor); }
-    catch { setCandidateError("원본 목록을 불러오지 못했어요"); }
+    catch { setCandidateError("담을 자료를 불러오지 못했어요"); }
     finally { setCandidateLoading(false); }
   }, []);
   const [state, setState] = useState<"idle" | "working" | "error">("idle");
@@ -189,9 +194,9 @@ function CollectionForm({ existing }: { existing?: ArchiveCollection }) {
     <label>모음 이름<input required maxLength={120} value={title} onChange={(event) => setTitle(event.target.value)} /></label>
     <label>설명<textarea maxLength={1000} value={description} onChange={(event) => setDescription(event.target.value)} /></label>
     <label>공개 범위<select value={visibility} onChange={(event) => setVisibility(event.target.value as ArchiveCollectionVisibility)}><option value="public">누구나 보기</option><option value="member_only">위브 로그인 이용자만 보기</option><option value="hold">아직 공개하지 않기</option></select></label>
-    <section className={styles.group}><h2>연결할 원본</h2><p>항목을 추가해도 원본 파일은 복사되지 않습니다.</p><div className={styles.grid}>{candidates.map((item) => { const checked = selected.some((value) => value.targetType === item.targetType && value.id === item.id); return <label className={styles.item} key={`${item.targetType}:${item.id}`}><input type="checkbox" checked={checked} onChange={() => toggle(item)} /> <strong>{item.title}</strong><small>{archiveTargetLabel(item.targetType)}</small></label>; })}</div></section>
-    {candidateLoading && <p role="status">원본 목록을 불러오는 중</p>}
-    {(candidateCursor || candidateError) && <button type="button" disabled={candidateLoading} onClick={() => void loadCandidates(candidateCursor)}>{candidateError ? "원본 목록 다시 시도" : "연결할 원본 더 보기"}</button>}
+    <section className={styles.group}><h2>모음에 담기</h2><p>함께 볼 자료와 기록을 선택해 주세요.</p><div className={styles.grid}>{candidates.map((item) => { const checked = selected.some((value) => value.targetType === item.targetType && value.id === item.id); return <label className={styles.item} key={`${item.targetType}:${item.id}`}><input type="checkbox" checked={checked} onChange={() => toggle(item)} /> <strong>{item.title}</strong><small>{archiveTargetLabel(item.targetType)}</small></label>; })}</div></section>
+    {candidateLoading && <p role="status">담을 자료를 불러오는 중</p>}
+    {(candidateCursor || candidateError) && <button type="button" disabled={candidateLoading} onClick={() => void loadCandidates(candidateCursor)}>{candidateError ? "자료 목록 다시 시도" : "담을 자료 더 보기"}</button>}
     {candidateError && <p role="alert">{candidateError}</p>}
     {selected.length > 0 && <section className={styles.group}><h2>표시 순서</h2><ol className={styles.connectorResults}>{selected.map((item, index) => <li key={`${item.targetType}:${item.id}`}><span>{item.title}</span><span className={styles.collectionActions}><button type="button" aria-label={`${item.title} 위로`} disabled={index === 0} onClick={() => move(index, -1)}><ArrowUp size={16} /></button><button type="button" aria-label={`${item.title} 아래로`} disabled={index === selected.length - 1} onClick={() => move(index, 1)}><ArrowDown size={16} /></button><button type="button" aria-label={`${item.title} 모음에서 제거`} onClick={() => toggle(item)}><X size={16} /></button></span></li>)}</ol></section>}
     {message && <p className={`${styles.status} ${styles.error}`} role="alert">{message}</p>}
@@ -199,7 +204,7 @@ function CollectionForm({ existing }: { existing?: ArchiveCollection }) {
   </form>;
 }
 
-export function ArchiveCollectionCreatePage() { return <section className={styles.page}><Link className="back-link" to="/collections"><ArrowLeft size={17} /> 자료 모음으로 돌아가기</Link><PageHeader title="새 자료 모음" description="기존 행사·자료·기록을 참조해 목적에 맞는 목록을 만듭니다." /><CollectionForm /></section>; }
+export function ArchiveCollectionCreatePage() { return <section className={styles.page}><Link className="back-link" to="/collections"><ArrowLeft size={17} /> 자료 모음으로 돌아가기</Link><PageHeader title="새 자료 모음" description="함께 볼 행사와 자료, 기록을 골라 담아 보세요." /><AuthorAccessGate><CollectionForm /></AuthorAccessGate></section>; }
 
 export function ArchiveCollectionEditPage() {
   const { collectionId = "" } = useParams(); const [collection, setCollection] = useState<ArchiveCollection>(); const [failed, setFailed] = useState(false);
@@ -212,7 +217,7 @@ export function ArchiveCollectionDetailPage() {
   const { collectionId = "" } = useParams(); const [collection, setCollection] = useState<ArchiveCollection>(); const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   useEffect(() => { void getArchiveCollection(collectionId).then((result) => { setCollection(result ?? undefined); setState("ready"); }).catch(() => setState("error")); }, [collectionId]);
   const collectionItems = collection?.items ?? [];
-  return <section className={styles.page}><Link className="back-link" to="/collections"><ArrowLeft size={17} /> 자료 모음으로 돌아가기</Link>{state === "loading" && <p className={styles.status}>모음을 불러오고 있어요.</p>}{state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert">모음을 불러오지 못했어요.</p>}{state === "ready" && !collection && <PageHeader title="이 모음을 볼 수 없어요" description="모음이 없거나 현재 공개 범위에서 볼 수 없습니다." />}{collection && <><PageHeader title={collection.title} description={collection.description || "연결된 원본을 모아 봅니다."} /><div className={styles.actions}>{collection.canEdit && <Link className="button button-secondary" to={`/collections/${encodeURIComponent(collection.id)}/edit`}>모음 편집</Link>}</div>{collectionItems.length ? <div className={styles.grid}>{[...collectionItems].sort((a, b) => a.order - b.order).map((item) => <article className={styles.item} key={`${item.targetType}:${item.id}`}><Link to={item.targetType === "event" ? `/archive-events/${encodeURIComponent(item.id)}` : archiveRelationPath(item as ArchiveRelationSummary)} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link><small>{archiveTargetLabel(item.targetType)}</small></article>)}</div> : <p className={styles.status}>이 모음에 연결된 항목이 없어요.</p>}</>}</section>;
+  return <section className={styles.page}><Link className="back-link" to="/collections"><ArrowLeft size={17} /> 자료 모음으로 돌아가기</Link>{state === "loading" && <p className={styles.status}>모음을 불러오고 있어요.</p>}{state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert">모음을 불러오지 못했어요.</p>}{state === "ready" && !collection && <PageHeader title="이 모음을 볼 수 없어요" description="모음이 없거나 현재 공개 범위에서 볼 수 없습니다." />}{collection && <><PageHeader title={collection.title} description={collection.description || "함께 볼 자료와 기록입니다."} /><div className={styles.actions}>{collection.canEdit && <Link className="button button-secondary" to={`/collections/${encodeURIComponent(collection.id)}/edit`}>모음 편집</Link>}</div>{collectionItems.length ? <div className={styles.grid}>{[...collectionItems].sort((a, b) => a.order - b.order).map((item) => <article className={styles.item} key={`${item.targetType}:${item.id}`}><Link to={item.targetType === "event" ? `/archive-events/${encodeURIComponent(item.id)}` : archiveRelationPath(item as ArchiveRelationSummary)} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link><small>{archiveTargetLabel(item.targetType)}</small></article>)}</div> : <p className={styles.status}>이 모음에 연결된 항목이 없어요.</p>}</>}</section>;
 }
 
 export function ArchiveRelationCreatePage() {
@@ -243,7 +248,7 @@ export function ArchiveRelationCreatePage() {
       setCandidateCursor(result.nextCursor);
       setEvents((current) => [...current, ...result.items.flatMap((item) => item.targetType === "event" ? [{ id: item.id, title: item.title, heldYear: item.heldYear }] : [])]);
       setTargets((current) => [...current, ...result.items.flatMap((item) => item.targetType !== "event" && item.canLink ? [{ id: item.id, title: item.title, targetType: item.targetType }] : [])]);
-    } catch { setMessage("다음 원본 목록을 불러오지 못했어요. 다시 눌러 주세요."); }
+    } catch { setMessage("다음 담을 자료를 불러오지 못했어요. 다시 눌러 주세요."); }
     finally { setLoadingMore(false); }
   };
   const submit = async (event: FormEvent) => {
@@ -257,5 +262,5 @@ export function ArchiveRelationCreatePage() {
     catch { setState("error"); setMessage("행사에 연결하지 못했어요. 원본 소유권과 현재 상태를 확인해 주세요."); }
   };
   const malformedPreset = Boolean(rawTargetType || rawTargetId) && !(presetTargetType && rawTargetId);
-  return <section className={styles.page}><Link className="back-link" to={returnTo}><ArrowLeft size={17} /> 이전 화면으로 돌아가기</Link><PageHeader title="행사에 기존 원본 연결" description="연결만 추가하며 자료나 기록의 원본과 공개 범위는 바꾸지 않습니다." />{malformedPreset ? <p className={`${styles.status} ${styles.error}`} role="alert">연결할 원본 정보가 올바르지 않아요.</p> : <form className={styles.form} onSubmit={submit}>{!presetEventId && <label>연결할 행사<select required value={archiveEventId} onChange={(event) => setArchiveEventId(event.target.value)}><option value="">행사를 선택해 주세요</option>{events.map((event) => <option key={event.id} value={event.id}>{event.heldYear} · {event.title}</option>)}</select></label>}{!(presetTargetType && rawTargetId) && <label>연결할 기존 원본<select required value={targetKey} onChange={(event) => setTargetKey(event.target.value)}><option value="">자료나 기록을 선택해 주세요</option>{targets.map((item) => <option key={`${item.targetType}:${item.id}`} value={`${item.targetType}:${item.id}`}>{item.title}</option>)}</select></label>}{candidateCursor && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "행사·원본 목록 더 보기"}</button>}<p className={styles.muted}>목록에 행사가 없다면 먼저 연도만 있는 과거 행사를 만들 수 있어요.</p><div className={styles.actions}><Link className="button button-secondary" to="/archive-events/new">과거 행사 만들기</Link><button className="button button-primary" type="submit" disabled={state === "loading" || state === "working" || !archiveEventId || !targetKey}><Link2 size={17} /> {state === "working" ? "연결하는 중" : "행사에 연결"}</button></div>{message && <p className={`${styles.status} ${state === "error" ? styles.error : ""}`} role="alert">{message}</p>}</form>}</section>;
+  return <section className={styles.page}><Link className="back-link" to={returnTo}><ArrowLeft size={17} /> 이전 화면으로 돌아가기</Link><PageHeader title="행사에 기존 원본 연결" description="이 행사와 함께 볼 자료나 기록을 선택해 주세요." />{malformedPreset ? <p className={`${styles.status} ${styles.error}`} role="alert">연결할 원본 정보가 올바르지 않아요.</p> : <form className={styles.form} onSubmit={submit}>{!presetEventId && <label>연결할 행사<select required value={archiveEventId} onChange={(event) => setArchiveEventId(event.target.value)}><option value="">행사를 선택해 주세요</option>{events.map((event) => <option key={event.id} value={event.id}>{event.heldYear} · {event.title}</option>)}</select></label>}{!(presetTargetType && rawTargetId) && <label>연결할 기존 원본<select required value={targetKey} onChange={(event) => setTargetKey(event.target.value)}><option value="">자료나 기록을 선택해 주세요</option>{targets.map((item) => <option key={`${item.targetType}:${item.id}`} value={`${item.targetType}:${item.id}`}>{item.title}</option>)}</select></label>}{candidateCursor && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "행사·원본 목록 더 보기"}</button>}<p className={styles.muted}>목록에 행사가 없다면 먼저 연도만 있는 과거 행사를 만들 수 있어요.</p><div className={styles.actions}><Link className="button button-secondary" to="/archive-events/new">과거 행사 만들기</Link><button className="button button-primary" type="submit" disabled={state === "loading" || state === "working" || !archiveEventId || !targetKey}><Link2 size={17} /> {state === "working" ? "연결하는 중" : "행사에 연결"}</button></div>{message && <p className={`${styles.status} ${state === "error" ? styles.error : ""}`} role="alert">{message}</p>}</form>}</section>;
 }

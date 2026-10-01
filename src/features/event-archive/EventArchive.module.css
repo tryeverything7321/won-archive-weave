@@ -220,3 +220,12 @@
     justify-content: center;
   }
 }
+
+.conditions { border-block:1px solid #d8e5e3; padding-block:4px; }
+.conditions summary { cursor:pointer; min-height:44px; padding:12px 4px; color:#143957; font-weight:700; }
+.conditions[open] summary { margin-bottom:12px; }
+.conditions .formGrid { padding-bottom:16px; }
+.conditions summary:focus-visible { outline:3px solid #246e7a; outline-offset:3px; }
+
+.selectedConditions button { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:8px 12px; border:1px solid #c4d9d8; border-radius:10px; color:#143957; background:#edf4f2; font:inherit; cursor:pointer; }
+.selectedConditions button:focus-visible { outline:3px solid #246e7a; outline-offset:3px; }

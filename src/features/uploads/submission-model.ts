@@ -110,7 +110,7 @@ export function submissionPreviewNotice(
 }
 
 export type EditableSubmissionDraft = {
-  textContent?: { schemaVersion: 1; format: "markdown"; body: string };
+  textContent?: { schemaVersion: 1; format: "markdown" | "plain"; body: string };
   id: string;
   status: "draft" | "revision_requested";
   sourceMode: "text" | "upload" | "google_drive_link" | "instagram_url";
@@ -264,11 +264,11 @@ export function parseEditableSubmissionDraft(value: unknown): EditableSubmission
   if (data.textContent !== undefined && data.textContent !== null) {
     const text = data.textContent as Record<string, unknown>;
     if (typeof text !== "object" || Array.isArray(text)
-      || text.schemaVersion !== 1 || text.format !== "markdown"
+      || text.schemaVersion !== 1 || (text.format !== "markdown" && text.format !== "plain")
       || typeof text.body !== "string" || text.body.length > 50_000) {
       throw new Error("지원하지 않는 본문 형식이에요.");
     }
-    textContent = { schemaVersion: 1, format: "markdown", body: text.body };
+    textContent = { schemaVersion: 1, format: text.format, body: text.body };
   }
   if (
     typeof data.id !== "string"

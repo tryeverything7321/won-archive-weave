@@ -1,6 +1,6 @@
 import { HttpsError } from 'firebase-functions/v2/https'
 
-export type TextContent = { schemaVersion: 1; format: 'markdown'; body: string }
+export type TextContent = { schemaVersion: 1; format: 'markdown' | 'plain'; body: string }
 
 export function normalizeTextContent(value: unknown): TextContent | undefined {
   if (value === undefined || value === null) return undefined
@@ -9,7 +9,7 @@ export function normalizeTextContent(value: unknown): TextContent | undefined {
   }
   const data = value as Record<string, unknown>
   if ((data.schemaVersion !== undefined && data.schemaVersion !== 1)
-    || data.format !== 'markdown' || typeof data.body !== 'string') {
+    || (data.format !== 'markdown' && data.format !== 'plain') || typeof data.body !== 'string') {
     throw new HttpsError('invalid-argument', '지원하지 않는 본문 형식이에요')
   }
   if (data.body.length > 50_000) {
@@ -17,6 +17,6 @@ export function normalizeTextContent(value: unknown): TextContent | undefined {
   }
   const normalized = data.body.replace(/\r\n?/g, '\n')
   if (!normalized.trim()) return undefined
-  const body = normalized.replace(/^(?:[ \t]*\n)+/, '').replace(/(?:\n[ \t]*)+$/, '')
-  return { schemaVersion: 1, format: 'markdown', body }
+  const body = data.format === 'plain' ? normalized : normalized.replace(/^(?:[ \t]*\n)+/, '').replace(/(?:\n[ \t]*)+$/, '')
+  return { schemaVersion: 1, format: data.format, body }
 }

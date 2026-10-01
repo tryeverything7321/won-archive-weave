@@ -1,9 +1,10 @@
+import { OpeningWelcome } from "../features/opening/OpeningWelcome";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ActivityCard } from "../components/ArchiveCards";
 import { activities } from "../content";
 import { InstagramFeed } from "../features/social/InstagramFeed";
-import { PurposeHome } from "../features/experience/PurposeHome";
+import { PurposeHome, SecondaryHomePaths } from "../features/experience/PurposeHome";
 import { UpcomingEvents } from "../features/landing/UpcomingEvents";
 import { showPublicFixtures } from "../config/public-fixtures";
 import fixtureStyles from "./FixtureDisclosure.module.css";
@@ -13,6 +14,8 @@ export function HomePage() {
     <>
       <PurposeHome />
       <UpcomingEvents />
+      <SecondaryHomePaths />
+      <OpeningWelcome />
       {showPublicFixtures && <section
         className="home-preview section-frame"
         aria-labelledby="preview-title"

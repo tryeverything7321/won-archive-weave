@@ -18,13 +18,19 @@ export function PurposeHome() {
     <nav className={styles.purposes} aria-label="위브에서 시작할 일">
       {purposes.map(({ to, label, detail, icon: Icon, cue }) => <Link key={to} to={to} className={styles.purpose}>
         <div className={styles.purposeCue}><Icon size={24} aria-hidden="true" /><span>{cue}</span></div>
-        <h2>{label}</h2><p>{detail}</p><span className={styles.purposeAction}>바로 시작하기 <ArrowRight size={20} aria-hidden="true" /></span>
+        <h2>{label}</h2><p>{detail}</p><span className={styles.purposeAction}><span className={styles.purposeActionLabel}>바로 시작하기</span> <ArrowRight size={20} aria-hidden="true" /></span>
       </Link>)}
     </nav>
+
+  </section>;
+}
+
+export function SecondaryHomePaths() {
+  return <nav className="section-frame" aria-label="위브 더 둘러보기">
     <div className={styles.secondaryPaths}>
       <Link to="/archive">다른 모임의 활동 기록 보기 <ArrowRight size={16} aria-hidden="true" /></Link>
       <Link to="/community">요즘 나누는 이야기 보기 <ArrowRight size={16} aria-hidden="true" /></Link>
       <Link to="/start">원불교가 처음이라면 <ArrowRight size={16} aria-hidden="true" /></Link>
     </div>
-  </section>;
+  </nav>;
 }

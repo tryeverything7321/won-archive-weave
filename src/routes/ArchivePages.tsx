@@ -433,7 +433,7 @@ export function ActivityPage() {
       <div className="detail-layout">
         <section>
           <h2>활동 이야기</h2>
-          {'textContent' in activity && readTextContent(activity.textContent) ? <MarkdownBody body={readTextContent(activity.textContent)!.body} /> : <p>{sentence(activity.story)}</p>}
+          {'textContent' in activity && readTextContent(activity.textContent) ? <MarkdownBody format={readTextContent(activity.textContent)!.format} body={readTextContent(activity.textContent)!.body} /> : <p>{sentence(activity.story)}</p>}
           {activity.outcome.trim() && <div className="outcome">
             <strong>남긴 결과</strong>
             <span>{sentence(activity.outcome)}</span>

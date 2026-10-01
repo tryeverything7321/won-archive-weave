@@ -1,3 +1,4 @@
+import { FieldRequirement } from "../../components/forms/FieldRequirement";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -138,6 +139,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
   const previewFileInput = useRef<HTMLInputElement>(null);
   const [sourceMode, setSourceMode] = useState<SourceMode>("text");
   const [body, setBody] = useState('');
+  const [bodyFormat, setBodyFormat] = useState<'plain' | 'markdown'>('plain');
   const previousUid = useRef(user?.uid);
   const successHeading = useRef<HTMLHeadingElement>(null);
   const attemptRevision = useRef(0);
@@ -201,6 +203,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
   const contributionDraftValue = useMemo<ContributionDraftValue>(() => ({
     sourceMode,
     body,
+    bodyFormat,
     sourceLinkUrl,
     instagramAttachments,
     title,
@@ -238,6 +241,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
     activityType,
     attribution,
     body,
+    bodyFormat,
     consentBasis,
     consentConfirmed,
     draftCreateReservation,
@@ -261,6 +265,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
   const restoreContributionDraft = useCallback((draft: ContributionDraftValue) => {
     setSourceMode(draft.sourceMode);
     setBody(draft.body);
+    setBodyFormat(draft.bodyFormat ?? "markdown");
     setSourceLinkUrl(draft.sourceLinkUrl);
     setInstagramAttachments(draft.instagramAttachments);
     setTitle(draft.title);
@@ -305,6 +310,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
     attemptRevision.current += 1;
     initialCreatePayload.current = null;
     setBody("");
+    setBodyFormat("plain");
     setTitle("");
     setOwner(nextOwner);
     setSource("");
@@ -392,6 +398,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
         if (!active) return;
         setSourceMode(draft.sourceMode);
         setBody(draft.textContent?.body ?? '');
+        setBodyFormat(draft.textContent?.format ?? 'markdown');
         setTitle(draft.title);
         setSource(draft.source);
         setOwner(draft.owner);
@@ -466,7 +473,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
     if (!services || !user) {
       setStatus({
         tone: "error",
-        message: "먼저 네이버 또는 카카오로 로그인해 주세요.",
+        message: "먼저 로그인해 주세요.",
       });
       return;
     }
@@ -854,6 +861,10 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
             provider="naver"
             onClick={() => startOAuthLogin("naver", contributionReturnTo(window.location.search, window.location.hash))}
           />
+<ProviderLoginButton
+            provider="google"
+            onClick={() => startOAuthLogin("google", contributionReturnTo(window.location.search, window.location.hash))}
+          />
         </div>
       ) : editingSubmissionId && editLoad === "loading" ? (
         <div className="contribution-message working" role="status">
@@ -913,11 +924,11 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
             <p>제목과 만든 사람을 먼저 적어 주세요.</p>
             <div className="contribution-fields">
               <label>
-                <span>제목 (필수)</span>
+                <span>제목 <FieldRequirement /></span>
                 <input id="contribution-first-input" required maxLength={120} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="예: 청년 정기훈련 회고 자료" />
               </label>
               <label>
-                <span>만든 사람 또는 단체 (필수)</span>
+                <span>만든 사람 또는 단체 <FieldRequirement /></span>
                 <input required maxLength={160} value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="예: 서울 청년회" />
               </label>
             </div>
@@ -925,7 +936,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
 
           {hasActivityDetails && (
             <details className="contribution-optional">
-              <summary>활동 이야기를 조금 더 들려주기 <span>선택</span></summary>
+              <summary>활동 이야기를 조금 더 들려주기 <FieldRequirement optional /></summary>
               <fieldset className="contribution-step">
               <legend>활동 정보</legend>
               <p id="activity-details-help">
@@ -1015,7 +1026,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
 
           {hasRecipeDetails && (
             <details className="contribution-optional">
-              <summary>다른 지역에 도움이 될 운영 팁 더하기 <span>선택</span></summary>
+              <summary>다른 지역에 도움이 될 운영 팁 더하기 <FieldRequirement optional /></summary>
               <fieldset className="contribution-step">
               <legend>활동 운영 노하우</legend>
               <p id="activity-recipe-help">
@@ -1077,7 +1088,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
           <fieldset className="contribution-step">
             <legend>본문 작성</legend>
             <p>직접 적거나 TXT·MD 파일의 내용을 가져오세요. 본문을 쓴 뒤에도 첨부 파일이나 원문 링크를 함께 연결할 수 있어요.</p>
-            <TextComposer key={`${user?.uid ?? 'guest'}-${composerKey}`} value={body} onChange={setBody} required={sourceMode === 'text'} />
+            <TextComposer key={`${user?.uid ?? 'guest'}-${composerKey}`} value={body} onChange={setBody} format={bodyFormat} onFormatChange={setBodyFormat} required={sourceMode === 'text'} />
           </fieldset>
 
           <fieldset className="contribution-step" id="contribution-source">
@@ -1122,7 +1133,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
                 <div className={styles.filePickerGroup}>
                   <label className="file-field">
                     <FileCheck2 size={22} aria-hidden="true" />
-                    <span>{file ? "다른 첨부 파일 선택" : existingFileCount > 0 ? "기존 첨부 파일 교체" : "첨부 파일 선택 (필수)"}</span>
+                    <span>{file ? "다른 첨부 파일 선택" : existingFileCount > 0 ? "기존 첨부 파일 교체" : "첨부 파일 선택"}{!file && existingFileCount === 0 && <FieldRequirement />}</span>
                     <input
                       ref={fileInput}
                       required={!file && (!editingSubmissionId || existingFileCount === 0)}
@@ -1193,7 +1204,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
               </>
             ) : sourceMode === "google_drive_link" ? (
               <label className="source-link-field">
-                <span>Google Drive 또는 Docs 링크 (필수)</span>
+                <span>Google Drive 또는 Docs 링크 <FieldRequirement /></span>
                 <input
                   required
                   type="url"
@@ -1225,7 +1236,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
             <p>이 내용을 처음 올리기 전에 누가 볼 수 있는지 직접 선택해 주세요.</p>
             <div className="contribution-fields">
               <label>
-                <span>누가 볼 수 있나요 (필수)</span>
+                <span>누가 볼 수 있나요 <FieldRequirement /></span>
                 <select
                   required
                   value={visibility ?? ""}
@@ -1270,7 +1281,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
                     setSensitiveDataReviewed(event.target.checked);
                   }}
                 />
-                <span>공유할 권한이 있으며 개인정보나 공개하면 안 되는 내용이 없는지 확인했어요 (필수)</span>
+                <span>공유할 권한이 있으며 개인정보나 공개하면 안 되는 내용이 없는지 확인했어요 <FieldRequirement /></span>
               </label>
             </div>
           </fieldset>
@@ -1278,7 +1289,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
           </div>
 
           <details className="contribution-optional">
-            <summary>출처와 이용 방법 바꾸기 <span>선택</span></summary>
+            <summary>출처와 이용 방법 바꾸기 <FieldRequirement optional /></summary>
             <fieldset className="contribution-step">
               <legend>세부 출처 설정</legend>
               <div className="contribution-fields">

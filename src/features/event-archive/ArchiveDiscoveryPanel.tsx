@@ -25,6 +25,7 @@ export function ArchiveDiscoveryPanel() {
     format: search.get("archiveFormat") || undefined,
   }), [search]);
   const active = keys.some((key) => search.has(key));
+  const [conditionsOpen, setConditionsOpen] = useState(active);
 
   useEffect(() => {
     if (!ready) return;
@@ -65,15 +66,18 @@ export function ArchiveDiscoveryPanel() {
   const facets = result?.facets;
 
   return <section className={styles.section} aria-labelledby="archive-discovery-title">
-    <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">행사와 주최로 자료 찾기</h2><p>개최 연도와 업로드 연도는 서로 다른 기준입니다. 행사 없는 독립 자료에는 개최 연도를 붙이지 않습니다.</p></div><Filter size={26} aria-hidden="true" /></div>
+    <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">행사·자료 묶음·기록 찾기</h2><p>주최나 행사가 열린 해로 찾아보세요.</p></div><Filter size={26} aria-hidden="true" /></div>
+    <details className={styles.conditions} open={conditionsOpen} onToggle={event => setConditionsOpen(event.currentTarget.open)}>
+      <summary>상세 조건{active ? ` · ${keys.filter(key => search.has(key)).length}개 적용` : ""}</summary>
     <div className={styles.formGrid}>
       <label className={styles.form}>주최<select value={filters.organizerId ?? ""} onChange={(event) => setFilter("organizer", event.target.value)}><option value="">모든 주최</option>{facets?.organizers.map((item) => <option key={item.id} value={item.id}>{item.displayName}</option>)}</select></label>
-      <label className={styles.form}>개최 연도<select value={filters.heldYear ?? ""} onChange={(event) => setFilter("heldYear", event.target.value)}><option value="">모든 개최 연도</option>{facets?.heldYears.map((year) => <option key={year}>{year}</option>)}</select></label>
-      <label className={styles.form}>업로드 연도<select value={filters.uploadYear ?? ""} onChange={(event) => setFilter("uploadYear", event.target.value)}><option value="">모든 업로드 연도</option>{facets?.uploadYears.map((year) => <option key={year}>{year}</option>)}</select></label>
+      <label className={styles.form}>개최 연도<span className={styles.muted}>행사가 열린 해</span><select value={filters.heldYear ?? ""} onChange={(event) => setFilter("heldYear", event.target.value)}><option value="">모든 개최 연도</option>{facets?.heldYears.map((year) => <option key={year}>{year}</option>)}</select></label>
+      <label className={styles.form}>업로드 연도<span className={styles.muted}>자료를 올린 해</span><select value={filters.uploadYear ?? ""} onChange={(event) => setFilter("uploadYear", event.target.value)}><option value="">모든 업로드 연도</option>{facets?.uploadYears.map((year) => <option key={year}>{year}</option>)}</select></label>
       <label className={styles.form}>개최 지역<select value={filters.region ?? ""} onChange={(event) => setFilter("region", event.target.value)}><option value="">모든 지역</option>{facets?.regions.map((region) => <option key={region}>{region}</option>)}</select></label>
       <label className={styles.form}>자료 형식<select value={filters.format ?? ""} onChange={(event) => setFilter("archiveFormat", event.target.value)}><option value="">모든 형식</option>{facets?.formats.map((format) => <option key={format}>{format}</option>)}</select></label>
     </div>
-    {active && <div className={styles.actions}><button type="button" className="button button-secondary" onClick={reset}><X size={16} /> 행사 기준 초기화</button></div>}
+    </details>
+    {active && <div className={`${styles.actions} ${styles.selectedConditions}`} aria-label="적용한 상세 조건">{keys.filter(key => search.has(key)).map(key => <button type="button" key={key} onClick={() => setFilter(key, "")} aria-label={`${({ organizer: "주최", heldYear: "개최 연도", uploadYear: "업로드 연도", region: "지역", archiveFormat: "형식" })[key]} 조건 해제`}>{({ organizer: "주최", heldYear: "개최 연도", uploadYear: "업로드 연도", region: "지역", archiveFormat: "형식" })[key]}: {key === "organizer" ? facets?.organizers.find(item => item.id === search.get(key))?.displayName ?? "선택한 주최" : search.get(key)} <X size={14} aria-hidden="true" /></button>)}<button type="button" className="button button-secondary" onClick={reset}><X size={16} /> 행사 기준 초기화</button></div>}
     {state === "loading" && <p className={styles.status} role="status">행사와 연결된 자료를 찾고 있어요.</p>}
     {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert"><RotateCcw size={16} /> 행사 기준 검색을 완료하지 못했어요.</p>}
     {state === "ready" && result && <>

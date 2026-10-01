@@ -1,11 +1,11 @@
-export type TextContent = { schemaVersion: 1; format: 'markdown'; body: string }
+export type TextContent = { schemaVersion: 1; format: 'markdown' | 'plain'; body: string }
 
 export function readTextContent(value: unknown): TextContent | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
   const data = value as Record<string, unknown>
-  return data.schemaVersion === 1 && data.format === 'markdown'
+  return data.schemaVersion === 1 && (data.format === 'markdown' || data.format === 'plain')
     && typeof data.body === 'string' && data.body.length <= 50_000 && data.body.trim()
-    ? { schemaVersion: 1, format: 'markdown', body: data.body } : undefined
+    ? { schemaVersion: 1, format: data.format, body: data.body } : undefined
 }
 
 export function safeContentUrl(value: string): string {
@@ -16,7 +16,7 @@ export function safeContentUrl(value: string): string {
 }
 
 export function importText(name: string, bytes: ArrayBuffer): string {
-  if (!/\.(md|txt)$/i.test(name)) throw new Error('텍스트(.txt) 또는 Markdown(.md) 파일을 선택해 주세요.')
+  if (!/\.(md|txt)$/i.test(name)) throw new Error('TXT 또는 MD 텍스트 파일을 선택해 주세요.')
   if (bytes.byteLength > 1024 * 1024) throw new Error('1MB 이하의 파일을 선택해 주세요.')
   let body: string
   try { body = new TextDecoder('utf-8', { fatal: true }).decode(bytes).replace(/\r\n?/g, '\n') }

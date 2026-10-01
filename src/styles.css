@@ -13014,3 +13014,20 @@ section[aria-label="자료 본문"] {
 
 .provider-login-google-button { display: inline-flex; justify-content: center; align-items: center; gap: 12px; width: min(100%, 244px); min-height: 60px; border: 1px solid #747775; border-radius: 10px; background: #fff; color: #1f1f1f; font: 500 16px Arial, sans-serif; }
 .provider-login-google-button .provider-mark { width: 20px; height: 20px; object-fit: contain; }
+
+/* Keep the control compact; its enclosing label supplies the touch target. */
+main label input[type="checkbox"] { box-sizing:border-box; flex:0 0 20px; width:20px; height:20px; min-width:20px; min-height:20px; max-height:20px; padding:0; accent-color:#146fa8; }
+main label:has(> input[type="checkbox"]) { min-height:44px; cursor:pointer; }
+main .consent-field { display:flex; align-items:flex-start; gap:10px; min-height:44px; }
+main .consent-field > input[type="checkbox"] { margin:2px 0 0; }
+main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
+
+.community-section-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px; }
+.community-section-tabs > a { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; min-height:44px; border:1px solid #b9d0da; border-radius:12px; color:#143957; background:#fff; font-weight:700; }
+.community-section-tabs > a[aria-current="page"] { background:#143957; color:#fff; }
+.community-new { display:inline-flex; align-items:center; gap:3px; background:#fff1a8; color:#6a4b00; border-radius:6px; padding:2px 6px; font-size:11px; line-height:1.5; }
+.community-new svg { color:#966300; }
+.community-section-tabs a:focus-visible { outline:3px solid #146fa8; outline-offset:3px; }
+.community-opening-intro { padding:20px; margin-bottom:24px; border-radius:16px; background:#edf8f4; color:#143957; }
+.community-opening-intro h2 { margin:0 0 10px; font-size:22px; }
+.community-opening-intro p { margin:0; line-height:1.7; }

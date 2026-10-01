@@ -1,3 +1,4 @@
+import { FieldRequirement } from "../../components/forms/FieldRequirement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
@@ -319,6 +320,11 @@ export function EventEditor({ eventId, draftId, returnTo = "/calendar/new", init
                 provider="naver"
                 onClick={() => startOAuthLogin("naver", returnTo)}
               />
+<ProviderLoginButton
+                disabled={!isOAuthConfigured}
+                provider="google"
+                onClick={() => startOAuthLogin("google", returnTo)}
+              />
             </div>
           )}
           {services && !isOAuthConfigured && <small>로그인 연결을 준비하고 있어요.</small>}
@@ -345,15 +351,15 @@ export function EventEditor({ eventId, draftId, returnTo = "/calendar/new", init
           <div className={authoringStyles.eventCore} id="event-core">
             <fieldset className="event-editor-step">
               <legend><span>1</span> 어떤 행사인지 알려 주세요</legend>
-              <label className="field-wide">행사 이름 (필수)<input required value={value.title} onChange={(event) => set("title", event.target.value)} maxLength={120} /></label>
-              <label>주최 (필수)<input required value={value.organizerName} onChange={(event) => set("organizerName", event.target.value)} maxLength={80} /></label>
-              <label>지역 (필수)<input required value={value.region} onChange={(event) => set("region", event.target.value)} maxLength={40} /></label>
+              <label className="field-wide"><span>행사 이름 <FieldRequirement /></span><input required value={value.title} onChange={(event) => set("title", event.target.value)} maxLength={120} /></label>
+              <label><span>주최 <FieldRequirement /></span><input required value={value.organizerName} onChange={(event) => set("organizerName", event.target.value)} maxLength={80} /></label>
+              <label><span>지역 <FieldRequirement /></span><input required value={value.region} onChange={(event) => set("region", event.target.value)} maxLength={40} /></label>
             </fieldset>
 
             <fieldset className="event-editor-step">
               <legend><span>2</span> 언제 어디에서 만나는지 적어 주세요</legend>
-              <label>{value.allDay ? "시작일" : "시작"} (필수)<input required type={value.allDay ? "date" : "datetime-local"} value={eventEditorDateInputValue(value.startAt, value.allDay)} onChange={(event) => set("startAt", value.allDay ? eventEditorSetAllDayDate(value.startAt, event.target.value) : event.target.value)} /></label>
-              <label>{value.allDay ? "종료일 (이 날까지 포함)" : "종료"} (필수)<input required type={value.allDay ? "date" : "datetime-local"} value={eventEditorDateInputValue(value.endAt, value.allDay)} onChange={(event) => set("endAt", value.allDay ? eventEditorSetAllDayDate(value.endAt, event.target.value) : event.target.value)} /></label>
+              <label><span>{value.allDay ? "시작일" : "시작"} <FieldRequirement /></span><input required type={value.allDay ? "date" : "datetime-local"} value={eventEditorDateInputValue(value.startAt, value.allDay)} onChange={(event) => set("startAt", value.allDay ? eventEditorSetAllDayDate(value.startAt, event.target.value) : event.target.value)} /></label>
+              <label><span>{value.allDay ? "종료일 (이 날까지 포함)" : "종료"} <FieldRequirement /></span><input required type={value.allDay ? "date" : "datetime-local"} value={eventEditorDateInputValue(value.endAt, value.allDay)} onChange={(event) => set("endAt", value.allDay ? eventEditorSetAllDayDate(value.endAt, event.target.value) : event.target.value)} /></label>
               <label className="event-check field-wide"><input type="checkbox" checked={value.allDay} onChange={(event) => {
                 invalidateOperation();
                 setValue((current) => eventEditorToggleAllDay(current, event.target.checked));
@@ -445,7 +451,7 @@ export function EventEditor({ eventId, draftId, returnTo = "/calendar/new", init
 
           <fieldset className="event-editor-step event-editor-step-visibility" id="event-visibility">
             <legend><span>4</span> 공개 범위를 확인해 주세요</legend>
-            <label className="field-wide">공개 범위 (필수)
+            <label className="field-wide"><span>공개 범위 <FieldRequirement /></span>
               <select
                 required
                 value={visibilitySelected ? value.visibility : ""}

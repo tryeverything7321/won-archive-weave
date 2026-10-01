@@ -1,3 +1,5 @@
+import { OpeningCommunityTabs } from "./OpeningCommunityTabs";
+import { OPENING_PREFIX, openingPostBody, isOpeningPost } from "./opening-community-model";
 import { FEEDBACK_MARKER, FEEDBACK_PREFIX, launchFeedbackBody } from "../feedback/launch-feedback-model";
 import { useLocation } from "react-router-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -99,6 +101,8 @@ function postView(
 }
 
 function Gate({ configured }: { configured: boolean }) {
+  const location = useLocation();
+  const returnTo = `${location.pathname}${location.search}${location.hash}`;
   return (
     <section className="page-frame section-frame">
       <div className="page-intro">
@@ -113,6 +117,7 @@ function Gate({ configured }: { configured: boolean }) {
           이용자에게는 별명과 로그인 경로만 보입니다.
         </span>
       </div>
+      <OpeningCommunityTabs />
       <section className="community-gate">
         <div className="gate-orbits" aria-hidden="true">
           <span />
@@ -134,15 +139,15 @@ function Gate({ configured }: { configured: boolean }) {
           <div className="community-login-actions">
             <ProviderLoginButton
               disabled={!configured}
-              onClick={() => startOAuthLogin("kakao", "/community")}
+              onClick={() => startOAuthLogin("kakao", returnTo)}
               provider="kakao"
             />
             <ProviderLoginButton
               disabled={!configured}
-              onClick={() => startOAuthLogin("naver", "/community")}
+              onClick={() => startOAuthLogin("naver", returnTo)}
               provider="naver"
             />
-              <ProviderLoginButton disabled={!isOAuthConfigured} provider="google" onClick={() => startOAuthLogin("google", "/community")} />
+              <ProviderLoginButton disabled={!isOAuthConfigured} provider="google" onClick={() => startOAuthLogin("google", returnTo)} />
           </div>
           <small>
             {configured
@@ -238,7 +243,8 @@ export function CommunityExperience() {
   const hasLoadedOlderPosts = useRef(false);
   const { search: routeSearch } = useLocation();
   const feedbackMode = new URLSearchParams(routeSearch).get("feedback") === "launch";
-  const bodyLimit = feedbackMode ? 2000 - FEEDBACK_PREFIX.length : 2000;
+  const openingMode = new URLSearchParams(routeSearch).get("tab") === "opening";
+  const bodyLimit = 2000 - (openingMode ? OPENING_PREFIX.length : feedbackMode ? FEEDBACK_PREFIX.length : 0);
   const [composerOpen, setComposerOpen] = useState(() => new URLSearchParams(window.location.search).get("compose") === "1");
   useEffect(() => {
     if (new URLSearchParams(routeSearch).get("compose") === "1") queueMicrotask(() => setComposerOpen(true));
@@ -299,7 +305,7 @@ export function CommunityExperience() {
     if (ownershipState.error) return [];
     const keyword = search.trim().toLocaleLowerCase("ko-KR");
     const filtered = posts.filter((post) => {
-      if (ownershipState.hiddenIds.has(post.id)) return false;
+      if (ownershipState.hiddenIds.has(post.id) || (openingMode && !isOpeningPost(post.body))) return false;
       const matchesPurpose =
         purposeFilter === "모든 이야기" || post.purpose === purposeFilter;
       const matchesTopic = topicFilter === "전체" || post.topic === topicFilter;
@@ -314,9 +320,9 @@ export function CommunityExperience() {
         ? right.commentCount - left.commentCount || right.createdAtMs - left.createdAtMs
         : right.createdAtMs - left.createdAtMs,
     );
-  }, [ownershipState.error, ownershipState.hiddenIds, posts, purposeFilter, search, sort, topicFilter]);
+  }, [openingMode, ownershipState.error, ownershipState.hiddenIds, posts, purposeFilter, search, sort, topicFilter]);
   const visibleFixturePosts = useMemo(() => {
-    if (!showPublicFixtures) return [];
+    if (!showPublicFixtures || openingMode) return [];
     const keyword = search.trim().toLocaleLowerCase("ko-KR");
     return communityFixturePosts.filter((post) => {
       const matchesPurpose =
@@ -328,7 +334,7 @@ export function CommunityExperience() {
         post.pseudonym.toLocaleLowerCase("ko-KR").includes(keyword);
       return matchesPurpose && matchesTopic && matchesSearch;
     });
-  }, [purposeFilter, search, topicFilter]);
+  }, [openingMode, purposeFilter, search, topicFilter]);
   const postIdKey = useMemo(
     () => posts.map((post) => post.id).sort().join("\u0000"),
     [posts],
@@ -521,7 +527,7 @@ export function CommunityExperience() {
       : "");
     try {
       await communityApi.createPost({
-        body: launchFeedbackBody(submittedValue.body, feedbackMode),
+        body: openingMode ? openingPostBody(submittedValue.body) : launchFeedbackBody(submittedValue.body, feedbackMode),
         topic: submittedValue.topic || null,
         purpose: submittedValue.purpose,
       });
@@ -653,6 +659,8 @@ export function CommunityExperience() {
         <div className="page-intro-rule" />
         <span>궁금한 점이나 요즘의 고민, 직접 겪으며 알게 된 이야기를 편하게 나눠 보세요.</span>
       </div>
+      <OpeningCommunityTabs />
+      {openingMode && <div className="community-opening-intro"><h2>위브의 첫걸음을 함께 응원해 주세요</h2><p>짧은 응원도 좋아요. 다른 분이 남긴 글에 댓글로 마음을 보태도 좋습니다.</p></div>}
       {accountLoading ? (
         <div className="community-empty" role="status" aria-live="polite">
           <LoaderCircle className="spin" size={27} aria-hidden="true" />
@@ -763,13 +771,13 @@ export function CommunityExperience() {
           <section className="community-board-heading" aria-labelledby="community-board-title">
             <div>
               <p>함께 나누는 이야기</p>
-              <h2 id="community-board-title">요즘 위브에서는</h2>
+              <h2 id="community-board-title">{openingMode ? "오픈 응원" : "요즘 위브에서는"}</h2>
             </div>
             <div className="community-board-tools">
               <button ref={composerTriggerRef} className="button button-primary" type="button" aria-expanded={composerOpen} aria-controls="community-composer" onClick={() => {
                 setComposerOpen(!composerOpen);
                 if (!composerOpen) requestAnimationFrame(() => composerRef.current?.focus());
-              }}><PencilLine size={18} aria-hidden="true" />{composerOpen ? "작성 잠시 접기" : "이야기 남기기"}</button>
+              }}><PencilLine size={18} aria-hidden="true" />{composerOpen ? "작성 잠시 접기" : openingMode ? "응원 남기기" : "이야기 남기기"}</button>
               <label className="community-search">
                 <Search size={17} aria-hidden="true" />
                 <span className="sr-only">글 검색</span>
@@ -981,9 +989,9 @@ export function CommunityExperience() {
             ) : (
               <div className="community-empty">
                 <MessageCircleMore size={27} />
-                <h2>{posts.length || showPublicFixtures ? "찾는 글이 없어요" : "아직 첫 이야기를 기다리고 있어요"}</h2>
-                <p>{posts.length || showPublicFixtures ? "검색어나 관심 주제를 바꿔 보세요." : "긴 글이 아니어도 괜찮아요. 오늘의 생각이나 경험을 편하게 남겨 보세요."}</p>
-                {!posts.length && !feedError && (
+                <h2>{openingMode ? "첫 응원을 남겨 주세요" : posts.length || showPublicFixtures ? "찾는 글이 없어요" : "아직 첫 이야기를 기다리고 있어요"}</h2>
+                <p>{openingMode ? "현재 불러온 글에는 응원이 없어요. 이전 글을 더 보거나 첫 응원을 남겨 주세요." : posts.length || showPublicFixtures ? "검색어나 관심 주제를 바꿔 보세요." : "긴 글이 아니어도 괜찮아요. 오늘의 생각이나 경험을 편하게 남겨 보세요."}</p>
+                {!openingMode && !posts.length && !feedError && (
                   <div className="community-starters" aria-label="글감 예시">
                     {conversationStarterHints.map((starter) => (
                       <button

@@ -1,0 +1,22 @@
+.entry { display:flex; justify-content:center; padding:12px 24px 24px; }
+.entry button { display:inline-flex; align-items:center; gap:8px; min-height:44px; border:0; background:transparent; color:#31586d; font:inherit; font-size:14px; cursor:pointer; }
+.dialog { position:fixed; margin:auto; width:min(620px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); overflow-y:auto; box-sizing:border-box; padding:38px; border:1px solid #bcdad9; border-radius:24px; background:#fafdfe; color:#143957; box-shadow:0 24px 80px #08274040; word-break:keep-all; }
+.dialog::backdrop { background:#0a263d85; }
+.dialog .close { position:absolute; right:12px; top:12px; display:grid; place-items:center; width:44px; height:44px; padding:0; border:0; background:transparent; color:#143957; cursor:pointer; }
+.dialog .logo { display:block; width:150px; margin:0 0 28px; }
+.logo img { width:100%; height:auto; }
+.dialog h2 { margin:0 0 24px; font-size:clamp(24px,3vw,32px); line-height:1.35; letter-spacing:-.04em; }
+.message { font-size:16px; line-height:1.8; color:#365264; }
+.message p { margin:0 0 18px; }
+.actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+.actions button { flex:1 1 180px; min-height:48px; padding:12px 16px; border:1px solid #aecad2; border-radius:12px; background:#fff; color:#143957; font:inherit; font-weight:700; cursor:pointer; }
+.actions .primary { background:#143957; color:#fff; border-color:#143957; }
+.encouragement { display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:24px; font-size:14px; line-height:1.7; color:#4c6878; }
+.encouragement a, .pending { display:inline-flex; align-items:center; gap:6px; }
+.encouragement a { color:#15586a; font-weight:700; }
+.pending small { border-radius:5px; padding:1px 6px; background:#e8f0f3; font-size:11px; }
+.counter { color:#486979; font-size:14px; margin:0 0 12px; }
+.description { font-size:18px; line-height:1.7; color:#365264; margin:0 0 24px; }
+.destination { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:64px; padding:18px; border-radius:14px; background:#def2eb; color:#143957; font-weight:700; }
+.dialog :is(button,a):focus-visible, .entry button:focus-visible { outline:3px solid #146fa8; outline-offset:3px; }
+@media(max-width:600px) { .dialog { padding:28px 24px; border-radius:18px; } .dialog .logo { width:120px; margin-bottom:24px; } .actions button { flex-basis:100%; } }

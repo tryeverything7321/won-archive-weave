@@ -94,7 +94,7 @@ export function EventArchivePanel({ event }: { event: CalendarEvent }) {
     <div className={styles.heading}>
       <div className={styles.headingCopy}>
         <h2 id="event-archive-title">이 행사에서 남긴 자료와 기록</h2>
-        <p>행사 안내와 별개로 연결된 원본 자료와 활동 기록을 모아 봅니다.</p>
+        <p>발표 자료와 진행안, 함께한 후기를 찾아보세요.</p>
       </div>
       <Archive size={28} aria-hidden="true" />
     </div>

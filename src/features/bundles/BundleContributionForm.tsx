@@ -1,3 +1,4 @@
+import { FieldRequirement } from "../../components/forms/FieldRequirement";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { ArrowDown, ArrowUp, CheckCircle2, CircleAlert, FilePlus2, LoaderCircle, RotateCcw, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -72,8 +73,8 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
   const [description, setDescription] = useState("");
   const [source, setSource] = useState("");
   const [owner, setOwner] = useState("");
-  const [attribution, setAttribution] = useState("");
-  const [consentBasis, setConsentBasis] = useState("");
+  const [consentReasons, setConsentReasons] = useState<string[]>([]);
+  const consentBasis = consentReasons.join(" · ");
   const [visibility, setVisibility] = useState<BundleVisibility | "">("");
   const [rights, setRights] = useState<BundleRights>("view_only");
   const [rightsConfirmed, setRightsConfirmed] = useState(false);
@@ -82,6 +83,8 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
   const [finalized, setFinalized] = useState(false);
   const [relationState, setRelationState] = useState<"none" | "linked" | "failed">("none");
   const [selectionError, setSelectionError] = useState("");
+  const [draggingFiles, setDraggingFiles] = useState(false);
+  const dragDepth = useRef(0);
   const createRequestId = useRef(crypto.randomUUID());
   const finalizeRequestId = useRef(crypto.randomUUID());
   const relationRequestId = useRef(crypto.randomUUID());
@@ -100,12 +103,12 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
       const name = nextUser?.displayName?.trim() ?? "";
       if (name) {
         setOwner((current) => current || name);
-        setAttribution((current) => current || name);
       }
     });
   }, [services]);
 
-  const addFiles = (incoming: FileList | null) => {
+  const addFiles = (incoming: FileList | File[] | null) => {
+    if (status.tone === "working" || bundleId) return;
     const selected = [...(incoming ?? [])];
     if (!selected.length) return;
     const error = bundleSelectionError(files, selected);
@@ -181,10 +184,11 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
     event.preventDefault();
     if (!services || !user) return setStatus({ tone: "error", message: "자료를 올리려면 먼저 로그인해 주세요." });
     if (!files.length) return setStatus({ tone: "error", message: "먼저 올릴 파일을 선택해 주세요." });
-    if (!title.trim()) return setStatus({ tone: "error", message: "자료 묶음 제목을 입력해 주세요." });
+    if (!title.trim()) return setStatus({ tone: "error", message: "자료 제목을 입력해 주세요." });
     if (!visibility) return setStatus({ tone: "error", message: "공개 범위를 선택해 주세요." });
-    if (!source.trim() || !owner.trim() || !attribution.trim() || !consentBasis.trim()) return setStatus({ tone: "error", message: "출처와 권리 정보를 모두 입력해 주세요." });
+    if (!owner.trim() || !consentBasis) return setStatus({ tone: "error", message: "권리자를 적고 공유 근거를 선택해 주세요." });
     if (!rightsConfirmed) return setStatus({ tone: "error", message: "공유 권한과 개인정보 확인을 완료해 주세요." });
+    setSelectionError("");
     setStatus({ tone: "working", message: "자료 묶음을 만들고 파일을 올리고 있어요." });
     try {
       let resolvedArchiveEventId = archiveEventId;
@@ -199,7 +203,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
             title: title.trim(),
             ...(description.trim() ? { description: description.trim() } : {}),
             visibility,
-            rights: createBundleRightsRecord({ source, owner, attribution, redistribution: rights, consentBasis }),
+            rights: createBundleRightsRecord({ source: source.trim() || "작성자 제공", owner, attribution: owner, redistribution: rights, consentBasis }),
             ...(resolvedArchiveEventId ? { eventId: resolvedArchiveEventId } : {}),
           });
       setBundleId(created.bundleId);
@@ -259,21 +263,45 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
       {!services || !user ? (
         <div className={styles.loginState}>
           <p>{services ? "파일을 고르고 등록하려면 로그인해 주세요." : "자료 묶음 기능을 준비하고 있어요."}</p>
-          {services && <div className="community-login-actions"><ProviderLoginButton provider="kakao" onClick={() => startOAuthLogin("kakao", loginReturnTo)} /><ProviderLoginButton provider="naver" onClick={() => startOAuthLogin("naver", loginReturnTo)} /></div>}
+          {services && <div className="community-login-actions"><ProviderLoginButton provider="kakao" onClick={() => startOAuthLogin("kakao", loginReturnTo)} /><ProviderLoginButton provider="naver" onClick={() => startOAuthLogin("naver", loginReturnTo)} />
+<ProviderLoginButton provider="google" onClick={() => startOAuthLogin("google", loginReturnTo)} /></div>}
         </div>
       ) : (
         <form className={styles.form} onSubmit={submit}>
           <fieldset className={styles.section} disabled={status.tone === "working"}>
             <legend><span>1</span> 파일 선택</legend>
-            <label className={styles.filePicker}>
+            <label className={`${styles.filePicker} ${draggingFiles ? styles.filePickerDragging : ""}`}
+              onDragEnter={(event) => {
+                if (!event.dataTransfer.types.includes("Files")) return;
+                event.preventDefault(); dragDepth.current += 1;
+                if (status.tone !== "working" && !bundleId) setDraggingFiles(true);
+              }}
+              onDragOver={(event) => {
+                if (!event.dataTransfer.types.includes("Files")) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = status.tone === "working" || bundleId ? "none" : "copy";
+              }}
+              onDragLeave={(event) => {
+                event.preventDefault(); dragDepth.current = Math.max(0, dragDepth.current - 1);
+                if (dragDepth.current === 0) setDraggingFiles(false);
+              }}
+              onDrop={(event) => {
+                event.preventDefault(); event.stopPropagation();
+                dragDepth.current = 0; setDraggingFiles(false);
+                if (status.tone === "working" || bundleId) return;
+                if ([...event.dataTransfer.items].some(item => item.webkitGetAsEntry?.()?.isDirectory)) {
+                  setSelectionError("폴더 안의 파일을 선택해서 놓아 주세요."); return;
+                }
+                addFiles(event.dataTransfer.files);
+              }}>
               <FilePlus2 size={24} aria-hidden="true" />
-              <strong>{files.length ? "파일 더 추가" : "파일 선택"}</strong>
+              <strong>{bundleId ? "파일 선택 완료" : draggingFiles ? "여기에 파일을 놓아 주세요" : files.length ? "파일 더 추가하거나 끌어 놓기" : "파일 선택하거나 끌어 놓기"}</strong>
               <small>최대 10개 · 파일마다 20MB · 모두 합해 100MB</small>
-              <input type="file" multiple accept={uploadAccept} onChange={(event) => { addFiles(event.currentTarget.files); event.currentTarget.value = ""; }} />
+              <input type="file" multiple disabled={Boolean(bundleId)} aria-label="자료 파일 선택" accept={uploadAccept} onChange={(event) => { addFiles(event.currentTarget.files); event.currentTarget.value = ""; }} />
             </label>
             {selectionError && <p className={styles.error} role="alert">{selectionError}</p>}
             {files.length > 0 && <p className={styles.selectionSummary}>{files.length}개 · 총 {formatBytes(totalBytes)}</p>}
-            <div className={styles.fileList} aria-label="선택한 파일">
+            <div className={styles.fileList} role="group" aria-label="선택한 파일">
               {files.map((item, index) => (
                 <article className={styles.fileRow} key={item.clientFileId}>
                   <div className={styles.fileOrder} aria-label={`${index + 1}번째 파일`}>{index + 1}</div>
@@ -308,21 +336,20 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
           <fieldset className={styles.section} disabled={status.tone === "working" || completed}>
             <legend><span>2</span> 공통 정보</legend>
             <div className={styles.fields}>
-              <label>묶음 제목 (필수)<input required value={title} maxLength={160} onChange={(event) => setTitle(event.target.value)} /></label>
-              <label>자료 출처 (필수)<input required value={source} maxLength={160} onChange={(event) => setSource(event.target.value)} placeholder="예: 서울 청년회" /></label>
-              <label>권리자 (필수)<input required value={owner} maxLength={160} onChange={(event) => setOwner(event.target.value)} placeholder="예: 서울 청년회" /></label>
-              <label>표시할 이름 (필수)<input required value={attribution} maxLength={160} onChange={(event) => setAttribution(event.target.value)} placeholder="예: 서울 청년회 제공" /></label>
-              <label>공유 근거 (필수)<input required value={consentBasis} maxLength={500} onChange={(event) => setConsentBasis(event.target.value)} placeholder="예: 권리자가 위브 게시와 열람에 동의함" /></label>
-              <label className={styles.wide}>설명 또는 본문 (선택)<textarea value={description} maxLength={5000} rows={7} onChange={(event) => setDescription(event.target.value)} placeholder="파일을 이해하는 데 필요한 설명이 있을 때만 적어 주세요" /></label>
-              <label>공개 범위 (필수)<select required value={visibility} onChange={(event) => setVisibility(event.target.value as BundleVisibility)}><option value="" disabled>공개 범위를 선택해 주세요</option><option value="공개">누구나 볼 수 있게 공개</option><option value="회원 전용">위브 로그인 이용자에게 공개</option><option value="보류">나만 보관</option></select></label>
+              <label><span>자료 제목 <FieldRequirement /></span><input required value={title} maxLength={160} onChange={(event) => setTitle(event.target.value)} /></label>
+              <label><span>자료 출처 <FieldRequirement optional /></span><input value={source} maxLength={160} onChange={(event) => setSource(event.target.value)} placeholder="예: 서울 청년회" /></label>
+              <label><span>권리자 <FieldRequirement /></span><input required value={owner} maxLength={160} onChange={(event) => setOwner(event.target.value)} placeholder="예: 홍길동" /></label>
+              <fieldset className={`${styles.sharingBasis} ${styles.wide}`}><legend>공유 근거 <FieldRequirement /></legend><p>해당하는 항목을 선택해 주세요</p>{['내가 만든 자료예요', '만든 사람에게 공유를 허락받았어요', '단체 담당자로 공유할 권한이 있어요'].map(reason => <label className={styles.confirmation} key={reason}><input type="checkbox" checked={consentReasons.includes(reason)} onChange={event => setConsentReasons(current => event.target.checked ? [...current, reason] : current.filter(item => item !== reason))} /><span>{reason}</span></label>)}</fieldset>
+              <label className={styles.wide}><span>설명 또는 본문 <FieldRequirement optional /></span><textarea value={description} maxLength={5000} rows={7} onChange={(event) => setDescription(event.target.value)} placeholder="파일을 이해하는 데 필요한 설명이 있을 때만 적어 주세요" /></label>
+              <label><span>공개 범위 <FieldRequirement /></span><select required value={visibility} onChange={(event) => setVisibility(event.target.value as BundleVisibility)}><option value="" disabled>공개 범위를 선택해 주세요</option><option value="공개">누구나 볼 수 있게 공개</option><option value="회원 전용">위브 로그인 이용자에게 공개</option><option value="보류">나만 보관</option></select></label>
               <label>파일 이용 방법<select value={rights} onChange={(event) => setRights(event.target.value as BundleRights)}><option value="view_only">위브에서 보기만 허용</option><option value="download_allowed">원본 내려받기 허용</option></select></label>
-              <label className={`${styles.confirmation} ${styles.wide}`}><input required type="checkbox" checked={rightsConfirmed} onChange={(event) => setRightsConfirmed(event.target.checked)} /><span>공유할 권한이 있으며 개인정보나 공개하면 안 되는 내용이 없는지 확인했어요 (필수)</span></label>
+              <label className={`${styles.confirmation} ${styles.wide}`}><input required type="checkbox" checked={rightsConfirmed} onChange={(event) => setRightsConfirmed(event.target.checked)} /><span>공유할 권한이 있으며 개인정보나 공개하면 안 되는 내용이 없는지 확인했어요 <FieldRequirement /></span></label>
             </div>
           </fieldset>
 
           <div className={styles.submitBar}>
             <div><strong>{bundleId ? "파일별 상태를 확인해 주세요" : `${files.length || 0}개 파일을 한 묶음으로 등록`}</strong><span>검사 대기·차단 파일은 열거나 내려받을 수 없습니다.</span></div>
-            {!completed && <button className="button button-primary" type="submit" disabled={status.tone === "working" || files.length === 0}>{status.tone === "working" ? <LoaderCircle className="spin" size={18} /> : <FilePlus2 size={18} />}{status.tone === "working" ? "등록 중" : "자료 묶음 등록"}</button>}
+            {!completed && <button className="button button-primary" type="submit" disabled={status.tone === "working" || files.length === 0}>{status.tone === "working" ? <LoaderCircle className="spin" size={18} /> : <FilePlus2 size={18} />}{status.tone === "working" ? "등록 중" : "자료 등록"}</button>}
           </div>
           {status.tone !== "idle" && <div className={`${styles.status} ${styles[status.tone]}`} role={status.tone === "error" ? "alert" : "status"}>{status.tone === "success" ? <CheckCircle2 size={20} /> : status.tone === "working" ? <LoaderCircle className="spin" size={20} /> : <CircleAlert size={20} />}<span>{status.message}</span></div>}
           {completed && <div className={styles.completionActions}><Link className="button button-primary" to={`/bundles/${encodeURIComponent(bundleId)}`} state={{ returnTo }}>자료 묶음 보기</Link><Link className="button button-secondary" to="/profile?tab=activity">내 자료 관리</Link><Link className="button button-secondary" to={returnTo}>이전 화면으로</Link>{relationState === "failed" && <button type="button" className="button button-secondary" onClick={() => void connectEvent(bundleId)}>행사 연결 다시 시도</button>}</div>}
