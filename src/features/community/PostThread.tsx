@@ -1,3 +1,4 @@
+import { callableWriteErrorMessage } from "../../lib/firebase/callable-write-error";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
@@ -473,10 +474,8 @@ export function PostThread({
       setNotice(submissionCapture.localSaveUnavailable
         ? "댓글을 남겼어요. 이 기기의 임시저장은 지우지 않았어요."
         : "댓글을 남겼어요");
-    } catch {
-      setNotice(submissionCapture.localSaveUnavailable
-        ? "댓글을 남기지 못했고 이 기기의 임시저장도 확인하지 못했어요. 내용을 복사한 뒤 다시 시도해 주세요."
-        : "댓글을 남기지 못했어요. 잠시 뒤 다시 시도해 주세요.");
+    } catch (error) {
+      setNotice(callableWriteErrorMessage(error, "댓글") + (submissionCapture.localSaveUnavailable ? " 내용을 복사해 보관해 주세요." : ""));
     } finally {
       setWorking(false);
     }

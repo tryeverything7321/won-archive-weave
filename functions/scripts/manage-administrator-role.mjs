@@ -6,7 +6,7 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 
 const projectId = "won-archive-weave";
 const [action, uid, confirmation] = process.argv.slice(2);
-const supportedActions = new Set(["status", "grant", "revoke"]);
+const supportedActions = new Set(["status", "grant", "revoke", "grant-member-read", "revoke-member-read", "grant-member-private-read", "revoke-member-private-read"]);
 
 function printUsage() {
   console.log([
@@ -45,14 +45,25 @@ if (!supportedActions.has(action) || !uid) {
 
     if (action === "grant") {
       nextClaims.role = "administrator";
-    } else {
+    } else if (action === "revoke") {
       delete nextClaims.role;
+      delete nextClaims.memberRead;
+      delete nextClaims.memberPrivateRead;
+    } else {
+      if (currentClaims.role !== "administrator") throw new Error("관리자에게만 회원 조회 권한을 부여할 수 있습니다");
+      const privateRead = action.includes("private");
+      const grant = action.startsWith("grant-");
+      if (privateRead && grant && currentClaims.memberRead !== true) throw new Error("회원 조회 권한을 먼저 부여해 주세요");
+      const key = privateRead ? "memberPrivateRead" : "memberRead";
+      if (grant) nextClaims[key] = true;
+      else delete nextClaims[key];
+      if (!privateRead && !grant) delete nextClaims.memberPrivateRead;
     }
 
     await auth.setCustomUserClaims(uid, nextClaims);
     await auth.revokeRefreshTokens(uid);
     await getFirestore().collection("auditEvents").add({
-      type: action === "grant" ? "administrator.granted" : "administrator.revoked",
+      type: action === "grant" ? "administrator.granted" : action === "revoke" ? "administrator.revoked" : `administrator.${action}`,
       targetUid: uid,
       source: "manage-administrator-role",
       at: FieldValue.serverTimestamp(),

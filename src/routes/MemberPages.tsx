@@ -398,6 +398,7 @@ export function ProfilePage() {
           </div>
           {user && (
             <div className="profile-recovery-actions">
+              {operatorAccess.state === "allowed" && <Link className="button button-secondary" to="/admin"><ShieldCheck size={18} /> 운영 센터</Link>}
               <button className="button button-secondary" type="button" onClick={chooseProfilePhoto}>
                 사진 변경
               </button>

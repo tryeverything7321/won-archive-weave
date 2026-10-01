@@ -1270,21 +1270,44 @@ export const syncGooglePublicCalendarSource = onCall({ region: 'asia-northeast3'
   if (new URL(feedUrl).hostname !== 'calendar.google.com') {
     throw new HttpsError('failed-precondition', 'Google Calendar의 공개 iCal 주소를 다시 확인해 주세요')
   }
-  const response = await fetch(feedUrl, {
-    redirect: 'error',
-    signal: AbortSignal.timeout(icsLimits.timeoutMs),
-    headers: { accept: 'text/calendar,text/plain;q=0.8' },
-  }).catch(() => {
-    throw new HttpsError('unavailable', 'Google Calendar에서 일정을 가져오지 못했어요')
+  const attemptId = randomUUID()
+  const expectedRevision = String(source.connectionRevision ?? 'legacy-active')
+  await db.runTransaction(async transaction => {
+    const current = await transaction.get(reference)
+    if (current.get('status') !== 'active' || String(current.get('connectionRevision') ?? 'legacy-active') !== expectedRevision) {
+      throw new HttpsError('aborted', '연결 상태가 바뀌었어요. 다시 확인해 주세요')
+    }
+    transaction.update(reference, { lastSyncAttemptId: attemptId, lastSyncAttemptAt: FieldValue.serverTimestamp() })
   })
-  if (!response.ok) throw new HttpsError('unavailable', 'Google Calendar 공개 설정과 iCal 주소를 확인해 주세요')
-  const declaredLength = Number(response.headers.get('content-length') ?? 0)
-  if (declaredLength > icsLimits.maxBytes) throw new HttpsError('resource-exhausted', '캘린더 파일이 5MB를 넘어요')
-  const body = await response.text()
-  if (Buffer.byteLength(body, 'utf8') > icsLimits.maxBytes) throw new HttpsError('resource-exhausted', '캘린더 파일이 5MB를 넘어요')
-  const expectedConnectionRevision = String(source.connectionRevision ?? 'legacy-active')
-  const count = await ingestCalendarIcs({ sourceId, feedUrl, body, source, expectedConnectionRevision })
-  return { sourceId, imported: count, status: 'pending_review' }
+  try {
+    const response = await fetch(feedUrl, {
+      redirect: 'error',
+      signal: AbortSignal.timeout(icsLimits.timeoutMs),
+      headers: { accept: 'text/calendar,text/plain;q=0.8' },
+    }).catch(() => {
+      throw new HttpsError('unavailable', 'Google Calendar에서 일정을 가져오지 못했어요')
+    })
+    if (!response.ok) throw new HttpsError('unavailable', 'Google Calendar 공개 설정과 iCal 주소를 확인해 주세요')
+    const declaredLength = Number(response.headers.get('content-length') ?? 0)
+    if (declaredLength > icsLimits.maxBytes) throw new HttpsError('resource-exhausted', '캘린더 파일이 5MB를 넘어요')
+    const body = await response.text()
+    if (Buffer.byteLength(body, 'utf8') > icsLimits.maxBytes) throw new HttpsError('resource-exhausted', '캘린더 파일이 5MB를 넘어요')
+    const expectedConnectionRevision = String(source.connectionRevision ?? 'legacy-active')
+    const count = await ingestCalendarIcs({ sourceId, feedUrl, body, source, expectedConnectionRevision })
+    return { sourceId, imported: count, status: 'pending_review' }
+  } catch (error) {
+    await db.runTransaction(async transaction => {
+      const current = await transaction.get(reference)
+      // A later sync or a connection change must not be overwritten by this failure.
+      if (current.get('lastSyncAttemptId') !== attemptId || current.get('status') !== 'active'
+        || String(current.get('connectionRevision') ?? 'legacy-active') !== expectedRevision) return
+      const previousSuccess = source.lastSyncAt instanceof Timestamp ? source.lastSyncAt.toMillis() : null
+      const liveSuccess = current.get('lastSyncAt') instanceof Timestamp ? (current.get('lastSyncAt') as Timestamp).toMillis() : null
+      if (liveSuccess !== previousSuccess) return
+      transaction.update(reference, { lastSyncStatus: 'failed', lastSyncFailedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() })
+    })
+    throw error
+  }
 })
 
 function monthKeysBetween(startAt: Date, endAt: Date) {
