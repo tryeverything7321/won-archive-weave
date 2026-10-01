@@ -128,13 +128,13 @@ export async function getMaterialBundle(bundleId: string): Promise<MaterialBundl
   return parseMaterialBundle(value);
 }
 
-export async function listMyMaterialBundles(cursor?: number | null): Promise<{ bundles: MaterialBundle[]; nextCursor: number | null }> {
-  const callable = httpsCallable<{ limit: number; cursor?: number }, { items: unknown[]; nextCursor?: number | null }>(services().functions, "listMyMaterialBundles");
-  const result = await callable({ limit: 50, ...(typeof cursor === "number" ? { cursor } : {}) });
+export async function listMyMaterialBundles(cursor?: string | null): Promise<{ bundles: MaterialBundle[]; nextCursor: string | null }> {
+  const callable = httpsCallable<{ limit: number; cursor?: string }, { items: unknown[]; nextCursor?: string | null }>(services().functions, "listMyMaterialBundles");
+  const result = await callable({ limit: 50, ...(typeof cursor === "string" ? { cursor } : {}) });
   if (!Array.isArray(result.data.items)) throw new Error("내 자료 묶음 목록을 확인하지 못했어요.");
   return {
     bundles: result.data.items.map(parseMaterialBundle),
-    nextCursor: typeof result.data.nextCursor === "number" ? result.data.nextCursor : null,
+    nextCursor: typeof result.data.nextCursor === "string" ? result.data.nextCursor : null,
   };
 }
 

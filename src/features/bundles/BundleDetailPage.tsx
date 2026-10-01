@@ -1,6 +1,6 @@
 import { ArrowLeft, Download, Eye, LoaderCircle, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { PageFrame } from "../../components/PageFrame";
 import { callableWriteErrorMessage } from "../../lib/firebase/callable-write-error";
 import { createMaterialBundleFileAccess, getMaterialBundle } from "./bundle-api";
@@ -16,6 +16,9 @@ function formatBytes(bytes: number) {
 
 export function BundleDetailPage() {
   const { bundleId = "" } = useParams();
+  const location = useLocation();
+  const candidate = location.state?.returnTo;
+  const returnTo = typeof candidate === "string" && /^\/(?![/\\])/.test(candidate) ? candidate : "/resources";
   const [attempt, setAttempt] = useState(0);
   const [bundle, setBundle] = useState<MaterialBundle | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
@@ -44,11 +47,11 @@ export function BundleDetailPage() {
   };
 
   if (loadState === "loading") return <PageFrame eyebrow="자료 묶음" title="자료를 불러오고 있어요" description="파일별 공개 상태를 확인하고 있어요"><p role="status"><LoaderCircle className="spin" size={18} /> 잠시만 기다려 주세요.</p></PageFrame>;
-  if (loadState === "error" || !bundle) return <PageFrame eyebrow="자료 묶음" title="자료 묶음을 열지 못했어요" description={message || "공개가 중단되었거나 열람 권한이 필요한 자료일 수 있어요."}><div className={styles.actions}><Link to="/resources">자료 목록</Link><button type="button" onClick={() => { setLoadState("loading"); setAttempt((value) => value + 1); }}><RotateCcw size={17} /> 다시 확인</button></div></PageFrame>;
+  if (loadState === "error" || !bundle) return <PageFrame eyebrow="자료 묶음" title="자료 묶음을 열지 못했어요" description={message || "공개가 중단되었거나 열람 권한이 필요한 자료일 수 있어요."}><div className={styles.actions}><Link to={returnTo}>자료 목록</Link><button type="button" onClick={() => { setLoadState("loading"); setAttempt((value) => value + 1); }}><RotateCcw size={17} /> 다시 확인</button></div></PageFrame>;
 
   return <PageFrame eyebrow="자료 묶음" title={bundle.title} description={`${bundle.files.length}개 파일 · ${bundle.visibility}`}>
     <div className={styles.bundlePage}>
-      <Link className={styles.backLink} to="/resources"><ArrowLeft size={17} /> 자료 목록으로</Link>
+      <Link className={styles.backLink} to={returnTo}><ArrowLeft size={17} /> 이전 화면으로</Link>
       {bundle.description && <p className={styles.description}>{bundle.description}</p>}
       <dl className={styles.metadata}>
         <div><dt>출처</dt><dd>{bundle.sourceLabel || bundle.ownerLabel || "표시된 출처 없음"}</dd></div>

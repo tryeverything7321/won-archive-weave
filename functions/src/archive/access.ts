@@ -212,9 +212,16 @@ export function projectArchiveEvent(
   snapshot: DocumentSnapshot,
   viewer: ArchiveViewer,
   organizers: Array<{ id: string; displayName: string }> = [],
+  source?: DocumentSnapshot,
 ): ArchiveEventProjection | null {
   if (!snapshot.exists) return null
-  const data = snapshot.data() ?? {}
+  let data = snapshot.data() ?? {}
+  if (typeof data.sourceCalendarEventId === 'string') {
+    if (!source?.exists || source.get('status') !== 'published'
+      || !['public', 'member_only'].includes(source.get('visibility'))) return null
+    data = { ...data, title: source.get('title'), visibility: source.get('visibility'),
+      status: source.get('eventState') === 'canceled' ? 'canceled' : 'active' }
+  }
   if (!canReadArchiveRecord({ visibility: data.visibility, status: data.status, ownerUid: data.ownerUid }, viewer)) return null
   const year = Number(data.heldYear)
   if (!Number.isSafeInteger(year)) return null
@@ -240,7 +247,9 @@ export async function projectArchiveReference(reference: { targetType: ArchiveCo
   const id = archiveId(reference.targetId)
   if (reference.targetType === 'event') {
     const snapshot = await firestore.collection('archiveEvents').doc(id).get()
-    const event = projectArchiveEvent(snapshot, viewer)
+    const sourceId = snapshot.get('sourceCalendarEventId')
+    const source = typeof sourceId === 'string' ? await firestore.collection('calendarEvents').doc(sourceId).get() : undefined
+    const event = projectArchiveEvent(snapshot, viewer, [], source)
     return event ? { targetType: 'event' as const, id, title: event.title, href: `/archive-events/${encodeURIComponent(id)}` } : null
   }
   if (reference.targetType === 'bundle') {

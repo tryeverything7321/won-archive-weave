@@ -126,13 +126,19 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
     completeCollection('activities'),
     completeCollection('archiveOrganizers'),
   ])
+  const sourceIds = [...new Set(eventDocs.flatMap((doc) => typeof doc.get('sourceCalendarEventId') === 'string' ? [doc.get('sourceCalendarEventId') as string] : []))]
+  const sources = new Map<string, DocumentSnapshot>()
+  for (let offset = 0; offset < sourceIds.length; offset += 100) {
+    const docs = await firestore.getAll(...sourceIds.slice(offset, offset + 100).map((id) => firestore.collection('calendarEvents').doc(id)))
+    docs.forEach((doc) => sources.set(doc.id, doc))
+  }
   const organizerNames = organizerMap(organizerDocs)
   const eventItems = new Map<string, DiscoveryItem>()
   for (const doc of eventDocs) {
     const organizerIds = Array.isArray(doc.get('organizerIds'))
       ? [...new Set((doc.get('organizerIds') as unknown[]).flatMap((id) => typeof id === 'string' && organizerNames.has(id) ? [id] : []))]
       : []
-    const event = projectArchiveEvent(doc, viewer, organizerIds.map((id) => ({ id, displayName: organizerNames.get(id)! })))
+    const event = projectArchiveEvent(doc, viewer, organizerIds.map((id) => ({ id, displayName: organizerNames.get(id)! })), sources.get(doc.get('sourceCalendarEventId')))
     if (!event) continue
     eventItems.set(event.id, {
       targetType: 'event', id: event.id, title: event.title, href: `/archive-events/${encodeURIComponent(event.id)}`,

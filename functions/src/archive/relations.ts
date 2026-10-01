@@ -64,14 +64,19 @@ async function changeArchiveRelation(
     ])
     if (existingCommand.exists) return true
     if (!event.exists || event.get('status') === 'withdrawn') throw new HttpsError('not-found', '연결할 행사를 찾지 못했어요')
+    const sourceId = event.get('sourceCalendarEventId')
+    const source = typeof sourceId === 'string' ? await transaction.get(firestore.collection('calendarEvents').doc(sourceId)) : null
+    const privateSource = typeof sourceId === 'string' ? await transaction.get(firestore.collection('calendarEventSubmissions').doc(sourceId)) : null
+    if (source && (!source.exists || source.get('status') !== 'published')) throw new HttpsError('not-found', '연결할 행사를 찾지 못했어요')
+    const eventOwnerUid = privateSource ? privateSource.get('ownerUid') : event.get('ownerUid')
     const target = await targetOwnership(transaction, input.targetType, input.targetId, action === 'link')
-    const canReadEvent = canReadArchiveRecord({ visibility: event.get('visibility'), status: event.get('status'), ownerUid: event.get('ownerUid') }, { uid: actor.uid, member: true, administrator })
+    const canReadEvent = canReadArchiveRecord({ visibility: source ? source.get('visibility') : event.get('visibility'), status: event.get('status'), ownerUid: eventOwnerUid }, { uid: actor.uid, member: true, administrator })
     if (!canReadEvent) throw new HttpsError('permission-denied', '이 행사에는 연결할 수 없어요')
     const canManage = canManageArchiveRelation({
       actorUid: actor.uid,
       administrator,
       relationOwnerUid: relation.get('createdByUid'),
-      eventOwnerUid: event.get('ownerUid'),
+      eventOwnerUid,
       targetOwnerUid: target.ownerUid,
     })
     if (!canManage) throw new HttpsError('permission-denied', '본인이 올린 원본만 행사에 연결할 수 있어요')

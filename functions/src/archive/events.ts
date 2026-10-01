@@ -105,9 +105,11 @@ async function ensureInputRecord(data: Record<string, unknown>, uid: string) {
     if (!source.exists || source.get('status') !== 'published') throw new HttpsError('not-found', '연결할 행사 일정을 찾지 못했어요')
     const visibility = source.get('visibility')
     if (visibility !== 'public' && visibility !== 'member_only') throw new HttpsError('failed-precondition', '행사 공개 범위를 확인하지 못했어요')
+    const privateSource = await firestore.collection('calendarEventSubmissions').doc(sourceId).get()
+    const ownerUid = typeof privateSource.get('ownerUid') === 'string' ? privateSource.get('ownerUid') : null
     return {
       archiveEventId: calendarArchiveEventId(sourceId),
-      record: { ...calendarEventRecord(sourceId, source.data() ?? {}), organizerIds: organizers, ownerUid: uid },
+      record: { ...calendarEventRecord(sourceId, source.data() ?? {}), organizerIds: organizers, ownerUid },
       organizerIdsProvided: Array.isArray(data.organizerIds),
     }
   }
@@ -144,7 +146,9 @@ async function ensureInputRecord(data: Record<string, unknown>, uid: string) {
 async function eventProjection(reference: DocumentReference, viewer: ArchiveViewer): Promise<ArchiveEventProjection | null> {
   const snapshot = await reference.get()
   const organizers = snapshot.exists ? await organizerProjections(snapshot.get('organizerIds')) : []
-  return projectArchiveEvent(snapshot, viewer, organizers)
+  const sourceId = snapshot.get('sourceCalendarEventId')
+  const source = typeof sourceId === 'string' ? await firestore.collection('calendarEvents').doc(sourceId).get() : undefined
+  return projectArchiveEvent(snapshot, viewer, organizers, source)
 }
 
 export const ensureArchiveEventContext = onCall({ region: 'asia-northeast3' }, async (request) => {
@@ -171,7 +175,6 @@ export const ensureArchiveEventContext = onCall({ region: 'asia-northeast3' }, a
       }
       const authoritativeCalendarFields: Record<string, unknown> = { ...input.record }
       const nextOrganizerIds = input.record.organizerIds
-      delete authoritativeCalendarFields.ownerUid
       delete authoritativeCalendarFields.organizerIds
       transaction.update(eventRef, {
         ...authoritativeCalendarFields,

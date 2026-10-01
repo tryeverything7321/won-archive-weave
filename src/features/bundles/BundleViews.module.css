@@ -3,18 +3,18 @@
 .description { max-width: 760px; margin: 0; color: #466574; line-height: 1.75; white-space: pre-wrap; word-break: keep-all; }
 .metadata { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
 .metadata > div { padding: 14px 16px; border: 1px solid #c8dee7; border-radius: 12px; background: #f7fbfc; }
-.metadata dt { color: #607784; font-size: .8rem; font-weight: 750; }
+.metadata dt { color: #536d7b; font-size: .8rem; font-weight: 750; }
 .metadata dd { margin: 4px 0 0; font-weight: 750; }
 .sectionHeading { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 12px; }
 .sectionHeading h2, .sectionHeading span { margin: 0; }
 .sectionHeading h2 { font-family: SUITE, sans-serif; font-size: 1.3rem; }
-.sectionHeading span { color: #607784; font-size: .85rem; }
+.sectionHeading span { color: #536d7b; font-size: .85rem; }
 .fileGrid { display: grid; gap: 10px; }
 .fileCard { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 15px; border: 1px solid #c8dee7; border-radius: 14px; background: #fff; }
 .order { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #e7f4f0; font-weight: 800; }
 .fileCard h3, .fileCard p { margin: 0; }
 .fileCard h3 { font-size: 1rem; }
-.fileCard p { margin-top: 4px; color: #607784; font-size: .8rem; overflow-wrap: anywhere; }
+.fileCard p { margin-top: 4px; color: #536d7b; font-size: .8rem; overflow-wrap: anywhere; }
 .badge { display: inline-flex; margin-top: 8px; padding: 4px 8px; border-radius: 999px; background: #eef3f5; color: #466574; font-size: .75rem; font-weight: 750; }
 .badge.success { background: #e5f6ef; color: #19705c; }
 .badge.working { background: #eaf5fb; color: #176996; }
@@ -25,11 +25,11 @@
 .manager { display: grid; gap: 14px; }
 .managerHeader { display: flex; justify-content: space-between; align-items: end; gap: 14px; }
 .managerHeader h2, .managerHeader p { margin: 0; }
-.managerHeader p { margin-top: 4px; color: #607784; }
+.managerHeader p { margin-top: 4px; color: #536d7b; }
 .bundleEditor { padding: 18px; border: 1px solid #c8dee7; border-radius: 16px; background: #fff; }
 .editorHeader { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
 .editorHeader h3, .editorHeader p { margin: 0; }
-.editorHeader p { margin-top: 5px; color: #607784; font-size: .82rem; }
+.editorHeader p { margin-top: 5px; color: #536d7b; font-size: .82rem; }
 .editorFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
 .editorFields label { display: grid; gap: 5px; color: #315b70; font-size: .82rem; font-weight: 750; }
 .editorFields input, .editorFields select, .editorFields textarea { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid #bdd6e2; border-radius: 9px; background: #fff; color: #173f52; font: inherit; }

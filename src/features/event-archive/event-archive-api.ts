@@ -77,7 +77,9 @@ export async function unlinkArchiveRelation(input: {
 }
 
 export async function searchArchiveDiscovery(filters: ArchiveDiscoveryFilters & { cursor?: string; limit?: number }) {
-  const response = await callable<typeof filters, ArchiveDiscoveryResult>("searchArchiveDiscovery")(filters);
+  // Callable encoding converts undefined object fields to null. Omit absent filters.
+  const input = Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== undefined));
+  const response = await callable<typeof input, ArchiveDiscoveryResult>("searchArchiveDiscovery")(input);
   return response.data;
 }
 

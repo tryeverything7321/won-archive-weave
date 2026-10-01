@@ -149,6 +149,7 @@ export function ResourcesPage() {
           <Link className="contribute-link" to="/contribute?kind=material">
             <FilePenLine size={18} /> 자료 올리기
           </Link>
+          <Link className="button button-secondary" to="/collections">자료 모음 보기</Link>
         </div>
         <div className={discoveryStyles.filterSection}>
           <span className={discoveryStyles.filterLabel}>자료 형식</span>

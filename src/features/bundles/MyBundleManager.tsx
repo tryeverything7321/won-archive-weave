@@ -32,18 +32,35 @@ export function MyBundleManager() {
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const load = useCallback(async () => {
     setLoadState("loading");
     try {
       const result = await listMyMaterialBundles();
       setBundles(result.bundles);
+      setNextCursor(result.nextCursor);
+      setMessage("");
       setLoadState("ready");
     } catch (error) {
       setMessage(callableWriteErrorMessage(error, "자료·기록"));
       setLoadState("error");
     }
   }, []);
+
+  const loadMore = async () => {
+    if (nextCursor === null || loadingMore) return;
+    setLoadingMore(true);
+    setMessage("");
+    try {
+      const result = await listMyMaterialBundles(nextCursor);
+      setBundles((current) => [...current, ...result.bundles.filter((item) => !current.some((existing) => existing.bundleId === item.bundleId))]);
+      setNextCursor(result.nextCursor);
+    } catch (error) {
+      setMessage(callableWriteErrorMessage(error, "자료·기록"));
+    } finally { setLoadingMore(false); }
+  };
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void load(); }, 0);
@@ -59,6 +76,8 @@ export function MyBundleManager() {
       <Link className="button button-primary" to="/contribute?intent=material"><FilePlus2 size={17} /> 새 묶음 올리기</Link>
     </div>
     {!bundles.length ? <p>아직 올린 자료 묶음이 없습니다.</p> : bundles.map((bundle) => <BundleEditor key={`${bundle.bundleId}:${bundle.updatedAtMs ?? 0}`} bundle={bundle} onChanged={load} />)}
+    {nextCursor !== null && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "자료 묶음 더 보기"}</button>}
+    {message && <p role="alert">{message}</p>}
   </section>;
 }
 
@@ -143,7 +162,7 @@ function BundleEditor({ bundle, onChanged }: { bundle: MaterialBundle; onChanged
   return <article className={styles.bundleEditor}>
     <div className={styles.editorHeader}>
       <div><h3>{bundle.title}</h3><p>{bundle.files.length}개 파일 · {bundle.status === "active" ? "게시됨" : bundle.status === "draft" ? "등록 중" : "공개 중단"}</p></div>
-      <Link className="button button-secondary" to={`/bundles/${encodeURIComponent(bundle.bundleId)}`}>묶음 보기</Link>
+      <Link className="button button-secondary" to={`/bundles/${encodeURIComponent(bundle.bundleId)}`} state={{ returnTo: "/profile?tab=activity" }}>묶음 보기</Link>
     </div>
     <div className={styles.editorFields}>
       <label>제목<input value={title} maxLength={120} onChange={(event) => setTitle(event.target.value)} /></label>

@@ -8,7 +8,7 @@ const dist = new URL('../dist/', import.meta.url);
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const localIndex = await readFile(new URL('index.html', dist));
 const assetNames = (await readdir(new URL('assets/', dist))).filter(name => /\.(js|css)$/.test(name));
-const routes = ['/', '/archive', '/resources', '/contribute', '/profile', '/calendar', '/materials/release-check-unavailable'];
+const routes = ['/', '/archive', '/resources', '/contribute', '/profile', '/calendar', '/materials/release-check-unavailable', '/bundles/release-check-unavailable', '/archive-events/new', '/collections', '/collections/new'];
 
 for (const route of routes) {
   const response = await fetch(`${origin}${route}`, { headers: { 'Cache-Control': 'no-cache' } });
@@ -25,7 +25,7 @@ for (let offset = 0; offset < assetNames.length; offset += 8) {
   }));
 }
 
-const guardedFunctions = ['prepareSubmissionUploads', 'reconcileSubmissionUpload', 'setActivityMaterialLinks', 'getActivityMaterialLinks', 'getMaterialLinkImpact', 'listSubmissionOperatorExceptions'];
+const guardedFunctions = ['prepareSubmissionUploads', 'reconcileSubmissionUpload', 'setActivityMaterialLinks', 'getActivityMaterialLinks', 'getMaterialLinkImpact', 'listSubmissionOperatorExceptions', 'completeGoogleLogin', 'getMyMemberProfile', 'createMaterialBundle', 'prepareMaterialBundleFiles', 'finalizeMaterialBundle', 'updateMaterialBundle', 'withdrawMaterialBundleFile', 'ensureArchiveEventContext', 'linkArchiveRelation', 'createArchiveCollection'];
 for (const name of guardedFunctions) {
   // All handlers require authentication before touching Firestore or Storage.
   const response = await fetch(`https://asia-northeast3-won-archive-weave.cloudfunctions.net/${name}`, {

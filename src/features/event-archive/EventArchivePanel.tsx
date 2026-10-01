@@ -14,10 +14,11 @@ import { archiveRelationPath, eventContextQuery, type ArchiveRelationSummary, ty
 import styles from "./EventArchive.module.css";
 
 function RelationGroup({ title, items, empty }: { title: string; items: ArchiveRelationSummary[]; empty: string }) {
+  const location = useLocation();
   return <section className={styles.group} aria-labelledby={`event-archive-${title}`}>
     <h3 id={`event-archive-${title}`}>{title}</h3>
     {items.length ? <div className={styles.grid}>{items.map((item) => <article className={styles.item} key={`${item.targetType}:${item.id}`}>
-      <Link to={archiveRelationPath(item)}>{item.title}</Link>
+      <Link to={archiveRelationPath(item)} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link>
       {item.description && <p>{item.description}</p>}
       {typeof item.fileCount === "number" && <small>첨부 {item.fileCount}개{typeof item.pendingFileCount === "number" && item.pendingFileCount > 0 ? ` · 검사 중 ${item.pendingFileCount}개` : ""}</small>}
     </article>)}</div> : <p>{empty}</p>}
@@ -31,6 +32,7 @@ export function EventArchivePanel({ event }: { event: CalendarEvent }) {
   const [overview, setOverview] = useState<EventArchiveOverview>();
   const [connectorOpen, setConnectorOpen] = useState(false);
   const [candidates, setCandidates] = useState<ArchiveRelationSummary[]>([]);
+  const [candidateCursor, setCandidateCursor] = useState<string>();
   const [connectorState, setConnectorState] = useState<"idle" | "loading" | "linking" | "done" | "error">("idle");
   const [connectorMessage, setConnectorMessage] = useState("");
   const requestRef = useRef(0);
@@ -55,15 +57,16 @@ export function EventArchivePanel({ event }: { event: CalendarEvent }) {
     return () => { requestRef.current += 1; };
   }, [audience, load, ready]);
 
-  const openConnector = async () => {
+  const openConnector = async (cursor?: string) => {
     setConnectorOpen(true);
     setConnectorState("loading");
     setConnectorMessage("");
     try {
-      const result = await searchArchiveDiscovery({ limit: 20 });
-      setCandidates(result.items.flatMap((item) => (item.targetType === "material" || item.targetType === "bundle") && item.canLink
+      const result = await searchArchiveDiscovery({ limit: 20, cursor });
+      setCandidateCursor(result.nextCursor);
+      setCandidates((current) => [...(cursor ? current : []), ...result.items.flatMap((item) => (item.targetType === "material" || item.targetType === "bundle") && item.canLink
         ? [{ id: item.id, title: item.title, targetType: item.targetType, description: item.format ?? undefined }]
-        : []));
+        : [])]);
       setConnectorState("idle");
     } catch {
       setConnectorState("error");
@@ -119,6 +122,7 @@ export function EventArchivePanel({ event }: { event: CalendarEvent }) {
       {connectorState === "loading" && <p role="status">자료를 확인하고 있어요.</p>}
       {candidates.length > 0 && <ul className={styles.connectorResults}>{candidates.map((item) => <li key={`${item.targetType}:${item.id}`}><span>{item.title}</span><button type="button" disabled={connectorState === "linking"} onClick={() => void connect(item)}>이 행사에 연결</button></li>)}</ul>}
       {connectorState === "idle" && candidates.length === 0 && <p>현재 연결할 수 있는 자료가 없어요. 먼저 자료를 올려 주세요.</p>}
+      {candidateCursor && <button type="button" disabled={connectorState === "loading" || connectorState === "linking"} onClick={() => void openConnector(candidateCursor)}>연결할 자료 더 보기</button>}
       {connectorMessage && <p className={connectorState === "error" ? styles.error : styles.status} role={connectorState === "error" ? "alert" : "status"}>{connectorMessage}</p>}
     </div>}
   </section>;

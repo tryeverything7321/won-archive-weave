@@ -19,6 +19,7 @@ import { MembersAdmin } from "../features/admin/MembersAdmin";
 import { useOperatorAccess } from "../features/auth/useOperatorAccess";
 import { PageFrame } from "../components/PageFrame";
 import { LiveSubmissionReview } from "../features/admin/LiveSubmissionReview";
+import { ArchiveOrganizerAdmin } from "../features/admin/ArchiveOrganizerAdmin";
 import { CalendarSourceAdmin } from "../features/admin/CalendarSourceAdmin";
 import { ContentModerationPanel } from "../features/admin/ContentModerationPanel";
 import {
@@ -53,7 +54,7 @@ export function AdminPage({ section }: { section: AdminSection }) {
       </nav>
       {section === "submissions" && <><ContentModerationPanel key="submission" kind="submission" /><LiveSubmissionReview /></>}
       {section === "community" && <CommunityAdmin />}
-      {section === "calendar" && <><ContentModerationPanel key="event" kind="event" /><CalendarSourceAdmin /></>}
+      {section === "calendar" && <><ContentModerationPanel key="event" kind="event" /><CalendarSourceAdmin /><ArchiveOrganizerAdmin /></>}
       {section === "audit" && <OperatorAudit />}
       {section === "home" && <OperationsHome />}
       {section === "members" && <MembersAdmin />}

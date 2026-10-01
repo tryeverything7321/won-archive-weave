@@ -8,7 +8,7 @@ export function bundleFixture(name, input, state) {
     store.bundles[bundleId] = { ...input, bundleId, ownerLabel: '합성 작성자', status: 'draft', files: [], createdAtMs: Date.now(), updatedAtMs: Date.now() };
     return store.requests[input.requestId] = { bundleId, status: 'draft' };
   }
-  if (name === 'listMyMaterialBundles') return { bundles: Object.values(store.bundles), nextCursor: null };
+  if (name === 'listMyMaterialBundles') return { items: Object.values(store.bundles), nextCursor: null };
   if (name === 'getMaterialBundle') {
     if (!bundle) throw new Error('synthetic bundle not found');
     return { bundle };

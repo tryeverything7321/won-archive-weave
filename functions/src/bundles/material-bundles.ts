@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { getApps, initializeApp } from 'firebase-admin/app'
-import { FieldValue, Timestamp, getFirestore } from 'firebase-admin/firestore'
+import { FieldPath, FieldValue, Timestamp, getFirestore } from 'firebase-admin/firestore'
 import { getStorage } from 'firebase-admin/storage'
 import { HttpsError, onCall } from 'firebase-functions/v2/https'
 import { onSchedule } from 'firebase-functions/v2/scheduler'
@@ -379,17 +379,26 @@ export const listMyMaterialBundles = onCall({ region: 'asia-northeast3' }, async
   const { uid } = await requireActorPolicy(request.auth)
   const requestedLimit = Number(request.data?.limit ?? 20)
   const limit = Number.isSafeInteger(requestedLimit) ? Math.min(50, Math.max(1, requestedLimit)) : 20
-  const cursor = Number.isSafeInteger(request.data?.cursor) ? Number(request.data.cursor) : Number.POSITIVE_INFINITY
-  const snapshots = await getFirestore().collection('materialBundles').where('ownerUid', '==', uid).limit(100).get()
-  const records = snapshots.docs
-    .map((snapshot) => ({ id: snapshot.id, bundle: recordFrom(snapshot) }))
+  let query = getFirestore().collection('materialBundles').where('ownerUid', '==', uid)
+    .orderBy('updatedAtMs', 'desc').orderBy(FieldPath.documentId(), 'desc')
+  const cursor = request.data?.cursor
+  if (typeof cursor === 'string') {
+    try {
+      if (cursor.length > 512) throw new Error('cursor too long')
+      const parsed = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8'))
+      if (!Number.isSafeInteger(parsed.time) || typeof parsed.id !== 'string' || !parsed.id || parsed.id.includes('/')) throw new Error('invalid cursor')
+      query = query.startAfter(parsed.time, parsed.id)
+    } catch { throw new HttpsError('invalid-argument', '목록 위치를 확인하지 못했어요') }
+  } else if (Number.isSafeInteger(cursor)) query = query.startAfter(Number(cursor))
+  const snapshots = await query.limit(limit + 1).get()
+  const page = snapshots.docs.slice(0, limit)
+  const records = page.map((snapshot) => ({ id: snapshot.id, bundle: recordFrom(snapshot) }))
     .filter((item): item is { id: string; bundle: MaterialBundleRecord } => Boolean(item.bundle))
-    .filter((item) => item.bundle.updatedAtMs < cursor)
-    .sort((left, right) => right.bundle.updatedAtMs - left.bundle.updatedAtMs)
-    .slice(0, limit)
+  const last = page.at(-1)
   return {
     items: records.map((item) => projectMaterialBundle(item.id, item.bundle, true)),
-    nextCursor: records.length === limit ? records.at(-1)?.bundle.updatedAtMs ?? null : null,
+    nextCursor: snapshots.size > limit && last
+      ? Buffer.from(JSON.stringify({ time: last.get('updatedAtMs'), id: last.id })).toString('base64url') : null,
   }
 })
 

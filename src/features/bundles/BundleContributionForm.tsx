@@ -325,7 +325,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
             {!completed && <button className="button button-primary" type="submit" disabled={status.tone === "working" || files.length === 0}>{status.tone === "working" ? <LoaderCircle className="spin" size={18} /> : <FilePlus2 size={18} />}{status.tone === "working" ? "등록 중" : "자료 묶음 등록"}</button>}
           </div>
           {status.tone !== "idle" && <div className={`${styles.status} ${styles[status.tone]}`} role={status.tone === "error" ? "alert" : "status"}>{status.tone === "success" ? <CheckCircle2 size={20} /> : status.tone === "working" ? <LoaderCircle className="spin" size={20} /> : <CircleAlert size={20} />}<span>{status.message}</span></div>}
-          {completed && <div className={styles.completionActions}><Link className="button button-primary" to={`/bundles/${encodeURIComponent(bundleId)}`}>자료 묶음 보기</Link><Link className="button button-secondary" to="/profile?tab=activity">내 자료 관리</Link><Link className="button button-secondary" to={returnTo}>이전 화면으로</Link>{relationState === "failed" && <button type="button" className="button button-secondary" onClick={() => void connectEvent(bundleId)}>행사 연결 다시 시도</button>}</div>}
+          {completed && <div className={styles.completionActions}><Link className="button button-primary" to={`/bundles/${encodeURIComponent(bundleId)}`} state={{ returnTo }}>자료 묶음 보기</Link><Link className="button button-secondary" to="/profile?tab=activity">내 자료 관리</Link><Link className="button button-secondary" to={returnTo}>이전 화면으로</Link>{relationState === "failed" && <button type="button" className="button button-secondary" onClick={() => void connectEvent(bundleId)}>행사 연결 다시 시도</button>}</div>}
         </form>
       )}
     </section>
