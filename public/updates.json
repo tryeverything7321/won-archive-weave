@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-01T23:53:47.850Z",
+  "generatedAt": "2026-10-01T23:55:08.484Z",
   "entries": [
     {
       "id": "47cc21b5561877331b86980cd7b9ed5486351b65-0",
@@ -13,7 +13,7 @@
         "네이버·카카오·구글 일반 이용자의 자료 묶음 업로드에서 저장소 권한 오류가 발생하던 규칙을 수정했어요",
         "실패한 파일만 재시도할 수 있고 계정 식별자·내부 경로 대신 쉬운 오류 안내를 보여줘요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "bb02a393c2c1fbfaf1081f936e95335334aa368f-0",
