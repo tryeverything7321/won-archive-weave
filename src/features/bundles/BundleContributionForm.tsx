@@ -75,6 +75,8 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
   const [owner, setOwner] = useState("");
   const [consentReasons, setConsentReasons] = useState<string[]>([]);
   const consentBasis = consentReasons.join(" · ");
+  const [consentError, setConsentError] = useState(false);
+  const consentGroup = useRef<HTMLFieldSetElement>(null);
   const [visibility, setVisibility] = useState<BundleVisibility | "">("");
   const [rights, setRights] = useState<BundleRights>("view_only");
   const [rightsConfirmed, setRightsConfirmed] = useState(false);
@@ -186,7 +188,12 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
     if (!files.length) return setStatus({ tone: "error", message: "먼저 올릴 파일을 선택해 주세요." });
     if (!title.trim()) return setStatus({ tone: "error", message: "자료 제목을 입력해 주세요." });
     if (!visibility) return setStatus({ tone: "error", message: "공개 범위를 선택해 주세요." });
-    if (!owner.trim() || !consentBasis) return setStatus({ tone: "error", message: "권리자를 적고 공유 근거를 선택해 주세요." });
+    if (!owner.trim()) return setStatus({ tone: "error", message: "권리자를 적어 주세요." });
+    if (!consentReasons.length) {
+      setConsentError(true);
+      consentGroup.current?.querySelector('input')?.focus();
+      return;
+    }
     if (!rightsConfirmed) return setStatus({ tone: "error", message: "공유 권한과 개인정보 확인을 완료해 주세요." });
     setSelectionError("");
     setStatus({ tone: "working", message: "자료 묶음을 만들고 파일을 올리고 있어요." });
@@ -339,7 +346,16 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
               <label><span>자료 제목 <FieldRequirement /></span><input required value={title} maxLength={160} onChange={(event) => setTitle(event.target.value)} /></label>
               <label><span>자료 출처 <FieldRequirement optional /></span><input value={source} maxLength={160} onChange={(event) => setSource(event.target.value)} placeholder="예: 서울 청년회" /></label>
               <label><span>권리자 <FieldRequirement /></span><input required value={owner} maxLength={160} onChange={(event) => setOwner(event.target.value)} placeholder="예: 홍길동" /></label>
-              <fieldset className={`${styles.sharingBasis} ${styles.wide}`}><legend>공유 근거 <FieldRequirement /></legend><p>해당하는 항목을 선택해 주세요</p>{['내가 만든 자료예요', '만든 사람에게 공유를 허락받았어요', '단체 담당자로 공유할 권한이 있어요'].map(reason => <label className={styles.confirmation} key={reason}><input type="checkbox" checked={consentReasons.includes(reason)} onChange={event => setConsentReasons(current => event.target.checked ? [...current, reason] : current.filter(item => item !== reason))} /><span>{reason}</span></label>)}</fieldset>
+              <fieldset ref={consentGroup} className={`${styles.sharingBasis} ${styles.wide}`} aria-describedby="bundle-consent-help" aria-invalid={consentError || undefined}>
+                <legend>공유 근거 <FieldRequirement /></legend>
+                <p id="bundle-consent-help">해당하는 항목을 하나 이상 선택해 주세요</p>
+                {['내가 만든 자료예요', '만든 사람에게 공유를 허락받았어요', '단체 담당자로 공유할 권한이 있어요'].map(reason => <label className={styles.confirmation} key={reason}><input type="checkbox" checked={consentReasons.includes(reason)} onChange={event => {
+                  const next = event.target.checked ? [...consentReasons, reason] : consentReasons.filter(item => item !== reason);
+                  setConsentReasons(next);
+                  if (next.length) setConsentError(false);
+                }} /><span>{reason}</span></label>)}
+                {consentError && <p className={styles.error} role="alert">공유 근거를 하나 이상 선택해 주세요</p>}
+              </fieldset>
               <label className={styles.wide}><span>설명 또는 본문 <FieldRequirement optional /></span><textarea value={description} maxLength={5000} rows={7} onChange={(event) => setDescription(event.target.value)} placeholder="파일을 이해하는 데 필요한 설명이 있을 때만 적어 주세요" /></label>
               <label><span>공개 범위 <FieldRequirement /></span><select required value={visibility} onChange={(event) => setVisibility(event.target.value as BundleVisibility)}><option value="" disabled>공개 범위를 선택해 주세요</option><option value="공개">누구나 볼 수 있게 공개</option><option value="회원 전용">위브 로그인 이용자에게 공개</option><option value="보류">나만 보관</option></select></label>
               <label>파일 이용 방법<select value={rights} onChange={(event) => setRights(event.target.value as BundleRights)}><option value="view_only">위브에서 보기만 허용</option><option value="download_allowed">원본 내려받기 허용</option></select></label>

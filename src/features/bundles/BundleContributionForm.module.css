@@ -13,7 +13,7 @@
 .form { display: grid; gap: 16px; margin-top: 16px; }
 .section { min-width: 0; margin: 0; padding: clamp(18px, 3vw, 28px); border: 1px solid #c2dce8; border-radius: 20px; background: #fff; }
 .section legend { padding: 0 7px; font-family: SUITE, sans-serif; font-size: 1.05rem; font-weight: 800; }
-.section legend span { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-right: 8px; border-radius: 50%; background: #143957; color: #fff; }
+.section > legend > span { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-right: 8px; border-radius: 50%; background: #143957; color: #fff; }
 .filePicker { position: relative; display: grid; grid-template-columns: 28px 1fr; gap: 3px 12px; align-items: center; min-height: 92px; padding: 18px; border: 1px dashed #69b7df; border-radius: 14px; background: #f7fcff; cursor: pointer; }
 .filePicker small { grid-column: 2; color: #566b75; }
 .filePicker input, .replaceButton input { position: absolute; width: 1px; height: 1px; opacity: 0; }
@@ -32,11 +32,11 @@
 .fileActions button:disabled { opacity: .42; cursor: default; }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .fields > label { display: grid; gap: 7px; color: #315b70; font-size: .85rem; font-weight: 750; }
-.fields input, .fields select, .fields textarea { width: 100%; min-height: 48px; border: 1px solid #bdd6e2; border-radius: 11px; padding: 11px 12px; background: #fff; color: #143957; font: inherit; }
+.fields input:not([type="checkbox"]), .fields select, .fields textarea { width: 100%; min-height: 48px; border: 1px solid #bdd6e2; border-radius: 11px; padding: 11px 12px; background: #fff; color: #143957; font: inherit; }
 .fields textarea { min-height: 160px; resize: vertical; line-height: 1.7; }
 .fields small { color: #607784; font-weight: 500; line-height: 1.5; }
 .wide { grid-column: 1 / -1; }
-.confirmation { display: flex !important; grid-template-columns: none; flex-direction: row; align-items: start; min-height: 44px; }
+.confirmation { gap:10px; display: flex !important; grid-template-columns: none; flex-direction: row; align-items: start; min-height: 44px; }
 .confirmation input { flex: 0 0 auto; width: 20px; min-height: 20px; margin-top: 2px; accent-color: #143957; }
 .confirmation span { line-height: 1.55; }
 .submitBar { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 16px 18px; border: 1px solid #c2dce8; border-radius: 14px; background: #f2f7f7; }
