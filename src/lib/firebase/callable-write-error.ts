@@ -11,6 +11,9 @@ function errorFields(error: unknown): { code: string; message: string } {
 
 export function callableWriteErrorMessage(error: unknown, target: WriteTarget): string {
   const { code, message } = errorFields(error);
+  if (code === "storage/unauthorized") return "파일 업로드 권한을 확인하지 못했어요. 재시도 버튼으로 다시 올려 주세요. 계속되면 운영자에게 알려 주세요.";
+  if (code === "storage/unauthenticated") return "로그인이 만료되었어요. 다시 로그인한 뒤 파일을 올려 주세요.";
+  if (code === "storage/retry-limit-exceeded" || code === "storage/invalid-checksum" || code === "storage/canceled") return "파일 전송을 완료하지 못했어요. 연결 상태를 확인하고 이 파일만 다시 올려 주세요.";
   if (code === "resource-exhausted") {
     const seconds = error && typeof error === "object" && "details" in error
       ? Number((error.details as { retryAfterSeconds?: unknown } | null)?.retryAfterSeconds) : NaN;

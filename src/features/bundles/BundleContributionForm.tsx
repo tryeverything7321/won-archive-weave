@@ -163,7 +163,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
           fileId: target.fileId,
           revision: target.revision,
           status: "failed",
-          error: error instanceof Error ? error.message : "파일을 올리지 못했어요.",
+          error: callableWriteErrorMessage(error, "자료·기록"),
         });
         return false;
       }

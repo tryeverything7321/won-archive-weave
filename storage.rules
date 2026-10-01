@@ -87,7 +87,10 @@ service firebase.storage {
     }
 
     match /quarantined/{uid}/material-bundles/{bundleId}/{fileId}/{fileName} {
-      allow create: if resource == null && isActiveMember() && request.auth.uid == uid && validUpload(fileName)
+      // Storage permits at most two Firestore document lookups per request.
+      // The server issues reservations after checking account connection and consent.
+      // Use that authorization plus current bundle/file state, without a third users lookup.
+      allow create: if resource == null && signedIn() && request.auth.uid == uid && validUpload(fileName)
         && hasBundleUploadReservation(uid, bundleId, fileId, fileName);
       allow read, update, delete: if false;
     }

@@ -13,3 +13,13 @@ test("does not leak internal errors and warns against duplicate retry", () => {
   assert.match(callableWriteErrorMessage({ code: "functions/already-exists" }, "행사"), /이미 저장되었을 수/);
   assert.match(callableWriteErrorMessage({ code: "functions/unauthenticated" }, "커뮤니티 글"), /다시 로그인/);
 });
+
+
+test("storage failures explain retry without revealing account identity or object paths", () => {
+  const message = "Firebase Storage: access denied quarantined/naver:private-identity/material-bundles/file.pptx";
+  for (const code of ["storage/unauthorized", "storage/unauthenticated", "storage/retry-limit-exceeded", "storage/invalid-checksum", "storage/canceled", "storage/unknown"]) {
+    const result = callableWriteErrorMessage({code, message}, "자료·기록");
+    assert.doesNotMatch(result, /naver:|quarantined|private-identity|Firebase/);
+    assert.match(result, /다시|재시도|잠시/);
+  }
+});
