@@ -65,7 +65,7 @@ function sourceCollection(source: OperationsQueueSource): string {
   return 'submissionOperatorExceptions'
 }
 
-function sourceQuery(
+export function operationsSourceQuery(
   source: OperationsQueueSource,
   filter: OperationsQueueFilter,
   asOfMs: number,
@@ -81,7 +81,12 @@ function sourceQuery(
     query = query.where('status', '==', 'open')
   }
   const upperBound = filter.priority === 'overdue' ? asOfMs - OPERATIONS_OVERDUE_MS : asOfMs
+  // Counts must use the same deployed composite index as the paged queue.
+  // Without an explicit order Firestore infers ascending createdAt for this
+  // inequality, which requires a different index even for count().
   return query.where('createdAt', '<=', Timestamp.fromMillis(upperBound))
+    .orderBy('createdAt', 'desc')
+    .orderBy(FieldPath.documentId(), 'desc')
 }
 
 function snapshotCursor(document: QueryDocumentSnapshot<DocumentData>): OperationsQueueCursorPart | null {
@@ -108,7 +113,7 @@ function projectedQueueItem(
 async function exactCount(filter: OperationsQueueFilter, asOfMs: number): Promise<number> {
   const sources = queueSourcesForFilter(filter)
   const results = await Promise.all(sources.map(async (source) => {
-    const snapshot = await sourceQuery(source, filter, asOfMs).count().get()
+    const snapshot = await operationsSourceQuery(source, filter, asOfMs).count().get()
     return snapshot.data().count
   }))
   return results.reduce((total, count) => total + count, 0)
@@ -182,10 +187,7 @@ export const listOperationsQueue = onCall({ region: 'asia-northeast3' }, async (
   const sources = queueSourcesForFilter(filter)
   const nowMs = Date.now()
   const pages = await Promise.all(sources.map(async (source) => {
-    let query = sourceQuery(source, filter, nowMs)
-      .orderBy('createdAt', 'desc')
-      .orderBy(FieldPath.documentId(), 'desc')
-      .limit(pageSize + 1)
+    let query = operationsSourceQuery(source, filter, nowMs).limit(pageSize + 1)
     const part = cursor.sources[source]
     if (part) query = query.startAfter(new Timestamp(part.seconds, part.nanoseconds), part.id)
     const snapshot = await query.get()
