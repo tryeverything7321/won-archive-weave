@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-01T08:28:05.453Z",
+  "generatedAt": "2026-10-01T08:29:47.123Z",
   "entries": [
     {
       "id": "bb02a393c2c1fbfaf1081f936e95335334aa368f-0",
@@ -13,7 +13,7 @@
         "지난 개선 사항을 한국 시간 기준으로 모아 검색하고 날짜·기능별로 볼 수 있어요",
         "새 변경 기록은 GitHub 푸시 후 자동 갱신되며 서비스 반영 여부를 따로 표시해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "b03d4a2a04aa865cf467d9d2687a63529b0ebb58-0",
