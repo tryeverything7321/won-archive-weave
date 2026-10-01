@@ -8,7 +8,7 @@ const dist = new URL('../dist/', import.meta.url);
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const localIndex = await readFile(new URL('index.html', dist));
 const assetNames = (await readdir(new URL('assets/', dist))).filter(name => /\.(js|css)$/.test(name));
-const routes = ['/', '/archive', '/resources', '/contribute', '/profile', '/calendar', '/materials/release-check-unavailable', '/bundles/release-check-unavailable', '/archive-events/new', '/collections', '/collections/new'];
+const routes = ['/', '/updates', '/archive', '/resources', '/contribute', '/profile', '/calendar', '/materials/release-check-unavailable', '/bundles/release-check-unavailable', '/archive-events/new', '/collections', '/collections/new'];
 
 for (const route of routes) {
   const response = await fetch(`${origin}${route}`, { headers: { 'Cache-Control': 'no-cache' } });

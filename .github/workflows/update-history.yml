@@ -1,0 +1,35 @@
+name: Update public history
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: weave-public-update-history
+  cancel-in-progress: false
+jobs:
+  update-history:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Test history generation
+        run: node --test scripts/updates/generate.test.mjs
+      - name: Generate public history
+        run: node scripts/updates/generate.mjs
+      - name: Publish history
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/updates.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore(updates): refresh public history'
+            git push origin HEAD:main
+          fi

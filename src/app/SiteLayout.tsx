@@ -27,6 +27,7 @@ const menuItems = [
   ["/calendar", "행사 일정"],
   ["/community", "커뮤니티"],
   ["/about", "청년회와 위브"],
+  ["/updates", "업데이트"],
 ] as const;
 
 export function SiteLayout({ children }: { children: ReactNode }) {
@@ -233,6 +234,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </div>
         <nav className="footer-policies" aria-label="서비스와 운영 안내">
           <Link to="/about#weave-story">청년회와 위브</Link>
+          <Link to="/updates">업데이트 소식</Link>
           <Link to="/start">원불교가 처음이라면</Link>
           <Link to="/policies/terms">이용약관</Link>
           <Link to="/policies/privacy">개인정보 처리 안내</Link>

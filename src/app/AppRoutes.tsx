@@ -5,6 +5,8 @@ import { RouteTransition } from "../components/RouteTransition";
 import { RouteLoading } from "../components/RouteLoading";
 import { importWithReload } from "../lib/lazy-with-reload";
 
+const UpdatesPage = lazy(() => importWithReload(() => import("../routes/UpdatesPage").then(m => ({default:m.UpdatesPage})), "updates"));
+
 const HomePage = lazy(() =>
   importWithReload(
     () => import("../routes/HomePage").then((m) => ({ default: m.HomePage })),
@@ -189,6 +191,7 @@ export function AppRoutes() {
             <Route path="/" element={<HomePage />} />
             <Route path="/start" element={<StartPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/updates" element={<UpdatesPage />} />
             <Route path="/brand" element={<Navigate replace to="/about#weave-story" />} />
             <Route path="/archive" element={<ArchivePage />} />
             <Route path="/activities/:slug" element={<ActivityPage />} />
