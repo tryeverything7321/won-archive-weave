@@ -10,6 +10,7 @@
 .grid[data-count="1"] .card { min-height: 230px; }
 .grid[data-count="1"] .card:not(.withImage) .content { display: grid; grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.8fr) auto; align-items: center; gap: 30px; padding: 32px 40px; }
 .grid[data-count="1"] .card:not(.withImage) .date { margin: 0; }
+.grid[data-count="1"] .card:not(.withImage) .copy { margin-bottom: 0; }
 .grid[data-count="1"] .card:not(.withImage) .detailLink { margin: 0; padding: 0; white-space: nowrap; }
 .grid[data-count="1"] .card.withImage { flex-direction: row; min-height: 230px; }
 .grid[data-count="1"] .card.withImage .media { width: min(28%, 220px); height: 220px; margin: 16px 0 16px 16px; align-self: center; border-radius: 12px; flex: none; }
@@ -17,7 +18,7 @@
 .media { height: 170px; overflow: hidden; background: #eaf3f9; }
 .media img { width: 100%; height: 100%; object-fit: contain; }
 .content { display: flex; flex: 1; flex-direction: column; align-items: start; padding: 26px; }
-.copy { min-width: 0; }
+.copy { min-width: 0; margin-bottom: 24px; }
 .date { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; color: #146fa8; font-size: 14px; font-weight: 700; }
 .content h3 { margin: 0; font-size: clamp(20px, 2vw, 27px); line-height: 1.33; letter-spacing: -0.025em; word-break: keep-all; }
 .content h3 a { color: #172d40; text-decoration: none; }
@@ -33,7 +34,7 @@
 .message a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: #146fa8; font-weight: 700; white-space: nowrap; }
 @media (max-width: 920px) {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid[data-count="1"] .card:not(.withImage) .content { grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.35fr); gap: 12px 24px; }
+  .grid[data-count="1"] .card:not(.withImage) .content { grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.35fr); gap: 24px; }
   .grid[data-count="1"] .card:not(.withImage) .detailLink { grid-column: 2; }
   .grid[data-count="3"] .featured { grid-column: 1 / -1; }
   .grid[data-count="3"] .featured.withImage { flex-direction: row; }
@@ -47,6 +48,7 @@
   .grid[data-count="1"] .card { min-height: 0; }
   .grid[data-count="1"] .card:not(.withImage) .content { display: flex; align-items: start; gap: 0; padding: 22px; }
   .grid[data-count="1"] .card:not(.withImage) .date { margin-bottom: 18px; }
+  .grid[data-count="1"] .card:not(.withImage) .copy { margin-bottom: 24px; }
   .grid[data-count="1"] .card:not(.withImage) .detailLink { margin-top: auto; padding-top: 23px; }
   .grid[data-count="1"] .card.withImage,
   .grid[data-count="3"] .featured.withImage { flex-direction: column; }
