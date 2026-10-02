@@ -47,6 +47,7 @@ const ContributionForm = lazy(() =>
     default: m.ContributionForm,
   })),
 );
+const ManagedResourceEditForm = lazy(() => import("../features/admin/ManagedResourceEditor").then(m => ({default: m.ManagedResourceEditForm})));
 const BundleContributionForm = lazy(() => import("../features/bundles/BundleContributionForm").then(m => ({ default: m.BundleContributionForm })));
 const CommunityExperience = lazy(() =>
   import("../features/community/CommunityExperience").then((m) => ({
@@ -73,20 +74,22 @@ const EventEditor = lazy(() =>
 export function ContributePage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const useBundle = !params.get('submissionId') && params.get('legacy') !== '1'
+  const managedEdit = params.has('managedId');
+  const editing = managedEdit || params.has('submissionId');
+  const useBundle = !managedEdit && !params.get('submissionId') && params.get('legacy') !== '1'
     && (params.get('kind') === 'material' || params.get('intent') === 'material');
   return (
     <PageFrame
-      eyebrow="등록하기"
+      eyebrow={editing ? "수정하기" : "등록하기"}
       title={
         <>
-          활동 기록·자료 올리기
+          {editing ? "활동 기록·자료 수정" : "활동 기록·자료 올리기"}
         </>
       }
-      description="활동 후기나 공유할 자료를 남겨 주세요. 공개 범위를 직접 선택하고, 등록 후에는 내 위브에서 게시 상태와 관리 메뉴를 확인할 수 있어요."
+      description={editing ? "내용을 수정하고 미리보기로 확인한 뒤 저장하세요." : "활동 후기나 공유할 자료를 남겨 주세요. 공개 범위를 직접 선택하고, 등록 후에는 내 위브에서 게시 상태와 관리 메뉴를 확인할 수 있어요."}
     >
       <Suspense fallback={<RouteLoading />}>
-        {useBundle ? <BundleContributionForm /> : <ContributionForm />}
+        {managedEdit ? <ManagedResourceEditForm key={location.search} /> : useBundle ? <BundleContributionForm /> : <ContributionForm />}
       </Suspense>
     </PageFrame>
   );

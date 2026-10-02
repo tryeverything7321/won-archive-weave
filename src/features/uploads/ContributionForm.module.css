@@ -498,3 +498,5 @@
   .eventContext { flex-direction: column; }
   .eventContext > div:last-child { align-items: stretch; flex-direction: column; }
 }
+
+.managedDescription {display:block;width:100%;box-sizing:border-box;padding:13px;border:1px solid #c2dce8;border-radius:12px;font:inherit;line-height:1.65;resize:vertical;}

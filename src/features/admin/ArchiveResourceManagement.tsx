@@ -18,7 +18,7 @@ export function AdminResourceDeleteButton({id,type,title,onDeleted}:{id:string;t
 }
 
 export function AdminResourceActions(props:{id:string;type:ManagedResourceType;title:string;onDeleted:()=>void}){
- return <div className={archiveStyles.rowActions}><ManagedResourceEditor id={props.id} type={props.type} title={props.title} onSaved={props.onDeleted}/><AdminResourceDeleteButton {...props}/></div>
+ return <div className={archiveStyles.rowActions}><ManagedResourceEditor id={props.id} type={props.type} title={props.title}/><AdminResourceDeleteButton {...props}/></div>
 }
 
 export function QcResourceCleanup({onDeleted}:{onDeleted?:()=>void}){
