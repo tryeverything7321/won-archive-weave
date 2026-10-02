@@ -1,8 +1,19 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T02:16:36.227Z",
+  "generatedAt": "2026-10-02T02:17:22.803Z",
   "entries": [
+    {
+      "id": "626aeda7a301dfb49e4132b9883be1c08f05913b-0",
+      "commit": "626aeda7a301dfb49e4132b9883be1c08f05913b",
+      "committedAt": "2026-10-02T11:17:13+09:00",
+      "area": "자료 등록",
+      "title": "등록 안내와 버튼 이름도 자료로 통일했어요",
+      "details": [
+        "파일 수와 관계없이 자료 올리기·자료 보기로 안내해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "a5020d5a346164ae441b4cac9edd8bcc097431bd-0",
       "commit": "a5020d5a346164ae441b4cac9edd8bcc097431bd",
