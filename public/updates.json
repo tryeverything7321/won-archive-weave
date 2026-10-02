@@ -1,8 +1,19 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T23:17:27.167Z",
+  "generatedAt": "2026-10-02T23:23:43.574Z",
   "entries": [
+    {
+      "id": "629fe246b6516e47bd64d2eb6bcb7eba679f4de6-0",
+      "commit": "629fe246b6516e47bd64d2eb6bcb7eba679f4de6",
+      "committedAt": "2026-10-03T08:23:34+09:00",
+      "area": "행사·탐색",
+      "title": "연결할 캘린더를 아이콘으로 알아볼 수 있어요",
+      "details": [
+        "공유 캘린더 연결에 Google Calendar와 TimeTree 아이콘과 이름을 표시해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "68ff85eccb2b027b3a239f3e4b841e97ee5dabad-0",
       "commit": "68ff85eccb2b027b3a239f3e4b841e97ee5dabad",
