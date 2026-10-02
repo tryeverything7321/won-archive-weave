@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:08:05.651Z",
+  "generatedAt": "2026-10-02T01:09:53.509Z",
   "entries": [
     {
       "id": "d3ea061f4d7eee0567b13f9a57a400ffedcb57ec-0",
@@ -13,7 +13,7 @@
         "네이버 버튼을 회색으로 표시하고 선택을 잠시 막았어요",
         "카카오·구글 로그인과 기존 로그인 상태는 유지해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "0c486ccc18ad5386bcb01d1b44ba14c78df84d45-0",
@@ -28,7 +28,7 @@
         "관리자는 QC 테스트 기록의 제목을 확인해 정리할 수 있어요",
         "회의록 이동 버튼과 내부 업데이트 검증 기록의 노출을 없앴어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "87b69bae1eb9e243bf08371cf73e28053622c43f-0",
