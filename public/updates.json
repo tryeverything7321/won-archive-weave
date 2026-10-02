@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:33:06.484Z",
+  "generatedAt": "2026-10-02T02:16:36.227Z",
   "entries": [
+    {
+      "id": "a5020d5a346164ae441b4cac9edd8bcc097431bd-0",
+      "commit": "a5020d5a346164ae441b4cac9edd8bcc097431bd",
+      "committedAt": "2026-10-02T11:16:25+09:00",
+      "area": "행사·탐색",
+      "title": "행사에서도 자료를 한 목록으로 볼 수 있어요",
+      "details": [
+        "자료 묶음과 개별 자료 구분을 없애고 자료로 통일했어요",
+        "자료 게시글 수와 첨부 파일 수를 구분해 표시해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "1cabb0d5fe4cb8f0f59c3b3764c6a9dcc6ec14df-0",
       "commit": "1cabb0d5fe4cb8f0f59c3b3764c6a9dcc6ec14df",
