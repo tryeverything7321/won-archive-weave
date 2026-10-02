@@ -33,6 +33,9 @@ test('year-only event, six files, two records, shared collections and private re
   assert.ok(unified.items.some(item=>item.id===materialId&&item.targetType==='material'));
   assert.ok(unified.items.some(item=>item.id===bundleId&&item.targetType==='bundle'&&item.fileCount===6));
   assert.ok(unified.items.every(item=>['material','bundle'].includes(item.targetType)));
+  assert.equal(unified.items.find(item=>item.id===bundleId)?.files.length,6);
+  assert.ok(unified.items.find(item=>item.id===bundleId)?.uploadedAtMs);
+
   const searched=await invoke(searchArchiveDiscovery,{scope:'resources',keyword:tag},null);
   assert.ok(searched.items.some(item=>item.id===materialId));assert.ok(searched.items.every(item=>item.title.includes(tag)));
   const collections=[]

@@ -1,7 +1,4 @@
 import { useOperatorAccess } from "../auth/useOperatorAccess";
-import { httpsCallable } from "firebase/functions";
-import {getFirebaseServices} from "../../lib/firebase/client";
-import {callableWriteErrorMessage} from "../../lib/firebase/callable-write-error";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
@@ -29,14 +26,6 @@ export function OwnedSubmissionActions({ id, returnTo, kind = "material" }: { id
       setError("수정 화면을 열지 못했어요. 다시 시도해 주세요.");
       setWorking(false);
     }
-  };
-
-  const classify = async()=>{
-    if(!window.confirm("회의록·문서 자료로 옮길까요? 기존 주소와 행사 연결은 유지됩니다."))return;
-    const services=getFirebaseServices();if(!services)return;
-    setWorking(true);setError("");
-    try{const result=await httpsCallable<{submissionId:string},{href:string}>(services.functions,"classifySubmissionAsMaterial")({submissionId:id});if(result.data.href!==`/materials/${id}`)throw Error("Invalid classification result");navigate(result.data.href,{replace:true})}
-    catch(error){setError(callableWriteErrorMessage(error,"자료·기록"));setWorking(false)}
   };
 
   const unpublish = async () => {
@@ -70,7 +59,6 @@ export function OwnedSubmissionActions({ id, returnTo, kind = "material" }: { id
     {phase === "ready" && (record?.availableActions.includes("request_revision") || record?.availableActions.includes("edit")) && <button className="button button-secondary" type="button" onClick={() => void edit()} disabled={working}><Pencil size={16} aria-hidden="true" /> 수정</button>}
     {phase === "ready" && record?.availableActions.includes("unpublish") && <button className="button button-quiet" type="button" onClick={() => void unpublish()} disabled={working}><Trash2 size={16} aria-hidden="true" /> 삭제</button>}
     {phase === "ready" && record && !record.availableActions.includes("request_revision") && !record.availableActions.includes("edit") && <p role="status">현재 상태는 내 위브에서 확인할 수 있어요.</p>}
-    {kind === "activity" && (record?.status === "published" || operator.state === "allowed") && <button className="button button-secondary" type="button" disabled={working} onClick={()=>void classify()}>자료 나눔으로 옮기기</button>}
     {!record && operator.state === "allowed" && <a className="button button-secondary" href="/admin/submissions">운영 센터에서 관리</a>}
     {error && <p role="alert">{error}</p>}
   </section>;

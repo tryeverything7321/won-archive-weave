@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, FilePlus2, LoaderCircle, RotateCcw, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { callableWriteErrorMessage } from "../../lib/firebase/callable-write-error";
 import { uploadAccept, uploadContentType, uploadFileError } from "../uploads/file-policy";
 import {
@@ -28,6 +28,8 @@ import styles from "./BundleViews.module.css";
 type PendingUpload = { file: File; clientFileId: string; replaceFileId?: string; uploading: boolean; error: string };
 
 export function MyBundleManager() {
+  const [search]=useSearchParams();
+  const selectedId=search.get("bundleId");
   const [bundles, setBundles] = useState<MaterialBundle[]>([]);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("");
@@ -39,6 +41,7 @@ export function MyBundleManager() {
     setLoadState("loading");
     try {
       const result = await listMyMaterialBundles();
+      while(selectedId && !result.bundles.some(bundle=>bundle.bundleId===selectedId) && result.nextCursor){const next=await listMyMaterialBundles(result.nextCursor);result.bundles.push(...next.bundles);result.nextCursor=next.nextCursor}
       setBundles(result.bundles);
       setNextCursor(result.nextCursor);
       setMessage("");
@@ -47,7 +50,7 @@ export function MyBundleManager() {
       setMessage(callableWriteErrorMessage(error, "자료·기록"));
       setLoadState("error");
     }
-  }, []);
+  }, [selectedId]);
 
   const loadMore = async () => {
     if (nextCursor === null || loadingMore) return;
@@ -67,16 +70,17 @@ export function MyBundleManager() {
     return () => window.clearTimeout(timer);
   }, [attempt, load]);
 
-  if (loadState === "loading") return <p role="status"><LoaderCircle className="spin" size={18} /> 내 자료 묶음을 불러오고 있어요.</p>;
+  if (loadState === "loading") return <p role="status"><LoaderCircle className="spin" size={18} /> 내 자료을 불러오고 있어요.</p>;
   if (loadState === "error") return <div className={styles.actions}><p role="alert">{message}</p><button type="button" onClick={() => setAttempt((value) => value + 1)}><RotateCcw size={17} /> 다시 확인</button></div>;
 
   return <section className={styles.manager} aria-labelledby="my-bundles-title">
+    {selectedId && <Link to="/profile?tab=activity">내 자료 전체 보기</Link>}
     <div className={styles.managerHeader}>
-      <div><h2 id="my-bundles-title">내 자료 묶음</h2><p>파일별 검사 상태와 표시 순서를 관리할 수 있어요.</p></div>
-      <Link className="button button-primary" to="/contribute?intent=material"><FilePlus2 size={17} /> 새 묶음 올리기</Link>
+      <div><h2 id="my-bundles-title">내 자료</h2><p>파일별 검사 상태와 표시 순서를 관리할 수 있어요.</p></div>
+      <Link className="button button-primary" to="/contribute?intent=material"><FilePlus2 size={17} /> 자료 올리기</Link>
     </div>
-    {!bundles.length ? <p>아직 올린 자료 묶음이 없습니다.</p> : bundles.map((bundle) => <BundleEditor key={`${bundle.bundleId}:${bundle.updatedAtMs ?? 0}`} bundle={bundle} onChanged={load} />)}
-    {nextCursor !== null && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "자료 묶음 더 보기"}</button>}
+    {!bundles.length ? <p>아직 올린 자료 묶음이 없습니다.</p> : bundles.filter(bundle=>!selectedId||bundle.bundleId===selectedId).map((bundle) => <BundleEditor key={`${bundle.bundleId}:${bundle.updatedAtMs ?? 0}`} bundle={bundle} onChanged={load} />)}
+    {nextCursor !== null && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "자료 더 보기"}</button>}
     {message && <p role="alert">{message}</p>}
   </section>;
 }
@@ -162,7 +166,7 @@ function BundleEditor({ bundle, onChanged }: { bundle: MaterialBundle; onChanged
   return <article className={styles.bundleEditor}>
     <div className={styles.editorHeader}>
       <div><h3>{bundle.title}</h3><p>{bundle.files.length}개 파일 · {bundle.status === "active" ? "게시됨" : bundle.status === "draft" ? "등록 중" : "공개 중단"}</p></div>
-      <Link className="button button-secondary" to={`/bundles/${encodeURIComponent(bundle.bundleId)}`} state={{ returnTo: "/profile?tab=activity" }}>묶음 보기</Link>
+      <Link className="button button-secondary" to={`/bundles/${encodeURIComponent(bundle.bundleId)}`} state={{ returnTo: "/profile?tab=activity" }}>자료 보기</Link>
     </div>
     <div className={styles.editorFields}>
       <label>제목<input value={title} maxLength={120} onChange={(event) => setTitle(event.target.value)} /></label>

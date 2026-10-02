@@ -162,7 +162,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
     const formats = [...new Set(bundle.files.map((file) => file.format))]
     items.push({
       targetType: 'bundle', id: bundle.bundleId, title: bundle.title, href: `/bundles/${encodeURIComponent(bundle.bundleId)}`,
-      sortMs: bundle.updatedAtMs ?? bundle.createdAtMs ?? 0, heldYear: null, uploadYear: bundle.uploadYear,
+      sortMs: bundle.createdAtMs ?? bundle.updatedAtMs ?? 0, heldYear: null, uploadYear: bundle.uploadYear,
       region: '', format: formats.length === 1 ? formats[0]! : formats.length > 1 ? 'MIXED' : null, formats,
       organizerIds: [], linkedEventIds, canLink: viewer.administrator || (viewer.uid !== null && doc.get('ownerUid') === viewer.uid),
     })
@@ -219,7 +219,13 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
   const organizers = [...organizerNames].filter(([id]) => [...eventItems.values()].some((event) => event.organizerIds.includes(id)))
     .map(([id, displayName]) => ({ id, displayName })).sort((left, right) => left.displayName.localeCompare(right.displayName, 'ko') || left.id.localeCompare(right.id))
   return {
-    items: page.map((item) => ({
+    items: page.map((item) => {
+      const bundle = readableBundles.find(value => value.bundleId === item.id);
+      const source = item.targetType === 'bundle' ? bundleDocs.find(doc => doc.id === item.id) : materialDocs.find(doc => doc.id === item.id);
+      const raw = source?.data() ?? {};
+      const rights = raw.rights && typeof raw.rights === 'object' ? raw.rights : {};
+      const organizers = [...new Set(item.linkedEventIds.flatMap(id => eventItems.get(id)?.organizerIds ?? []))].flatMap(id => organizerNames.get(id) ?? []);
+      return ({
       targetType: item.targetType,
       id: item.id,
       title: item.title,
@@ -229,8 +235,12 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
       region: item.region,
       format: item.format,
       canLink: item.canLink,
+      uploadedAtMs: item.targetType === 'bundle' ? bundle?.createdAtMs ?? null : item.sortMs || null,
+      organizerLabel: organizers.join(' · ') || (typeof rights.source === 'string' ? rights.source.trim().slice(0,160) : typeof raw.source === 'string' ? raw.source.trim().slice(0,160) : ''),
+      canEdit: viewer.uid !== null && (item.targetType !== 'material' ? raw.ownerUid === viewer.uid : submissionOwners.get(item.id) === viewer.uid),
+      ...(item.targetType === 'bundle' ? {files: bundle?.files.map(file => ({fileId:file.fileId, displayName:file.displayName, originalName:file.originalName, format:file.format, sizeBytes:file.sizeBytes,status:file.status})).filter(file => file.status !== 'withdrawn') ?? []} : {}),
       fileCount: item.targetType === 'bundle' ? readableBundles.find(bundle => bundle.bundleId === item.id)?.files.length ?? 0 : item.targetType === 'material' && readableMaterials.find(material => material.id === item.id)?.hasOriginalFile ? 1 : 0,
-    })),
+    });}),
     facets: {
       organizers,
       heldYears: [...new Set([...eventItems.values()].flatMap((item) => item.heldYear === null ? [] : [item.heldYear]))].sort((a, b) => b - a),

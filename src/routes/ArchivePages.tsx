@@ -153,7 +153,7 @@ export function ArchivePage() {
           <br /> 활동을 이어가요
         </>
       }
-      description="함께한 활동의 과정과 후기를 살펴보세요. 내 활동을 기록하고 사진이나 관련 자료도 함께 남길 수 있어요."
+      description="하나의 행사나 활동에서 무엇을 했는지 개괄적으로 소개해요. 회의록과 발표 문서는 자료 나눔에 올릴 수 있어요."
     >
       <div className="archive-controls">
         <Link className="button button-primary" to="/contribute?intent=activity">활동 기록 남기기</Link>

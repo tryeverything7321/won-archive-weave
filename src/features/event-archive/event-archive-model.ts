@@ -93,6 +93,10 @@ export type ArchiveDiscoveryResult = {
 };
 
 export type ArchiveDiscoveryItem = {
+  uploadedAtMs?: number | null;
+  organizerLabel?: string;
+  canEdit?: boolean;
+  files?: Array<{fileId:string;displayName:string;originalName:string;format:string;sizeBytes:number;status:string}>;
   fileCount?: number;
   targetType: "event" | ArchiveRelationTarget;
   id: string;

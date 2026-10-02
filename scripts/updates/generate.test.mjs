@@ -18,6 +18,7 @@ test('generator excludes its own commits, preserves real timestamps and never ma
   writeFileSync(join(repo,'one.txt'),'one');git('add','.');git('commit','-m','feat: first');const deployed=git('rev-parse','HEAD');const date=git('show','-s','--format=%cI','HEAD');
   writeFileSync(join(repo,'one.txt'),'two');git('add','.');git('commit','-m','fix: next');
   writeFileSync(join(repo,'one.txt'),'three');git('add','.');git('commit','-m','chore(updates): refresh public history');
+  writeFileSync(join(repo,'one.txt'),'four');git('add','.');git('commit','-m','chore(updates): verify classification auth guard');
   const notesPath=join(root,'notes.json');writeFileSync(notesPath,JSON.stringify({deployedThrough:deployed,commits:{}}));
   const result=generate({repo,notesPath,out:join(root,'out.json')});assert.equal(result.entries.length,2);assert.equal(result.entries[0].status,'development');assert.equal(result.entries[1].status,'deployed');assert.equal(result.entries[1].committedAt,date);
   git('remote','set-url','origin','https://github.com/private/unrelated.git');assert.throws(()=>generate({repo,notesPath,out:join(root,'bad.json')}),/Only the public Weave/);

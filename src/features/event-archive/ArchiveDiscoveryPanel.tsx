@@ -1,15 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Filter, RotateCcw, Search, X } from "lucide-react";
+import { Filter, RotateCcw, Search, X, FileText, FileImage, Presentation } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useFirebaseAudience } from "../auth/useFirebaseAudience";
 import { searchArchiveDiscovery } from "./event-archive-api";
-import { archiveRelationPath, archiveTargetLabel, type ArchiveDiscoveryResult, type ArchiveRelationSummary } from "./event-archive-model";
+import { type ArchiveDiscoveryResult } from "./event-archive-model";
+import {ResourceActions} from "./ResourceActions";
+import {OwnedSubmissionActions} from "../uploads/OwnedSubmissionActions";
+import {useOperatorAccess} from "../auth/useOperatorAccess";
+import {httpsCallable} from "firebase/functions";
+import {getFirebaseServices} from "../../lib/firebase/client";
 import styles from "./EventArchive.module.css";
 
 const keys = ["organizer", "heldYear", "uploadYear", "region", "archiveFormat"] as const;
 
 export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boolean}) {
   const location = useLocation();
+  const operator=useOperatorAccess();
+  const [attempt,setAttempt]=useState(0);
+  const [qcMessage,setQcMessage]=useState("");
+  const refresh=()=>setAttempt(value=>value+1);
+  const cleanupQc=async()=>{try{const services=getFirebaseServices();if(!services)return;const call=httpsCallable<{remove:boolean},{items?:Array<{title:string}>;removed?:number}>(services.functions,"manageQcResources");const found=await call({remove:false});const items=found.data.items??[];if(!items.length){setQcMessage("정리할 QC 기록이 없어요");return}if(!window.confirm(`QC 테스트 ${items.length}건을 삭제할까요?\n${items.map(x=>x.title).join("\n")}`))return;const result=await call({remove:true});setQcMessage(`${result.data.removed??0}건을 삭제했어요`);refresh()}catch{setQcMessage("QC 기록을 정리하지 못했어요. 관리자 권한을 확인해 주세요.")}};
   const { audience, ready } = useFirebaseAudience();
   const [search, setSearch] = useSearchParams();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
@@ -44,7 +54,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
       setState("ready");
     }).catch(() => { if (request === requestRef.current) setState("error"); });
     return () => { requestRef.current += 1; };
-  }, [audience, filters, ready]);
+  }, [audience, filters, ready,attempt]);
 
   const loadMore = async () => {
     if (!result?.nextCursor || loadingMore) return;
@@ -68,6 +78,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
 
   return <section className={styles.section} aria-labelledby="archive-discovery-title">
     <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">{resourcesOnly ? "자료 찾기" : "행사·자료·기록 찾기"}</h2><p>{resourcesOnly ? "제목·자료 형식·행사 정보로 찾아보세요." : "주최나 행사가 열린 해로 찾아보세요."}</p></div><Filter size={26} aria-hidden="true" /></div>
+    {resourcesOnly && <div className={styles.actions}><button className="button button-secondary" type="button" onClick={refresh}><RotateCcw size={16}/>새로고침</button>{operator.state==="allowed"&&<button className="button button-quiet" type="button" onClick={()=>void cleanupQc()}>QC 테스트 정리</button>}{qcMessage&&<p role="status">{qcMessage}</p>}</div>}
     {resourcesOnly && <label className={styles.resourceSearch}><Search size={20} aria-hidden="true"/><span className="sr-only">자료 검색</span><input type="search" value={keyword} placeholder="자료 제목 검색" onChange={event=>setFilter("q",event.target.value)}/></label>}
     <details className={styles.conditions} open={conditionsOpen} onToggle={event => setConditionsOpen(event.currentTarget.open)}>
       <summary>상세 조건{active ? ` · ${keys.filter(key => search.has(key)).length}개 적용` : ""}</summary>
@@ -83,13 +94,25 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
     {state === "loading" && <p className={styles.status} role="status">행사와 연결된 자료를 찾고 있어요.</p>}
     {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert"><RotateCcw size={16} /> 행사 기준 검색을 완료하지 못했어요.</p>}
     {state === "ready" && result && <>
-      <ul className={styles.counts} aria-label="현재 조건의 고유 결과">{resourcesOnly ? <><li>자료 {result.counts.bundleCount + result.counts.materialCount}</li><li>첨부 파일 {result.counts.fileCount}</li></> : <><li>행사 {result.counts.eventCount}</li><li>자료 묶음 {result.counts.bundleCount}</li><li>개별 자료 {result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 {result.counts.fileCount}</li></>}</ul>
-      {result.items.length ? <div className={styles.grid}>{result.items.map((item) => {
-        const isEvent = item.targetType === "event";
-        const path = isEvent ? `/archive-events/${encodeURIComponent(item.id)}` : archiveRelationPath(item as ArchiveRelationSummary);
-        const detail = isEvent ? `${item.heldYear}년 · ${item.region || "지역 미입력"}` : item.format;
-        return <article className={styles.item} key={`${item.targetType}:${item.id}`}><small>{resourcesOnly ? (item.fileCount ? `${item.fileCount}개 파일` : "글·회의록") : archiveTargetLabel(item.targetType)}</small><Link to={path} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link>{detail && <p>{detail}</p>}</article>;
-      })}</div> : <p className={styles.status}>현재 조건에서 볼 수 있는 자료가 없어요.</p>}
+      <ul className={styles.counts} aria-label="현재 조건의 고유 결과">{resourcesOnly ? <><li>자료 {result.totalCount ?? result.counts.bundleCount + result.counts.materialCount}</li><li>첨부 파일 {result.counts.fileCount}</li></> : <><li>행사 {result.counts.eventCount}</li><li>자료 묶음 {result.counts.bundleCount}</li><li>개별 자료 {result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 {result.counts.fileCount}</li></>}</ul>
+      {resourcesOnly ? <div className={styles.resourceList}>
+        <div className={styles.resourceColumns} aria-hidden="true"><span>이름</span><span>주최·출처</span><span>등록 날짜</span><span>관리</span></div>
+        {result.items.map(item=>{
+          const path=item.href || (item.targetType === "bundle" ? `/bundles/${item.id}` : `/materials/${item.id}`);
+          const previews=item.files?.slice(0,3)??[];
+          const formats=previews.length?previews.map(file=>file.format):[item.format??"문서"];
+          return <article className={styles.resourceRow} key={`${item.targetType}:${item.id}`}>
+            <Link className={styles.resourceName} to={path} state={{returnTo:location.pathname+location.search,resourcesReturn:location.pathname+location.search}}>
+              <span className={styles.thumbnailStack}>{formats.map((format,index)=>{const Icon=/PPT/.test(format)?Presentation:/PNG|JPG|JPEG|WEBP/.test(format)?FileImage:FileText;return <span key={index} className={styles.fileThumbnail} data-format={format} aria-hidden="true"><Icon size={24}/><small>{format==="TEXT"?"글":format}</small></span>})}</span>
+              <span><strong>{item.title}</strong><small>{item.files?.length?`${item.files.length}개 파일 · ${item.files.map(file=>file.originalName).join(" · ")}`:item.format==="TEXT"?"글·회의록":item.format||"자료"}</small></span>
+            </Link>
+            <span className={styles.rowOrganizer}>{item.organizerLabel||"—"}</span>
+            <time className={styles.rowDate} dateTime={item.uploadedAtMs?new Date(item.uploadedAtMs).toISOString():undefined}>{item.uploadedAtMs?new Intl.DateTimeFormat("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}).format(item.uploadedAtMs):"날짜 정보 없음"}</time>
+            <div>{item.targetType==="material"?<OwnedSubmissionActions id={item.id} returnTo="/resources"/>:item.canEdit&&item.targetType==="bundle"?<ResourceActions id={item.id} type="bundle" onDeleted={refresh}/>:null}</div>
+          </article>
+        })}
+        {!result.items.length&&<p className={styles.status}>{audience==="public"?"공개된 자료가 없어요. 로그인하면 이용자에게 공개된 자료도 볼 수 있어요.":"현재 조건에서 볼 수 있는 자료가 없어요."}</p>}
+      </div> : result.items.length ? <div className={styles.grid}>{result.items.map(item=><article className={styles.item} key={`${item.targetType}:${item.id}`}><Link to={item.href} state={{returnTo:location.pathname+location.search,resourcesReturn:location.pathname+location.search}}>{item.title}</Link></article>)}</div>:<p className={styles.status}>현재 조건에서 볼 수 있는 자료가 없어요.</p>}
       {result.nextCursor && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "검색 결과 더 보기"}</button>}
       {pageError && <p role="alert">{pageError}</p>}
       <p className={styles.muted}>현재 권한에서 조회한 결과 · {new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short", timeZone: result.timeZone }).format(new Date(result.asOfMs))} 기준</p>

@@ -29,7 +29,7 @@ export function generate({repo,notesPath,out}) {
   const entries=[];
   for(const hash of hashes){
     const message=git('show','-s','--format=%B',hash);
-    if(message.startsWith('chore(updates): refresh public history') || message.startsWith('chore(updates): mark deployed'))continue;
+    if(message.startsWith('chore(updates):'))continue;
     const committedAt=git('show','-s','--format=%cI',hash);
     const files=git('diff-tree','--root','--no-commit-id','--name-only','-r',hash).split('\n');
     let deployed=false;
