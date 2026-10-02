@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T02:18:58.983Z",
+  "generatedAt": "2026-10-02T03:04:52.801Z",
   "entries": [
+    {
+      "id": "ae1b470c20e52bd0675078b8d439f600149f5729-0",
+      "commit": "ae1b470c20e52bd0675078b8d439f600149f5729",
+      "committedAt": "2026-10-02T12:04:42+09:00",
+      "area": "자료 등록",
+      "title": "기존 자료도 수정하고 첨부파일을 간결하게 확인해요",
+      "details": [
+        "관리자도 기존 회의록의 제목·본문·출처를 수정할 수 있어요",
+        "첨부파일 이름은 두 개까지 표시하고 나머지는 외 N개로 정리해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "626aeda7a301dfb49e4132b9883be1c08f05913b-0",
       "commit": "626aeda7a301dfb49e4132b9883be1c08f05913b",
