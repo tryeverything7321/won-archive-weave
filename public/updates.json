@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:18:37.797Z",
+  "generatedAt": "2026-10-02T01:19:25.361Z",
   "entries": [
     {
       "id": "240b586358e68474287445b151766055e353a45b-0",
@@ -12,7 +12,7 @@
       "details": [
         "승인 안내 배지와 로그인 버튼 선택 기능을 유지해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "f796f57769ce8052ebb0b4f085eca746aec48004-0",
