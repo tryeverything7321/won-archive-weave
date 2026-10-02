@@ -92,7 +92,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
     {state === "loading" && <p className={styles.status} role="status">행사와 연결된 자료를 찾고 있어요.</p>}
     {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert"><RotateCcw size={16} /> 행사 기준 검색을 완료하지 못했어요.</p>}
     {state === "ready" && result && <>
-      <ul className={styles.counts} aria-label="현재 조건의 고유 결과">{resourcesOnly ? <><li>자료 {result.totalCount ?? result.counts.bundleCount + result.counts.materialCount}</li><li>첨부 파일 {result.counts.fileCount}</li></> : <><li>행사 {result.counts.eventCount}</li><li>자료 묶음 {result.counts.bundleCount}</li><li>개별 자료 {result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 {result.counts.fileCount}</li></>}</ul>
+      <ul className={styles.counts} aria-label="현재 조건의 고유 결과">{resourcesOnly ? <><li>자료 {result.totalCount ?? result.counts.bundleCount + result.counts.materialCount}</li><li>첨부 파일 {result.counts.fileCount}</li></> : <><li>행사 {result.counts.eventCount}</li><li>자료 {result.counts.bundleCount + result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 파일 {result.counts.fileCount}</li></>}</ul>
       {resourcesOnly ? <div className={styles.resourceList}>
         <div className={styles.resourceColumns} aria-hidden="true"><span>이름</span><span>주최·출처</span><span>등록 날짜</span><span>관리</span></div>
         {result.items.map(item=>{

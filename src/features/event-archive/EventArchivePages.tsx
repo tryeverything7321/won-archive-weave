@@ -99,8 +99,8 @@ function PastArchiveEventForm() {
 
 function ArchiveEventRelations({ overview }: { overview: EventArchiveOverview }) {
   const location = useLocation();
-  const groups: Array<[string, ArchiveRelationSummary[]]> = [["자료 묶음", overview.bundles], ["개별 자료", overview.materials], ["활동 기록", overview.activities]];
-  return <>{groups.map(([label, items]) => <section className={styles.group} key={label}><h2>{label}</h2>{items.length ? <div className={styles.grid}>{items.map((item) => <article className={styles.item} key={`${item.targetType}:${item.id}`}><Link to={archiveRelationPath(item)} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link>{item.description && <p>{item.description}</p>}</article>)}</div> : <p>연결된 {label}이 없어요.</p>}</section>)}</>;
+  const groups: Array<[string, ArchiveRelationSummary[]]> = [["자료", [...overview.bundles, ...overview.materials]], ["활동 기록", overview.activities]];
+  return <>{groups.map(([label, items]) => <section className={styles.group} key={label}><h2>{label}</h2>{items.length ? <div className={styles.grid}>{items.map((item) => <article className={styles.item} key={`${item.targetType}:${item.id}`}><Link to={archiveRelationPath(item)} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link>{item.description && <p>{item.description}</p>}</article>)}</div> : <p>아직 연결된 {label} 없음</p>}</section>)}</>;
 }
 
 export function ArchiveEventDetailPage() {
@@ -122,7 +122,7 @@ export function ArchiveEventDetailPage() {
     {state === "ready" && !archiveEvent && <PageHeader title="이 행사를 볼 수 없어요" description="행사가 없거나 현재 공개 범위에서 볼 수 없습니다." />}
     {archiveEvent && overview && <>
       <PageHeader title={archiveEvent.title} description={`${archiveEventDateLabel(archiveEvent)} · ${archiveEvent.region || "지역 미입력"}${archiveEvent.organizers.length ? ` · ${archiveEvent.organizers.map((item) => item.displayName).join(", ")}` : archiveEvent.unmatchedOrganizerName ? ` · 주최 확인 전: ${archiveEvent.unmatchedOrganizerName}` : ""}`} />
-      <ul className={styles.counts}><li>자료 묶음 {overview.counts.bundleCount}</li><li>개별 자료 {overview.counts.materialCount}</li><li>활동 기록 {overview.counts.activityCount}</li><li>첨부 {overview.counts.fileCount}</li></ul>
+      <ul className={styles.counts}><li>자료 {overview.counts.bundleCount + overview.counts.materialCount}</li><li>활동 기록 {overview.counts.activityCount}</li><li>첨부 파일 {overview.counts.fileCount}</li></ul>
       <ArchiveEventRelations overview={overview} />
       <div className={styles.actions} aria-label="이 행사 기록 이어가기">
         <Link className="button button-primary" to={archiveEventContextQuery(archiveEvent.id, "material", returnTo)}>자료 올리기</Link>

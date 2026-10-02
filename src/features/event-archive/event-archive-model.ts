@@ -138,8 +138,7 @@ export function archiveRelationPath(item: Pick<ArchiveRelationSummary, "id" | "t
 
 export function archiveTargetLabel(targetType: ArchiveCollectionTarget) {
   if (targetType === "event") return "행사";
-  if (targetType === "bundle") return "자료 묶음";
-  if (targetType === "material") return "개별 자료";
+  if (targetType === "bundle" || targetType === "material") return "자료";
   return "활동 기록";
 }
 

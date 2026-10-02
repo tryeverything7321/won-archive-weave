@@ -103,13 +103,11 @@ export function EventArchivePanel({ event }: { event: CalendarEvent }) {
     {state === "ready" && overview && <>
       {overview.archiveEvent?.unmatchedOrganizerName && <p className={styles.status}>주최 확인 전: {overview.archiveEvent.unmatchedOrganizerName}</p>}
       <ul className={styles.counts} aria-label="행사 아카이브 요약">
-        <li>자료 묶음 {counts?.bundleCount ?? 0}</li>
-        <li>개별 자료 {counts?.materialCount ?? 0}</li>
+        <li>자료 {(counts?.bundleCount ?? 0) + (counts?.materialCount ?? 0)}</li>
         <li>활동 기록 {counts?.activityCount ?? 0}</li>
-        <li>첨부 {counts?.fileCount ?? 0}</li>
+        <li>첨부 파일 {counts?.fileCount ?? 0}</li>
       </ul>
-      <RelationGroup title="자료 묶음" items={overview.bundles} empty="아직 연결된 자료 묶음이 없어요." />
-      <RelationGroup title="개별 자료" items={overview.materials} empty="아직 연결된 개별 자료가 없어요." />
+      <RelationGroup title="자료" items={[...overview.bundles, ...overview.materials]} empty="아직 연결된 자료가 없어요." />
       <RelationGroup title="활동 기록" items={overview.activities} empty="아직 연결된 활동 기록이 없어요." />
     </>}
     <div className={styles.actions} aria-label="행사 기록 이어가기">
