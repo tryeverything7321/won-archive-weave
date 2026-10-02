@@ -1,4 +1,4 @@
-import {AdminResourceDeleteButton} from "../admin/ArchiveResourceManagement";
+import {AdminResourceActions} from "../admin/ArchiveResourceManagement";
 import { useOperatorAccess } from "../auth/useOperatorAccess";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,7 +61,7 @@ export function OwnedSubmissionActions({ id, returnTo, kind = "material", onDele
     {phase === "ready" && (record?.availableActions.includes("request_revision") || record?.availableActions.includes("edit")) && <button className="button button-secondary" type="button" onClick={() => void edit()} disabled={working}><Pencil size={16} aria-hidden="true" /> 수정</button>}
     {phase === "ready" && record?.availableActions.includes("unpublish") && <button className="button button-quiet" type="button" onClick={() => void unpublish()} disabled={working}><Trash2 size={16} aria-hidden="true" /> 삭제</button>}
     {phase === "ready" && record && !record.availableActions.includes("request_revision") && !record.availableActions.includes("edit") && <p role="status">현재 상태는 내 위브에서 확인할 수 있어요.</p>}
-    {!record && operator.state === "allowed" && (operator.administrator ? <AdminResourceDeleteButton id={id} type={kind} title={kind === "material" ? "이 자료" : "이 활동 기록"} onDeleted={()=>navigate(returnTo,{replace:true})}/> : <a className="button button-secondary" href="/admin/submissions">운영 센터에서 관리</a>)}
+    {!record && operator.state === "allowed" && (operator.administrator ? <AdminResourceActions id={id} type={kind} title={kind === "material" ? "이 자료" : "이 활동 기록"} onDeleted={()=>navigate(returnTo,{replace:true})}/> : <a className="button button-secondary" href="/admin/submissions">운영 센터에서 관리</a>)}
     {error && <p role="alert">{error}</p>}
   </section>;
 }

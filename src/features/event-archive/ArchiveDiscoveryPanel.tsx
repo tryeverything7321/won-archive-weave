@@ -7,7 +7,7 @@ import { type ArchiveDiscoveryResult } from "./event-archive-model";
 import {ResourceActions} from "./ResourceActions";
 import {OwnedSubmissionActions} from "../uploads/OwnedSubmissionActions";
 import {useOperatorAccess} from "../auth/useOperatorAccess";
-import {AdminResourceDeleteButton,QcResourceCleanup} from "../admin/ArchiveResourceManagement";
+import {AdminResourceActions,QcResourceCleanup} from "../admin/ArchiveResourceManagement";
 import styles from "./EventArchive.module.css";
 
 const keys = ["organizer", "heldYear", "uploadYear", "region", "archiveFormat"] as const;
@@ -102,11 +102,11 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
           return <article className={styles.resourceRow} key={`${item.targetType}:${item.id}`}>
             <Link className={styles.resourceName} to={path} state={{returnTo:location.pathname+location.search,resourcesReturn:location.pathname+location.search}}>
               <span className={styles.thumbnailStack}>{formats.map((format,index)=>{const Icon=/PPT/.test(format)?Presentation:/PNG|JPG|JPEG|WEBP/.test(format)?FileImage:FileText;return <span key={index} className={styles.fileThumbnail} data-format={format} aria-hidden="true"><Icon size={24}/><small>{format==="TEXT"?"글":format}</small></span>})}</span>
-              <span><strong>{item.title}</strong><small>{item.files?.length?`${item.files.length}개 파일 · ${item.files.map(file=>file.originalName).join(" · ")}`:item.format==="TEXT"?"글·회의록":item.format||"자료"}</small></span>
+              <span className={styles.resourceTitle}><strong>{item.title}</strong>{item.files?.length?<small className={styles.fileSummary}><span className={styles.fileCount}>{item.files.length}개 파일</span><span className={styles.fileNames}>{item.files.slice(0,2).map(file=><span key={file.fileId} title={file.originalName}>{file.originalName}</span>)}</span>{item.files.length>2&&<span className={styles.fileMore}>외 {item.files.length-2}개</span>}</small>:<small>{item.format==="TEXT"?"글·회의록":item.format||"자료"}</small>}</span>
             </Link>
             <span className={styles.rowOrganizer}>{item.organizerLabel||"—"}</span>
             <time className={styles.rowDate} dateTime={item.uploadedAtMs?new Date(item.uploadedAtMs).toISOString():undefined}>{item.uploadedAtMs?new Intl.DateTimeFormat("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}).format(item.uploadedAtMs):"날짜 정보 없음"}</time>
-            <div>{item.targetType==="material"&&item.canEdit?<OwnedSubmissionActions id={item.id} returnTo="/resources" onDeleted={refresh}/>:item.targetType==="bundle"&&item.canEdit?<ResourceActions id={item.id} type="bundle" onDeleted={refresh}/>:operator.administrator&&(item.targetType==="material"||item.targetType==="bundle")?<AdminResourceDeleteButton id={item.id} type={item.targetType} title={item.title} onDeleted={refresh}/>:null}</div>
+            <div>{item.targetType==="material"&&item.canEdit?<OwnedSubmissionActions id={item.id} returnTo="/resources" onDeleted={refresh}/>:item.targetType==="bundle"&&item.canEdit?<ResourceActions id={item.id} type="bundle" onDeleted={refresh}/>:operator.administrator&&(item.targetType==="material"||item.targetType==="bundle")?<AdminResourceActions id={item.id} type={item.targetType} title={item.title} onDeleted={refresh}/>:null}</div>
           </article>
         })}
         {!result.items.length&&<p className={styles.status}>{audience==="public"?"공개된 자료가 없어요. 로그인하면 이용자에게 공개된 자료도 볼 수 있어요.":"현재 조건에서 볼 수 있는 자료가 없어요."}</p>}

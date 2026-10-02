@@ -275,3 +275,11 @@
 .thumbnailStack>.fileThumbnail:nth-child(2){z-index:1}
 .thumbnailStack>.fileThumbnail:first-child{z-index:2}
 @media(max-width:600px){.resourcesPage{width:calc(100% - 32px);margin-top:24px}.resourcesHeader{align-items:flex-start}.resourcesHeader p{max-width:180px;line-height:1.5}.resourcesHeader :global(.button){min-height:44px;padding:0 12px;flex-shrink:0}.resourcesPage>.section{padding:16px}.resourcesPage .rowOrganizer,.resourcesPage .rowDate,.resourcesPage .resourceRow>div:last-child{padding-left:84px}}
+
+.resourceTitle { min-width: 0; flex: 1; }
+.resourceName .fileSummary { display: flex; align-items: flex-start; gap: 8px; line-height: 1.55; }
+.fileCount,.fileMore { flex-shrink: 0; white-space: nowrap; }
+.fileNames { display: grid; gap: 2px; min-width: 0; max-width: 38ch; }
+.fileNames > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fileMore { border-radius: 5px; padding: 0 5px; background: #edf4f6; color: #345669; font-weight: 700; }
+@media(max-width:600px) { .resourceName .fileSummary { flex-wrap: wrap; gap: 4px 8px; }.fileNames { width: calc(100% - 60px); max-width: none; order: 3; }.fileMore { margin-left: 0; } }

@@ -1,3 +1,5 @@
+import {ManagedResourceEditor} from "./ManagedResourceEditor";
+import archiveStyles from "../event-archive/EventArchive.module.css";
 import {useCallback,useEffect,useState} from 'react';
 import {httpsCallable} from 'firebase/functions';
 import {Trash2,RefreshCw} from 'lucide-react';
@@ -13,6 +15,10 @@ async function call<T>(name:string,data:unknown):Promise<T>{const services=getFi
 export function AdminResourceDeleteButton({id,type,title,onDeleted}:{id:string;type:ManagedResourceType;title:string;onDeleted:()=>void}){
  const [dialog,setDialog]=useState<ActionDialogRequest|null>(null);
  return <><button className="button button-quiet" type="button" aria-label={`${title} 관리자 삭제`} onClick={()=>setDialog({title:'자료 삭제',target:title,description:'자료 나눔과 연결된 화면, 내 위브 목록에서 삭제합니다. 원본과 처리 이력은 보관됩니다.',confirmLabel:'삭제',requireReason:true,onConfirm:async reason=>{await call('withdrawArchiveResource',{targetType:type,targetId:id,reason});onDeleted()}})}><Trash2 size={16}/>삭제</button><ActionDialog request={dialog} onClose={()=>setDialog(null)}/></>
+}
+
+export function AdminResourceActions(props:{id:string;type:ManagedResourceType;title:string;onDeleted:()=>void}){
+ return <div className={archiveStyles.rowActions}><ManagedResourceEditor id={props.id} type={props.type} title={props.title} onSaved={props.onDeleted}/><AdminResourceDeleteButton {...props}/></div>
 }
 
 export function QcResourceCleanup({onDeleted}:{onDeleted?:()=>void}){
@@ -35,5 +41,5 @@ export function ArchiveResourceManagement(){
  const load=useCallback(async(nextCursor:string|null=null)=>{setBusy(true);setMessage('');try{const result=await call<{items:ManagedItem[];nextCursor:string|null}>('listManagedArchiveResources',{keyword,cursor:nextCursor,limit:30});setItems(prior=>nextCursor?[...prior,...result.items]:result.items);setCursor(result.nextCursor)}catch{setMessage('자료 목록을 불러오지 못했어요. 다시 시도해 주세요.')}finally{setBusy(false)}},[keyword]);
  useEffect(()=>{if(!access.administrator)return;const timer=setTimeout(()=>void load(),250);return()=>clearTimeout(timer)},[access.administrator,load]);
  if(!access.administrator)return null;
- return <section className={styles.panel} aria-label="전체 자료 관리"><h2>전체 자료 관리</h2><p>공개 중단·철회된 자료와 이전에 등록된 자료까지 확인하고 삭제할 수 있어요.</p><QcResourceCleanup onDeleted={()=>void load()}/><label>자료 제목 검색<input type="search" value={keyword} onChange={event=>setKeyword(event.target.value)} placeholder="자료 제목 검색"/></label><button className="button button-secondary" type="button" onClick={()=>void load()} disabled={busy}><RefreshCw size={16}/>새로고침</button>{busy&&<p role="status">자료를 불러오는 중이에요</p>}{message&&<p role="alert">{message}</p>}<div>{items.map(item=><article className={styles.managedRow} key={item.targetType+item.id}><div><strong>{item.title}</strong><span>{statusLabels[item.status]??'상태 확인 필요'}</span></div><AdminResourceDeleteButton id={item.id} type={item.targetType} title={item.title} onDeleted={()=>void load()}/></article>)}</div>{!busy&&!message&&!items.length&&<p>조건에 맞는 자료가 없어요</p>}{cursor&&<button className="button button-secondary" type="button" disabled={busy} onClick={()=>void load(cursor)}>이전 자료 더 보기</button>}</section>
+ return <section className={styles.panel} aria-label="전체 자료 관리"><h2>전체 자료 관리</h2><p>공개 중단·철회된 자료와 이전에 등록된 자료까지 확인하고 삭제할 수 있어요.</p><QcResourceCleanup onDeleted={()=>void load()}/><label>자료 제목 검색<input type="search" value={keyword} onChange={event=>setKeyword(event.target.value)} placeholder="자료 제목 검색"/></label><button className="button button-secondary" type="button" onClick={()=>void load()} disabled={busy}><RefreshCw size={16}/>새로고침</button>{busy&&<p role="status">자료를 불러오는 중이에요</p>}{message&&<p role="alert">{message}</p>}<div>{items.map(item=><article className={styles.managedRow} key={item.targetType+item.id}><div><strong>{item.title}</strong><span>{statusLabels[item.status]??'상태 확인 필요'}</span></div><AdminResourceActions id={item.id} type={item.targetType} title={item.title} onDeleted={()=>void load()}/></article>)}</div>{!busy&&!message&&!items.length&&<p>조건에 맞는 자료가 없어요</p>}{cursor&&<button className="button button-secondary" type="button" disabled={busy} onClick={()=>void load(cursor)}>이전 자료 더 보기</button>}</section>
 }

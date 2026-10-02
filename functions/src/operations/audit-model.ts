@@ -25,6 +25,7 @@ const minimumFirestoreTimestampSeconds = -62_135_596_800
 const maximumFirestoreTimestampSeconds = 253_402_300_799
 
 const allowedAuditTypes = new Map<string, { category: OperatorAuditEvent['category']; label: string }>([
+  ['archive_resource.edited', { category: 'submission', label: '자료 수정' }],
   ['archive_resource.withdrawn', { category: 'submission', label: '자료 삭제' }],
   ['qc_resource.withdrawn', { category: 'submission', label: 'QC 테스트 자료 정리' }],
   ['community.report_resolved', { category: 'community', label: '신고 처리' }],

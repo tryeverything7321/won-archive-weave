@@ -107,3 +107,5 @@ export { searchArchiveDiscovery } from './archive/discovery.js';
 
 export {classifySubmissionAsMaterial} from './uploads/submission-classification.js'
 export {withdrawArchiveResource,manageQcResources,listManagedArchiveResources} from './archive/resource-management.js'
+
+export {getManagedArchiveResource,updateManagedArchiveResource} from './archive/resource-editing.js'
