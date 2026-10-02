@@ -25,7 +25,7 @@ for (let offset = 0; offset < assetNames.length; offset += 8) {
   }));
 }
 
-const guardedFunctions = ['prepareSubmissionUploads', 'reconcileSubmissionUpload', 'setActivityMaterialLinks', 'getActivityMaterialLinks', 'getMaterialLinkImpact', 'listSubmissionOperatorExceptions', 'completeGoogleLogin', 'getMyMemberProfile', 'createMaterialBundle', 'prepareMaterialBundleFiles', 'finalizeMaterialBundle', 'updateMaterialBundle', 'withdrawMaterialBundleFile', 'ensureArchiveEventContext', 'linkArchiveRelation', 'createArchiveCollection'];
+const guardedFunctions = ['prepareSubmissionUploads', 'reconcileSubmissionUpload', 'setActivityMaterialLinks', 'getActivityMaterialLinks', 'getMaterialLinkImpact', 'listSubmissionOperatorExceptions', 'completeGoogleLogin', 'getMyMemberProfile', 'createMaterialBundle', 'prepareMaterialBundleFiles', 'finalizeMaterialBundle', 'updateMaterialBundle', 'withdrawMaterialBundleFile', 'ensureArchiveEventContext', 'linkArchiveRelation', 'createArchiveCollection', 'classifySubmissionAsMaterial'];
 for (const name of guardedFunctions) {
   // All handlers require authentication before touching Firestore or Storage.
   const response = await fetch(`https://asia-northeast3-won-archive-weave.cloudfunctions.net/${name}`, {
