@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T23:16:39.454Z",
+  "generatedAt": "2026-10-02T23:17:17.164Z",
   "entries": [
     {
       "id": "68ff85eccb2b027b3a239f3e4b841e97ee5dabad-0",
@@ -13,7 +13,7 @@
         "행사 등록과 공유 캘린더 연결을 일정 화면에 함께 배치했어요",
         "중복 단계 표시를 없애고 입력란과 안내 문구의 정렬을 맞췄어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "1e5fa4c746b8e2598c23e19a17393b23c1a6ed14-0",
