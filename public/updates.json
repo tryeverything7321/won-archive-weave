@@ -1,8 +1,17 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T00:32:21.774Z",
+  "generatedAt": "2026-10-02T00:33:06.620Z",
   "entries": [
+    {
+      "id": "ac1d092a7395dfb48adcaea34a4c89318961c448-0",
+      "commit": "ac1d092a7395dfb48adcaea34a4c89318961c448",
+      "committedAt": "2026-10-02T09:32:55+09:00",
+      "area": "개발·문서",
+      "title": "chore(updates): verify classification auth guard",
+      "details": [],
+      "status": "development"
+    },
     {
       "id": "87b69bae1eb9e243bf08371cf73e28053622c43f-0",
       "commit": "87b69bae1eb9e243bf08371cf73e28053622c43f",
