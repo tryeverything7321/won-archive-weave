@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:29:49.089Z",
+  "generatedAt": "2026-10-02T01:32:57.399Z",
   "entries": [
     {
       "id": "1cabb0d5fe4cb8f0f59c3b3764c6a9dcc6ec14df-0",
@@ -14,7 +14,7 @@
         "관리자 전체 자료 목록과 자료별 삭제 버튼을 추가했어요",
         "[QC]와 철회된 테스트 기록도 확인 후 정리할 수 있어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "240b586358e68474287445b151766055e353a45b-0",
