@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T03:26:02.097Z",
+  "generatedAt": "2026-10-02T03:27:59.767Z",
   "entries": [
     {
       "id": "0e00071adf7fa510d8456676a30bdf12e8596c3f-0",
@@ -13,7 +13,7 @@
         "회의록 본문이 목록 복귀 링크와 같은 왼쪽 기준선에서 시작해요",
         "입력한 들여쓰기와 띄어쓰기는 그대로 유지해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "ce3a70589cf36f149f1dfc46c7003d82b0180aa0-0",
