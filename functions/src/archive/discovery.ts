@@ -118,6 +118,8 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
   const limit = archivePageSize(data.limit)
   const cursor = decodeArchiveCursor(data.cursor)
   const viewer = await archiveViewer(request.auth)
+  // Public discovery uses the same publication boundary for every account.
+  const browsingViewer = {...viewer, administrator: false, uid: null}
   const [eventDocs, relationDocs, bundleDocs, materialDocs, activityDocs, organizerDocs] = await Promise.all([
     completeCollection('archiveEvents'),
     completeCollection('archiveRelations'),
@@ -138,7 +140,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
     const organizerIds = Array.isArray(doc.get('organizerIds'))
       ? [...new Set((doc.get('organizerIds') as unknown[]).flatMap((id) => typeof id === 'string' && organizerNames.has(id) ? [id] : []))]
       : []
-    const event = projectArchiveEvent(doc, viewer, organizerIds.map((id) => ({ id, displayName: organizerNames.get(id)! })), sources.get(doc.get('sourceCalendarEventId')))
+    const event = projectArchiveEvent(doc, browsingViewer, organizerIds.map((id) => ({ id, displayName: organizerNames.get(id)! })), sources.get(doc.get('sourceCalendarEventId')))
     if (!event) continue
     eventItems.set(event.id, {
       targetType: 'event', id: event.id, title: event.title, href: `/archive-events/${encodeURIComponent(event.id)}`,
@@ -156,7 +158,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
   const readableBundles: NonNullable<ReturnType<typeof projectArchiveBundle>>[] = []
   for (const doc of bundleDocs) {
     const linkedEventIds = [...(relations.get(`bundle:${doc.id}`) ?? [])].filter((id) => eventItems.has(id)).sort()
-    const bundle = projectArchiveBundle(doc, viewer, linkedEventIds)
+    const bundle = projectArchiveBundle(doc, browsingViewer, linkedEventIds)
     if (!bundle) continue
     readableBundles.push(bundle)
     const formats = [...new Set(bundle.files.map((file) => file.format))]
@@ -169,7 +171,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
   }
   const readableMaterials: NonNullable<ReturnType<typeof projectArchiveMaterial>>[] = []
   for (const doc of materialDocs) {
-    const material = projectArchiveMaterial(doc, viewer)
+    const material = projectArchiveMaterial(doc, browsingViewer)
     if (!material) continue
     readableMaterials.push(material)
     items.push({
@@ -181,7 +183,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
   }
   const readableActivities = []
   for (const doc of activityDocs) {
-    const activity = projectArchiveActivity(doc, viewer)
+    const activity = projectArchiveActivity(doc, browsingViewer)
     if (!activity) continue
     readableActivities.push(activity)
     items.push({

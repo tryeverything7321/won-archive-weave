@@ -116,6 +116,7 @@ export function projectArchiveBundle(
 ): ArchiveBundleProjection | null {
   if (!snapshot.exists) return null
   const data = snapshot.data() ?? {}
+  if (data.deletedFromListings === true) return null
   if (typeof data.ownerUid !== 'string' || typeof data.title !== 'string' || typeof data.description !== 'string'
     || !data.files || typeof data.files !== 'object' || Array.isArray(data.files)
     || !Number.isSafeInteger(data.createdAtMs) || !Number.isSafeInteger(data.updatedAtMs)) return null
@@ -177,6 +178,7 @@ function materialFormat(data: Record<string, unknown>): string {
 export function projectArchiveMaterial(snapshot: DocumentSnapshot, viewer: ArchiveViewer): ArchiveMaterialProjection | null {
   if (!snapshot.exists) return null
   const data = snapshot.data() ?? {}
+  if (data.deletedFromListings === true) return null
   if (!canReadArchiveRecord({ visibility: data.visibility, status: data.status }, viewer)) return null
   const attachmentReadable = data.attachmentStatus === undefined || data.attachmentStatus === 'clean' || data.attachmentStatus === 'not_applicable'
   const hasOriginalFile = attachmentReadable && typeof data.approvedStoragePath === 'string' && Boolean(data.approvedStoragePath)
@@ -197,6 +199,7 @@ export function projectArchiveMaterial(snapshot: DocumentSnapshot, viewer: Archi
 export function projectArchiveActivity(snapshot: DocumentSnapshot, viewer: ArchiveViewer): ArchiveActivityProjection | null {
   if (!snapshot.exists) return null
   const data = snapshot.data() ?? {}
+  if (data.deletedFromListings === true) return null
   if (!canReadArchiveRecord({ visibility: data.visibility, status: data.status }, viewer)) return null
   const createdAtMs = millis(data.createdAt)
   return {

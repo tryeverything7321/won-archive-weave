@@ -7,8 +7,7 @@ import { type ArchiveDiscoveryResult } from "./event-archive-model";
 import {ResourceActions} from "./ResourceActions";
 import {OwnedSubmissionActions} from "../uploads/OwnedSubmissionActions";
 import {useOperatorAccess} from "../auth/useOperatorAccess";
-import {httpsCallable} from "firebase/functions";
-import {getFirebaseServices} from "../../lib/firebase/client";
+import {AdminResourceDeleteButton,QcResourceCleanup} from "../admin/ArchiveResourceManagement";
 import styles from "./EventArchive.module.css";
 
 const keys = ["organizer", "heldYear", "uploadYear", "region", "archiveFormat"] as const;
@@ -17,9 +16,8 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
   const location = useLocation();
   const operator=useOperatorAccess();
   const [attempt,setAttempt]=useState(0);
-  const [qcMessage,setQcMessage]=useState("");
   const refresh=()=>setAttempt(value=>value+1);
-  const cleanupQc=async()=>{try{const services=getFirebaseServices();if(!services)return;const call=httpsCallable<{remove:boolean},{items?:Array<{title:string}>;removed?:number}>(services.functions,"manageQcResources");const found=await call({remove:false});const items=found.data.items??[];if(!items.length){setQcMessage("정리할 QC 기록이 없어요");return}if(!window.confirm(`QC 테스트 ${items.length}건을 삭제할까요?\n${items.map(x=>x.title).join("\n")}`))return;const result=await call({remove:true});setQcMessage(`${result.data.removed??0}건을 삭제했어요`);refresh()}catch{setQcMessage("QC 기록을 정리하지 못했어요. 관리자 권한을 확인해 주세요.")}};
+
   const { audience, ready } = useFirebaseAudience();
   const [search, setSearch] = useSearchParams();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
@@ -78,7 +76,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
 
   return <section className={styles.section} aria-labelledby="archive-discovery-title">
     <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">{resourcesOnly ? "자료 찾기" : "행사·자료·기록 찾기"}</h2><p>{resourcesOnly ? "제목·자료 형식·행사 정보로 찾아보세요." : "주최나 행사가 열린 해로 찾아보세요."}</p></div><Filter size={26} aria-hidden="true" /></div>
-    {resourcesOnly && <div className={styles.actions}><button className="button button-secondary" type="button" onClick={refresh}><RotateCcw size={16}/>새로고침</button>{operator.state==="allowed"&&<button className="button button-quiet" type="button" onClick={()=>void cleanupQc()}>QC 테스트 정리</button>}{qcMessage&&<p role="status">{qcMessage}</p>}</div>}
+    {resourcesOnly && <div className={styles.actions}><button className="button button-secondary" type="button" onClick={refresh}><RotateCcw size={16}/>새로고침</button><QcResourceCleanup onDeleted={refresh}/></div>}
     {resourcesOnly && <label className={styles.resourceSearch}><Search size={20} aria-hidden="true"/><span className="sr-only">자료 검색</span><input type="search" value={keyword} placeholder="자료 제목 검색" onChange={event=>setFilter("q",event.target.value)}/></label>}
     <details className={styles.conditions} open={conditionsOpen} onToggle={event => setConditionsOpen(event.currentTarget.open)}>
       <summary>상세 조건{active ? ` · ${keys.filter(key => search.has(key)).length}개 적용` : ""}</summary>
@@ -108,7 +106,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
             </Link>
             <span className={styles.rowOrganizer}>{item.organizerLabel||"—"}</span>
             <time className={styles.rowDate} dateTime={item.uploadedAtMs?new Date(item.uploadedAtMs).toISOString():undefined}>{item.uploadedAtMs?new Intl.DateTimeFormat("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}).format(item.uploadedAtMs):"날짜 정보 없음"}</time>
-            <div>{item.targetType==="material"?<OwnedSubmissionActions id={item.id} returnTo="/resources"/>:item.canEdit&&item.targetType==="bundle"?<ResourceActions id={item.id} type="bundle" onDeleted={refresh}/>:null}</div>
+            <div>{item.targetType==="material"&&item.canEdit?<OwnedSubmissionActions id={item.id} returnTo="/resources" onDeleted={refresh}/>:item.targetType==="bundle"&&item.canEdit?<ResourceActions id={item.id} type="bundle" onDeleted={refresh}/>:operator.administrator&&(item.targetType==="material"||item.targetType==="bundle")?<AdminResourceDeleteButton id={item.id} type={item.targetType} title={item.title} onDeleted={refresh}/>:null}</div>
           </article>
         })}
         {!result.items.length&&<p className={styles.status}>{audience==="public"?"공개된 자료가 없어요. 로그인하면 이용자에게 공개된 자료도 볼 수 있어요.":"현재 조건에서 볼 수 있는 자료가 없어요."}</p>}

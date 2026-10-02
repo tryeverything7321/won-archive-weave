@@ -21,3 +21,13 @@
 .panel textarea { min-height: 100px; resize: vertical; }
 .panel button { min-height: 44px; justify-self: start; }
 .panel p { margin: 0; overflow-wrap: anywhere; }
+
+.cleanup { display: grid; gap: 12px; min-width: 0; }
+.qcList { max-height: 240px; overflow: auto; margin: 0; padding-left: 24px; }
+.qcList li { overflow-wrap: anywhere; line-height: 1.6; }
+.managedRow { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid #dce5e2; align-items: center; }
+.managedRow > div { min-width: 0; display: grid; gap: 6px; }
+.managedRow strong { overflow-wrap: anywhere; }
+.managedRow span { font-size: 13px; color: #536e7b; }
+.panel input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #c6d8de; border-radius: 8px; font: inherit; }
+@media(max-width:600px) { .managedRow { align-items: flex-start; flex-direction: column; } }

@@ -25,6 +25,8 @@ const minimumFirestoreTimestampSeconds = -62_135_596_800
 const maximumFirestoreTimestampSeconds = 253_402_300_799
 
 const allowedAuditTypes = new Map<string, { category: OperatorAuditEvent['category']; label: string }>([
+  ['archive_resource.withdrawn', { category: 'submission', label: '자료 삭제' }],
+  ['qc_resource.withdrawn', { category: 'submission', label: 'QC 테스트 자료 정리' }],
   ['community.report_resolved', { category: 'community', label: '신고 처리' }],
   ['community.appeal_resolved', { category: 'community', label: '이의 제기 처리' }],
   ['community.post_moderated', { category: 'community', label: '커뮤니티 글 운영 조치' }],
@@ -124,7 +126,7 @@ export function projectOperatorAuditEvent(
     targetId = boundedId(data.caseId) ?? boundedId(data.postId) ?? boundedId(data.commentId)
   } else if (allowed.category === 'submission') {
     targetType = 'submission'
-    targetId = boundedId(data.submissionId) ?? boundedId(data.exceptionId)
+    targetId = boundedId(data.submissionId) ?? boundedId(data.exceptionId) ?? boundedId(data.targetId)
   } else if (allowed.category === 'calendar') {
     targetType = 'calendar_event'
     targetId = boundedId(data.eventId) ?? boundedId(data.sourceId)

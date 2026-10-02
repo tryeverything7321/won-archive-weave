@@ -1485,6 +1485,7 @@ export const listMySubmissions = onCall({ region: 'asia-northeast3' }, async (re
       .limit(MAX_OWNER_SUBMISSIONS)
       .get()
     const submissions = snapshot.docs
+      .filter((document) => document.get('deletedFromListings') !== true)
       .map((document) => submissionOwnerRecord(document.id, document.data()))
       .sort((left, right) => (right.updatedAtMs ?? right.createdAtMs ?? 0) - (left.updatedAtMs ?? left.createdAtMs ?? 0))
     return {
@@ -1519,7 +1520,7 @@ export const listMySubmissions = onCall({ region: 'asia-northeast3' }, async (re
     throw new HttpsError('data-loss', '내 제출 목록의 다음 위치를 만들 수 없어요')
   }
   return {
-    submissions: visible.map((document) => submissionOwnerRecord(document.id, document.data())),
+    submissions: visible.filter((document) => document.get('deletedFromListings') !== true).map((document) => submissionOwnerRecord(document.id, document.data())),
     limit: pageSize,
     migrationRequired: false,
     hasMore,
@@ -1529,7 +1530,7 @@ export const listMySubmissions = onCall({ region: 'asia-northeast3' }, async (re
 
 // Resolve only the requested public cards. Omit missing and other members' records alike.
 export function submissionManagementForOwner(id: string, value: Record<string, unknown> | undefined, uid: string) {
-  if (!value || value.ownerUid !== uid) return null
+  if (!value || value.ownerUid !== uid || value.deletedFromListings === true) return null
   const owned = submissionOwnerRecord(id, value)
   return { id: owned.id, status: owned.status, availableActions: owned.availableActions }
 }
@@ -2366,6 +2367,7 @@ export const requestSubmissionChange = onCall({ region: 'asia-northeast3' }, asy
     if (!snapshot.exists) throw new HttpsError('not-found', '제출 기록을 찾지 못했어요')
     const data = snapshot.data() as Record<string, unknown>
     requireSubmissionOwner(data.ownerUid, uid)
+    if (data.deletedFromListings === true) throw new HttpsError('failed-precondition', '삭제된 자료는 복원할 수 없어요')
     const restorePlan = action === 'restore_private' ? submissionPrivateDraftRestorePlan(data) : null
     const nextStatus = restorePlan?.nextStatus ?? submissionOwnerTransition(data.status, action)
     const restoreChangeRequestId = restorePlan?.alreadyApplied && typeof data.restoreChangeRequestId === 'string'
@@ -2519,6 +2521,7 @@ export const moderateSubmissionContent = onCall({ region: 'asia-northeast3' }, a
       return { status: status as SubmissionStatus, action: command.action, repeated: true }
     }
     const value = submissionSnapshot.data() as Record<string, unknown>
+    if (value.deletedFromListings === true) throw new HttpsError('failed-precondition', '삭제된 자료는 복원할 수 없어요')
     const currentStatus = value.status as SubmissionStatus
     if (!submissionStatuses.includes(currentStatus)) throw new HttpsError('failed-precondition', '제출 상태를 확인할 수 없어요')
     const marker = value.operatorModeration as Record<string, unknown> | undefined

@@ -1,3 +1,4 @@
+import {ArchiveResourceManagement} from "../features/admin/ArchiveResourceManagement";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createModerationRequestTracker } from "../features/community/moderation-request";
 import {
@@ -52,7 +53,7 @@ export function AdminPage({ section }: { section: AdminSection }) {
         <NavLink to="/admin/community">커뮤니티</NavLink>
         <NavLink to="/admin/audit">감사 기록</NavLink>
       </nav>
-      {section === "submissions" && <><ContentModerationPanel key="submission" kind="submission" /><LiveSubmissionReview /></>}
+      {section === "submissions" && <><ArchiveResourceManagement /><ContentModerationPanel key="submission" kind="submission" /><LiveSubmissionReview /></>}
       {section === "community" && <CommunityAdmin />}
       {section === "calendar" && <><ContentModerationPanel key="event" kind="event" /><CalendarSourceAdmin /><ArchiveOrganizerAdmin /></>}
       {section === "audit" && <OperatorAudit />}

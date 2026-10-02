@@ -25,7 +25,7 @@ export function ContentModerationPanel({ kind }: { kind: 'submission' | 'event' 
     try {
       const constraints = [orderBy('updatedAt', 'desc'), ...(append && cursor.current ? [startAfter(cursor.current)] : []), limit(20)];
       const snapshot = await getDocs(query(collection(services.firestore, kind === 'submission' ? 'submissions' : 'calendarEventSubmissions'), ...constraints));
-      const next = snapshot.docs.map(doc => ({ id: doc.id, title: String(doc.get('title') || '제목 없음') }));
+      const next = snapshot.docs.filter(doc => doc.get('deletedFromListings') !== true).map(doc => ({ id: doc.id, title: String(doc.get('title') || '제목 없음') }));
       setItems(current => append ? [...new Map([...current, ...next].map(item => [item.id, item])).values()] : next);
       cursor.current = snapshot.docs.at(-1) ?? null;
       setMore(snapshot.size === 20);

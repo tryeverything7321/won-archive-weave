@@ -1,3 +1,4 @@
+import {AdminResourceDeleteButton} from "../admin/ArchiveResourceManagement";
 import { useOperatorAccess } from "../auth/useOperatorAccess";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ import { requestSubmissionChange } from "./api";
 import { getMaterialLinkImpact } from "./material-links-api";
 import { useSubmissionManagement } from "./useSubmissionManagement";
 
-export function OwnedSubmissionActions({ id, returnTo, kind = "material" }: { id: string; returnTo: string; kind?: "material" | "activity" }) {
+export function OwnedSubmissionActions({ id, returnTo, kind = "material", onDeleted }: { id: string; returnTo: string; kind?: "material" | "activity"; onDeleted?: () => void }) {
   const { phase, records, retry } = useSubmissionManagement([id]);
   const record = records.get(id);
   const operator=useOperatorAccess();
@@ -45,6 +46,7 @@ export function OwnedSubmissionActions({ id, returnTo, kind = "material" }: { id
         return;
       }
       await requestSubmissionChange(id, "unpublish");
+      onDeleted?.();
       navigate(returnTo, { replace: true });
     } catch {
       setError("글을 목록에서 삭제하지 못했어요. 다시 시도해 주세요.");
@@ -59,7 +61,7 @@ export function OwnedSubmissionActions({ id, returnTo, kind = "material" }: { id
     {phase === "ready" && (record?.availableActions.includes("request_revision") || record?.availableActions.includes("edit")) && <button className="button button-secondary" type="button" onClick={() => void edit()} disabled={working}><Pencil size={16} aria-hidden="true" /> 수정</button>}
     {phase === "ready" && record?.availableActions.includes("unpublish") && <button className="button button-quiet" type="button" onClick={() => void unpublish()} disabled={working}><Trash2 size={16} aria-hidden="true" /> 삭제</button>}
     {phase === "ready" && record && !record.availableActions.includes("request_revision") && !record.availableActions.includes("edit") && <p role="status">현재 상태는 내 위브에서 확인할 수 있어요.</p>}
-    {!record && operator.state === "allowed" && <a className="button button-secondary" href="/admin/submissions">운영 센터에서 관리</a>}
+    {!record && operator.state === "allowed" && (operator.administrator ? <AdminResourceDeleteButton id={id} type={kind} title={kind === "material" ? "이 자료" : "이 활동 기록"} onDeleted={()=>navigate(returnTo,{replace:true})}/> : <a className="button button-secondary" href="/admin/submissions">운영 센터에서 관리</a>)}
     {error && <p role="alert">{error}</p>}
   </section>;
 }

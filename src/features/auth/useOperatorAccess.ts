@@ -5,6 +5,7 @@ import { getFirebaseServices } from '../../lib/firebase/client';
 export type OperatorAccess = {
   state: 'checking' | 'signed-out' | 'allowed' | 'denied' | 'error';
   memberRead: boolean;
+  administrator?: boolean;
 };
 
 export function useOperatorAccess(): OperatorAccess {
@@ -20,7 +21,7 @@ export function useOperatorAccess(): OperatorAccess {
       void getIdTokenResult(user).then(({ claims }) => {
         if (request !== generation) return;
         const operator = claims.role === 'administrator' || claims.role === 'moderator';
-        setAccess({ state: operator ? 'allowed' : 'denied', memberRead: claims.role === 'administrator' && claims.memberRead === true });
+        setAccess({ state: operator ? 'allowed' : 'denied', administrator: claims.role === 'administrator', memberRead: claims.role === 'administrator' && claims.memberRead === true });
       }).catch(() => {
         if (request === generation) setAccess({ state: 'error', memberRead: false });
       });
