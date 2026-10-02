@@ -13038,6 +13038,9 @@ main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
   overflow: visible;
   margin-bottom: 14px;
 }
+.provider-login-approval .provider-login-official-asset {
+  filter: grayscale(1);
+}
 .provider-login-approval .provider-approval-badge {
   position: absolute;
   z-index: 1;
