@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T21:44:27.174Z",
+  "generatedAt": "2026-10-02T22:40:20.055Z",
   "entries": [
+    {
+      "id": "1e5fa4c746b8e2598c23e19a17393b23c1a6ed14-0",
+      "commit": "1e5fa4c746b8e2598c23e19a17393b23c1a6ed14",
+      "committedAt": "2026-10-03T07:39:54+09:00",
+      "area": "화면·사용성",
+      "title": "일정 관리와 입력 화면을 더 간결하게 정리했어요",
+      "details": [
+        "일정 화면의 불필요한 바로가기를 덜어내고 수정·삭제를 쉽게 찾도록 했어요",
+        "검색창·선택란·입력란의 크기와 정렬을 맞추고 중복 제목과 여백을 줄였어요"
+      ],
+      "status": "development"
+    },
     {
       "id": "4ec9f0e29f986fd31cb0fcd13ec3362f9e00bb1c-0",
       "commit": "4ec9f0e29f986fd31cb0fcd13ec3362f9e00bb1c",
