@@ -1,8 +1,19 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:16:27.201Z",
+  "generatedAt": "2026-10-02T01:18:37.797Z",
   "entries": [
+    {
+      "id": "240b586358e68474287445b151766055e353a45b-0",
+      "commit": "240b586358e68474287445b151766055e353a45b",
+      "committedAt": "2026-10-02T10:18:28+09:00",
+      "area": "가입·로그인",
+      "title": "승인 대기 중인 네이버 버튼을 회색으로 표시해요",
+      "details": [
+        "승인 안내 배지와 로그인 버튼 선택 기능을 유지해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "f796f57769ce8052ebb0b4f085eca746aec48004-0",
       "commit": "f796f57769ce8052ebb0b4f085eca746aec48004",
