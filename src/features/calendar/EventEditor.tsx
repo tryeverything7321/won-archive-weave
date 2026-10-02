@@ -41,6 +41,7 @@ import {
 } from "./event-editor-model";
 
 type EventEditorProps = {
+  hideHeading?: boolean;
   eventId?: string;
   draftId?: string;
   returnTo?: string;
@@ -95,7 +96,7 @@ function initialEditorValue(initialValue: EventEditorProps["initialValue"]): Eve
   };
 }
 
-export function EventEditor({ eventId, draftId, returnTo = "/calendar/new", initialValue, onSaved, onCancel }: EventEditorProps) {
+export function EventEditor({ hideHeading = false, eventId, draftId, returnTo = "/calendar/new", initialValue, onSaved, onCancel }: EventEditorProps) {
   const services = useMemo(() => getFirebaseServices(), []);
   const [user, setUser] = useState<User | null>(() => services?.auth.currentUser ?? null);
   const [stableEventId] = useState(() => eventId ?? draftId ?? newEventId());
@@ -297,12 +298,12 @@ export function EventEditor({ eventId, draftId, returnTo = "/calendar/new", init
   const selectedGalleryCount = mediaRows.filter((row) => row.role === "gallery").length;
 
   return (
-    <section className="event-editor" aria-labelledby="event-editor-title">
-      <header className={`event-editor-heading ${authoringStyles.eventHeading}`}>
+    <section className="event-editor" aria-labelledby={hideHeading ? undefined : "event-editor-title"} aria-label={hideHeading ? "행사 등록" : undefined}>
+      {!hideHeading && <header className={`event-editor-heading ${authoringStyles.eventHeading}`}>
         <span className="section-kicker"><CalendarPlus size={18} /> 행사 등록</span>
         <h2 id="event-editor-title">{eventId ? "행사 내용을 다듬어요" : "새로운 만남을 일정에 더해요"}</h2>
         <p>이름과 주최, 지역을 적고 일시·장소를 이어서 입력해 주세요. 소개와 사진은 필요할 때 더할 수 있어요.</p>
-      </header>
+      </header>}
 
       {!services || !user ? (
         <div className="event-editor-state" role="status">

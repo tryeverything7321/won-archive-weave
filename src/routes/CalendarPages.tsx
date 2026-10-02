@@ -430,11 +430,8 @@ export function CalendarPage() {
           </div>
         </div>
         <div className="calendar-planner-actions">
-          <Link to="/calendar/new">행사 등록하기 <ArrowRight size={18} /></Link>
-          <Link to="/archive-events/new">과거 행사 기록하기 <ArrowRight size={18} /></Link>
-          <Link to="/calendar/connect">캘린더 연결하기 <ArrowRight size={18} /></Link>
-          <Link to="/collections">자료 모음 보기 <ArrowRight size={18} /></Link>
-          <Link to="/planner">행사 준비 예시 보기 <ArrowRight size={18} /></Link>
+          <Link className="button button-primary" to="/calendar/new">행사 등록하기</Link>
+          <Link className="button button-secondary" to="/profile?tab=activity&manage=events">내 일정 수정·삭제</Link>
         </div>
       </section>
       <section className="calendar-shell" aria-labelledby="calendar-month-title" ref={calendarShellRef} tabIndex={-1}>
@@ -655,12 +652,11 @@ export function CalendarEventCreatePage() {
           </div>
           <div className={discoveryStyles.completionActions} aria-label="저장한 행사 다음 행동">
             <Link className="button button-primary" to={`/events/${encodeURIComponent(savedEvent.eventId)}`}>저장한 행사 보기 <ArrowRight size={17} /></Link>
-            <Link className="button button-secondary" to="/profile?tab=activity&manage=events">내 행사 관리</Link>
             <Link className="button button-secondary" to="/calendar">행사 일정으로 돌아가기</Link>
           </div>
         </section>
-      ) : <EventEditor draftId={draftId} returnTo={draftPath} onSaved={setSavedEvent} />}
-      <section className="calendar-import-shortcut">
+      ) : <EventEditor hideHeading draftId={draftId} returnTo={draftPath} onSaved={setSavedEvent} />}
+      {!savedEvent && <section className="calendar-import-shortcut">
         <div>
           <CalendarDays size={22} aria-hidden="true" />
           <p>이미 Google Calendar에 적어 둔 일정이 있나요</p>
@@ -669,7 +665,7 @@ export function CalendarEventCreatePage() {
         <Link className="button button-secondary" to={calendarConnectPath(draftPath)}>
           Google Calendar에서 가져오기 <ArrowRight size={17} />
         </Link>
-      </section>
+      </section>}
     </PageFrame>
   );
 }
@@ -862,6 +858,7 @@ export function CalendarEventPage() {
       {calendarReturn
         ? <button className="back-link" type="button" onClick={() => navigate(-1)}><ArrowLeft size={17} /> 행사 일정으로 돌아가기</button>
         : <Link className="back-link" to="/calendar"><ArrowLeft size={17} /> 행사 일정으로 돌아가기</Link>}
+      {event.origin !== "fixture" && <OwnedEventActions event={event} onChanged={() => void load()} />}
       <header className={`calendar-detail-hero${presentation.hasThumbnail ? "" : " is-without-media"}`}>
         {presentation.hasThumbnail && <div className="calendar-detail-orbit" aria-hidden="true"><span /><i /></div>}
         <div className="calendar-event-kickers badge-row" data-badge-primary-count={event.origin === "fixture" ? "1" : "0"} data-badge-secondary-count={event.eventState !== "confirmed" || event.visibility === "member_only" ? "1" : "0"}>
@@ -915,7 +912,6 @@ export function CalendarEventPage() {
         </section>
       )}
       <InstagramEventEmbed posts={event.instagramPosts ?? []} />
-      {event.origin !== "fixture" && event.sourceType === "manual" && <OwnedEventActions event={event} onChanged={() => void load()} />}
     </article>
   );
 }

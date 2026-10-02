@@ -75,8 +75,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
   const facets = result?.facets;
 
   return <section className={styles.section} aria-labelledby="archive-discovery-title">
-    <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">{resourcesOnly ? "자료 찾기" : "행사·자료·기록 찾기"}</h2><p>{resourcesOnly ? "제목·자료 형식·행사 정보로 찾아보세요." : "주최나 행사가 열린 해로 찾아보세요."}</p></div><Filter size={26} aria-hidden="true" /></div>
-    {resourcesOnly && <div className={styles.actions}><button className="button button-secondary" type="button" onClick={refresh}><RotateCcw size={16}/>새로고침</button></div>}
+    <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">{resourcesOnly ? "자료 찾기" : "행사·자료·기록 찾기"}</h2><p>{resourcesOnly ? "제목·자료 형식·행사 정보로 찾아보세요." : "주최나 행사가 열린 해로 찾아보세요."}</p></div>{resourcesOnly ? <button className="button button-secondary" type="button" onClick={refresh}><RotateCcw size={16}/>새로고침</button> : <Filter size={26} aria-hidden="true" />}</div>
     {resourcesOnly && <label className={styles.resourceSearch}><Search size={20} aria-hidden="true"/><span className="sr-only">자료 검색</span><input type="search" value={keyword} placeholder="자료 제목 검색" onChange={event=>setFilter("q",event.target.value)}/></label>}
     <details className={styles.conditions} open={conditionsOpen} onToggle={event => setConditionsOpen(event.currentTarget.open)}>
       <summary>상세 조건{active ? ` · ${keys.filter(key => search.has(key)).length}개 적용` : ""}</summary>

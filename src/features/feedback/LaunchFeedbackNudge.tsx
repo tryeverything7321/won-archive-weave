@@ -34,7 +34,7 @@ export function LaunchFeedbackNudge() {
     container.current?.querySelector<HTMLAnchorElement>('a')?.focus();
     return () => document.removeEventListener('pointerdown', onPointer);
   }, [open]);
-  return <aside ref={container} className={styles.widget} aria-label="위브 의견 보내기" onKeyDown={event => { if (event.key === 'Escape' && open) { event.preventDefault(); close(); } }}>
+  return <aside ref={container} className={`${styles.widget} weave-feedback-widget`} aria-label="위브 의견 보내기" onKeyDown={event => { if (event.key === 'Escape' && open) { event.preventDefault(); close(); } }}>
     {open && <section className={styles.panel} id="weave-feedback-panel" aria-labelledby="weave-feedback-title">
       <button type="button" className={styles.close} aria-label="의견 보내기 닫기" onClick={close}><X size={20} aria-hidden="true" /></button>
       <h2 id="weave-feedback-title">어떤 이야기를 나눌까요?</h2>

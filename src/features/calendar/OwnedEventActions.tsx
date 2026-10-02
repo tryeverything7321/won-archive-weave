@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { httpsCallable } from "firebase/functions";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
+import { useOperatorAccess } from "../auth/useOperatorAccess";
 import { useOwnedRecord } from "../auth/useOwnedRecord";
 import { getFirebaseServices } from "../../lib/firebase/client";
 import type { CalendarEvent } from "./calendar-model";
@@ -15,13 +16,14 @@ import {
 import { ownedEventEditorRecord } from "./owned-event-model";
 
 export function OwnedEventActions({ event, onChanged }: { event: CalendarEvent; onChanged: () => void }) {
+  const operator = useOperatorAccess();
   const record = useOwnedRecord("calendarEventSubmissions", event.id);
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
   const status = record?.status;
-  if (!record || !managedEventStatuses.includes(status as ManagedEventStatus)) return null;
+  if (!record || !managedEventStatuses.includes(status as ManagedEventStatus)) return operator.state === "allowed" ? <div className="owned-content-actions"><span>일정 관리</span><Link className="button button-secondary" to="/admin/calendar">운영 센터에서 관리</Link></div> : null;
   const actions = managedEventActions(status as ManagedEventStatus);
   const managed = ownedEventEditorRecord(event, record);
 

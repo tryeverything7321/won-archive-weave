@@ -1,0 +1,89 @@
+/* Shared control geometry. Keep native keyboard, validation and date picker behavior. */
+.site-shell {
+  --control-height: 48px;
+  --control-border: #b7cbd4;
+  --control-focus: #1976a6;
+}
+#root .site-shell main :is(input:where(:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="hidden"]):not([type="color"])), select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  background-color: #fff;
+  color: #17394e;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  box-shadow: none;
+}
+#root .site-shell main :is(input:where(:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="hidden"]):not([type="color"])), select) {
+  height: var(--control-height);
+  min-height: var(--control-height);
+  padding: 10px 14px;
+  align-self: end;
+}
+#root .site-shell main select:not([multiple]) {
+  appearance: none;
+  padding-right: 42px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234c697a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 12px center;
+  background-size: 18px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+#root .site-shell main textarea { padding: 12px 14px; min-height: 120px; resize: vertical; white-space: pre-wrap; overflow-wrap: anywhere; }
+#root .site-shell main :is(input,textarea)::placeholder { color: #687f8c; opacity: 1; font-weight: 400; }
+#root .site-shell main :is(input,select,textarea):focus-visible { outline: 3px solid #1976a633; outline-offset: 1px; border-color: var(--control-focus); }
+#root .site-shell main :is(input,select,textarea):disabled { background-color: #edf2f4; color: #607582; cursor: not-allowed; }
+#root .site-shell main :is(input,select,textarea)[aria-invalid="true"] { border-color: #b64141; }
+#root .site-shell main fieldset { min-width: 0; }
+#root .site-shell main label { min-width: 0; }
+#root .site-shell main label:has(> :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]))) { gap: 8px; }
+/* Search owns one border; the field inside must not become a second box. */
+#root .site-shell main :is(.search-box,.community-search,[class*="resourceSearch"]) { box-sizing:border-box; min-height:48px; height:48px; padding:0 14px; border:1px solid var(--control-border); border-radius:10px; background:#fff; display:flex;align-items:center;gap:10px; }
+#root .site-shell main :is(.search-box,.community-search,[class*="resourceSearch"]) input { border:0; border-radius:0; padding:0; background:transparent; min-height:44px; height:44px; box-shadow:none; }
+#root .site-shell main :is(.search-box,.community-search,[class*="resourceSearch"]):focus-within {border-color:var(--control-focus);outline:3px solid #1976a633;outline-offset:1px;}
+#root .site-shell main :is(.search-box,.community-search,[class*="resourceSearch"]) input:focus-visible {outline:none;}
+#root .site-shell main [class*="Updates_"] input[type="search"], #root .site-shell main [class*="search_"] > input {padding-left:40px;}
+#root .site-shell main button:not([class]) {min-height:44px;padding:10px 16px;border:1px solid var(--control-border);border-radius:10px;background:#fff;color:#17394e;font:inherit;line-height:1.4;}
+#root .site-shell main button:not([class]):disabled {opacity:.55;cursor:not-allowed;}
+#root .site-shell main .archive-controls {align-items:end;gap:12px;}
+#root .site-shell main .archive-controls > .button {height:48px;min-height:48px;align-self:end;}
+#root .site-shell main .archive-type-filter select {height:48px;}
+#root .site-shell main .event-editor-grid > label {align-content:start;}
+#root .site-shell main .event-editor-grid > label > :is(input,select) {align-self:end;}
+/* Utility pages share a compact heading instead of stacking large introductions. */
+.site-shell .page-frame-utility {padding-top:32px;}
+.site-shell .page-frame-utility > .page-intro {display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:0 0 24px!important;margin-bottom:0!important;min-height:0;}
+.site-shell .page-frame-utility > .page-intro h1 {font-size:clamp(28px,3vw,38px)!important;line-height:1.35;max-width:36ch!important;margin:0;}
+.site-shell .page-frame-utility > .page-intro > span {align-self:flex-start;max-width:72ch;margin:0;padding:0;}
+.site-shell .page-frame-utility > .page-intro h1 br {display:none;}
+.site-shell .page-frame-utility > .page-content-stage {padding-top:24px;}
+.site-shell .page-frame-utility .event-editor {margin:0 auto 32px;background:transparent;}
+.site-shell .event-editor-heading h2,.site-shell .event-manager-heading h2 {font-size:clamp(22px,2.2vw,28px);line-height:1.4;}
+.site-shell .event-manager-actions .owner-icon-action {width:auto;min-width:92px;height:44px;padding:10px 14px;gap:8px;}
+.site-shell .calendar-detail > .owned-content-actions {margin:16px 0 24px;padding:12px 0;}
+.site-shell .calendar-planner-actions > a {min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+@media(max-width:600px){
+ .site-shell .page-frame-utility{padding-top:24px;}
+ #root .site-shell main .archive-controls{display:grid;grid-template-columns:minmax(0,1fr);}
+ #root .site-shell main .archive-controls > * {width:100%;}
+ .site-shell .calendar-planner-actions {display:flex;flex-wrap:wrap;gap:10px;}
+ .site-shell .calendar-planner-actions > a {flex:1 1 140px;}
+}
+@media(forced-colors:active){#root .site-shell main select:not([multiple]){appearance:auto;background-image:none;}}
+.site-shell .calendar-planner-actions {display:flex!important;flex-wrap:wrap;justify-content:flex-start;max-width:520px;}
+.site-shell .calendar-planner-actions > .button-primary {background:#143957;color:#fff;border-color:#143957;}
+.site-shell .calendar-planner-actions > .button-secondary {background:#fff;color:#143957;border-color:#b7cbd4;}
+#root .site-shell main [class*="inputWithIcon"] input {padding-left:40px;}
+.site-shell .member-profile-heading {padding:24px;gap:20px;background:#f7fafb;}
+.site-shell .member-profile-heading h2 {font-size:clamp(22px,2.2vw,28px);line-height:1.4;}
+.site-shell .member-profile-form form {padding:24px;gap:16px;}
+.site-shell .member-profile-optional {margin-block:8px;}
+.site-shell .member-profile-submit {margin-top:8px;padding-top:16px;}
+
+@media(max-width:700px){.site-shell:has(main :is(input,select,textarea):focus) .weave-feedback-widget{visibility:hidden;pointer-events:none;}}

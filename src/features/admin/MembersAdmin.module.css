@@ -92,3 +92,6 @@
   .summaryGrid, .countGrid, .profileGrid, .activitySummary { grid-template-columns: 1fr; }
   .summary, .listSection, .countSection, .timelineSection, .privatePanel { border-radius: 16px; padding: 16px; }
 }
+
+/* Supporting text remains readable on white and pale table surfaces. */
+.sectionHeading time,.sectionHeading > span,.basis,.tableWrap td:first-child small,.activityCounts small{color:#4e6675;}
