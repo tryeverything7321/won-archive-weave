@@ -12,7 +12,7 @@ export function PageFrame({
   title: ReactNode;
   description: string;
   children: ReactNode;
-  variant?: "editorial" | "utility" | "gate" | "recovery";
+  variant?: "editorial" | "utility" | "gate" | "recovery" | "detail";
 }) {
   const reduceMotion = useReducedMotion();
   const duration = reduceMotion ? 0 : 0.75;

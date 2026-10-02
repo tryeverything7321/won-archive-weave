@@ -13065,3 +13065,10 @@ main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
   align-items: flex-start;
   row-gap: 24px;
 }
+
+/* Resource details share a compact header and one content starting line. */
+.site-shell .page-frame-detail { padding-top: 28px; }
+.site-shell .page-frame-detail > .page-intro { display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:0 0 24px!important;margin-bottom:0!important;min-height:0; }
+.site-shell .page-frame-detail > .page-intro h1 { max-width:36ch!important;margin:0;font-size:clamp(26px,3vw,38px)!important;line-height:1.35; }
+.site-shell .page-frame-detail > .page-intro > span { margin:0;max-width:none;align-self:flex-start;padding:0; }
+.site-shell .page-frame-detail > .page-content-stage { padding-top:24px; }

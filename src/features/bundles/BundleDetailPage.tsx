@@ -62,10 +62,9 @@ export function BundleDetailPage() {
   if (loadState === "loading") return <PageFrame eyebrow="자료" title="자료를 불러오고 있어요" description="파일별 공개 상태를 확인하고 있어요"><p role="status"><LoaderCircle className="spin" size={18} /> 잠시만 기다려 주세요.</p></PageFrame>;
   if (loadState === "error" || !bundle) return <PageFrame eyebrow="자료" title="자료를 열지 못했어요" description={message || "공개가 중단되었거나 열람 권한이 필요한 자료일 수 있어요."}><div className={styles.actions}><Link to={returnTo}>자료 목록</Link><button type="button" onClick={() => { setLoadState("loading"); setAttempt((value) => value + 1); }}><RotateCcw size={17} /> 다시 확인</button></div></PageFrame>;
 
-  return <PageFrame eyebrow="자료" title={bundle.title} description={`${bundle.files.length}개 파일 · ${bundle.visibility}`}>
+  return <PageFrame variant="detail" eyebrow="자료" title={bundle.title} description={`${bundle.files.length}개 파일 · ${bundle.visibility}`}>
     <div className={styles.bundlePage}>
-      {owned && <ResourceActions id={bundleId} type="bundle" onDeleted={()=>window.location.assign("/resources")}/>}
-      <Link className={styles.backLink} to={returnTo}><ArrowLeft size={17} /> 이전 화면으로</Link>
+      <div className={styles.detailToolbar}><Link className={styles.backLink} to={returnTo}><ArrowLeft size={17} /> 이전 화면으로</Link>{owned && <ResourceActions id={bundleId} type="bundle" onDeleted={()=>window.location.assign("/resources")}/>}</div>
       {bundle.description && <p className={styles.description}>{bundle.description}</p>}
       <dl className={styles.metadata}>
         <div><dt>출처</dt><dd>{bundle.sourceLabel || bundle.ownerLabel || "표시된 출처 없음"}</dd></div>

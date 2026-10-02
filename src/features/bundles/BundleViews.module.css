@@ -56,3 +56,33 @@
 .fileCard {align-items:center}
 .fileCard .actions {justify-content:flex-end}
 @media(max-width:650px){.fileCard .actions {justify-content:flex-start;width:100%}.fileCard .actions :is(a,button) {flex:1}}
+
+/* Shared resource editing geometry: bounded fields and explicit primary action. */
+.detailToolbar {display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.bundleEditor {padding:clamp(16px,3vw,28px);min-width:0;}
+.editorFields {border:0;padding:0;margin:24px 0;gap:20px 24px;min-width:0;align-items:start;}
+.editorFields legend {font-size:18px;font-weight:750;margin-bottom:16px;padding:0;}
+.editorFields label,.managerFile label {min-width:0;font-size:14px;gap:8px;}
+.editorFields :is(input,select,textarea),.managerFile input {box-sizing:border-box;min-width:0;width:100%;min-height:48px;font-size:16px;}
+.managerFile {align-items:center;gap:16px;padding:16px;}
+.managerFile .actions {align-items:center;}
+.managerFile .badge {justify-self:start;width:fit-content;margin-top:0;}
+.filePicker:has(input:disabled),.actions button:disabled {opacity:.45;cursor:default;}
+.filePicker:focus-within {outline:3px solid #146fa8;outline-offset:3px;}
+.filesHeading {font-size:18px;margin:24px 0 8px;}
+.fileHelp {color:#526b78;font-size:14px;margin:8px 0;}
+.managerFiles {margin-bottom:20px;}
+.saveBar {position:sticky;top:96px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:20px 0;padding:16px;background:#f0f7fa;border:1px solid #b8d3df;border-radius:12px;box-shadow:0 4px 12px #14395712;}
+.saveBar>div {display:grid;gap:5px;min-width:0;}
+.saveBar strong {font-size:16px;}
+.saveBar span {font-size:13px;color:#486777;line-height:1.5;}
+.saveBar button {flex-shrink:0;min-height:48px;background:#143957;color:#fff;}
+.saveBar button:disabled {opacity:.6;cursor:default;}
+.successNotice,.errorNotice {display:flex;gap:8px;padding:14px 16px;margin:12px 0;border-radius:10px;}
+.successNotice {color:#17634f;background:#e8f6ef;}
+.errorNotice {color:#9b3341;background:#fff0f2;}
+@media(max-width:1100px){.saveBar{top:80px;}}
+@media(max-width:700px){.saveBar{flex-direction:column;align-items:stretch;padding:12px;gap:10px;}.saveBar button{width:100%;}.managerFile .actions{gap:8px;}.editorHeader a{align-self:flex-start;}}
+
+.editorFields input, .editorFields select, .editorFields textarea, .managerFile input { scroll-margin-top: 240px; }
+@media(max-width:700px){.saveBar > div > span {display:none}.saveBar strong{font-size:14px}.saveBar{gap:8px}}

@@ -139,6 +139,7 @@ export async function listMyMaterialBundles(cursor?: string | null): Promise<{ b
 }
 
 export async function updateMaterialBundle(input: {
+  fileEdits?: Array<{fileId:string;displayName:string;order:number}>;
   bundleId: string;
   requestId: string;
   title: string;

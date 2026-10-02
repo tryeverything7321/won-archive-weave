@@ -436,12 +436,31 @@ export const listMyMaterialBundles = onCall({ region: 'asia-northeast3' }, async
   }
 })
 
+function normalizeFileEdits(value: unknown) {
+  if (!Array.isArray(value) || value.length < 1 || value.length > maximumBundleFiles) {
+    throw new HttpsError('invalid-argument', '바꿀 파일 정보를 확인해 주세요')
+  }
+  const changes = value.map((raw: unknown) => {
+    const data = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {}
+    const fileId = typeof data.fileId === 'string' && /^[A-Za-z0-9_-]{8,80}$/.test(data.fileId) ? data.fileId : ''
+    const displayName = typeof data.displayName === 'string' ? data.displayName.trim() : ''
+    const order = Number(data.order)
+    if (!fileId || !displayName || displayName.length > 160 || !Number.isSafeInteger(order) || order < 0) {
+      throw new HttpsError('invalid-argument', '파일 표시 이름과 순서를 확인해 주세요')
+    }
+    return { fileId, displayName, order }
+  })
+  if(new Set(changes.map(item=>item.fileId)).size!==changes.length || new Set(changes.map(item=>item.order)).size!==changes.length)throw new HttpsError('invalid-argument','파일 이름과 순서가 중복되지 않도록 확인해 주세요')
+  return changes
+}
+
 export const updateMaterialBundle = onCall({ region: 'asia-northeast3' }, async (request) => {
   const { uid } = await requireActorPolicy(request.auth)
   const bundleId = normalizeBundleId(request.data?.bundleId)
   const requestId = normalizeRequestId(request.data?.requestId)
   const metadata = normalizeBundleMetadata(request.data)
-  const fingerprint = bundleCommandFingerprint(metadata)
+  const fileEdits = request.data?.fileEdits === undefined ? undefined : normalizeFileEdits(request.data.fileEdits)
+  const fingerprint = bundleCommandFingerprint(fileEdits ? {metadata,fileEdits} : metadata)
   const firestore = getFirestore()
   const ref = firestore.collection('materialBundles').doc(bundleId)
   const commandRef = firestore.collection('materialBundleCommands').doc(commandId(uid, `update:${bundleId}`, requestId))
@@ -454,7 +473,12 @@ export const updateMaterialBundle = onCall({ region: 'asia-northeast3' }, async 
       return
     }
     const nowMs = Date.now()
-    transaction.update(ref, { ...metadata, updatedAtMs: nowMs, updatedAt: FieldValue.serverTimestamp() })
+    const files = {...bundle.files}
+    for(const edit of fileEdits ?? []) {
+      if(!files[edit.fileId] || files[edit.fileId].status==='withdrawn')throw new HttpsError('not-found','바꿀 파일을 찾지 못했어요')
+      files[edit.fileId]={...files[edit.fileId],displayName:edit.displayName,order:edit.order,updatedAtMs:nowMs}
+    }
+    transaction.update(ref, { ...metadata, ...(fileEdits ? {files} : {}), updatedAtMs: nowMs, updatedAt: FieldValue.serverTimestamp() })
     transaction.create(commandRef, { uid, action: 'update', requestId, bundleId, fingerprint, at: FieldValue.serverTimestamp() })
   })
   return { bundleId }
@@ -464,19 +488,7 @@ export const updateMaterialBundleFiles = onCall({ region: 'asia-northeast3' }, a
   const { uid } = await requireActorPolicy(request.auth)
   const bundleId = normalizeBundleId(request.data?.bundleId)
   const requestId = normalizeRequestId(request.data?.requestId)
-  if (!Array.isArray(request.data?.files) || request.data.files.length < 1 || request.data.files.length > maximumBundleFiles) {
-    throw new HttpsError('invalid-argument', '바꿀 파일 정보를 확인해 주세요')
-  }
-  const changes = request.data.files.map((raw: unknown) => {
-    const data = raw && typeof raw === 'object' ? raw as Record<string, unknown> : {}
-    const fileId = typeof data.fileId === 'string' && /^[A-Za-z0-9_-]{8,80}$/.test(data.fileId) ? data.fileId : ''
-    const displayName = typeof data.displayName === 'string' ? data.displayName.trim() : ''
-    const order = Number(data.order)
-    if (!fileId || !displayName || displayName.length > 160 || !Number.isSafeInteger(order) || order < 0) {
-      throw new HttpsError('invalid-argument', '파일 표시 이름과 순서를 확인해 주세요')
-    }
-    return { fileId, displayName, order }
-  })
+  const changes = normalizeFileEdits(request.data?.files)
   const fingerprint = bundleCommandFingerprint(changes)
   const firestore = getFirestore()
   const ref = firestore.collection('materialBundles').doc(bundleId)
