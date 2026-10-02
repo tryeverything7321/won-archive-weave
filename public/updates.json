@@ -1,8 +1,21 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:19:37.420Z",
+  "generatedAt": "2026-10-02T01:29:49.089Z",
   "entries": [
+    {
+      "id": "1cabb0d5fe4cb8f0f59c3b3764c6a9dcc6ec14df-0",
+      "commit": "1cabb0d5fe4cb8f0f59c3b3764c6a9dcc6ec14df",
+      "committedAt": "2026-10-02T10:29:39+09:00",
+      "area": "운영·관리",
+      "title": "운영 센터에서 이전 자료와 QC 기록을 삭제할 수 있어요",
+      "details": [
+        "공개 중단된 자료는 자료 나눔 목록에서 제외해요",
+        "관리자 전체 자료 목록과 자료별 삭제 버튼을 추가했어요",
+        "[QC]와 철회된 테스트 기록도 확인 후 정리할 수 있어요"
+      ],
+      "status": "development"
+    },
     {
       "id": "240b586358e68474287445b151766055e353a45b-0",
       "commit": "240b586358e68474287445b151766055e353a45b",
