@@ -1,15 +1,21 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T00:33:06.620Z",
+  "generatedAt": "2026-10-02T01:02:27.196Z",
   "entries": [
     {
-      "id": "ac1d092a7395dfb48adcaea34a4c89318961c448-0",
-      "commit": "ac1d092a7395dfb48adcaea34a4c89318961c448",
-      "committedAt": "2026-10-02T09:32:55+09:00",
-      "area": "개발·문서",
-      "title": "chore(updates): verify classification auth guard",
-      "details": [],
+      "id": "0c486ccc18ad5386bcb01d1b44ba14c78df84d45-0",
+      "commit": "0c486ccc18ad5386bcb01d1b44ba14c78df84d45",
+      "committedAt": "2026-10-02T10:02:15+09:00",
+      "area": "자료 등록",
+      "title": "자료 게시글을 파일 수와 관계없이 한 줄로 찾아요",
+      "details": [
+        "글 한 건을 한 행에 표시하고 첨부 파일 수와 형식 표시를 함께 보여줘요",
+        "주최·출처와 등록 날짜·시간을 함께 확인할 수 있어요",
+        "자료 게시글의 수정과 삭제를 목록에서 할 수 있어요",
+        "관리자는 QC 테스트 기록의 제목을 확인해 정리할 수 있어요",
+        "회의록 이동 버튼과 내부 업데이트 검증 기록의 노출을 없앴어요"
+      ],
       "status": "development"
     },
     {
