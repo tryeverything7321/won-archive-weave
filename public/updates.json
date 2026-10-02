@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T02:17:22.803Z",
+  "generatedAt": "2026-10-02T02:18:48.594Z",
   "entries": [
     {
       "id": "626aeda7a301dfb49e4132b9883be1c08f05913b-0",
@@ -12,7 +12,7 @@
       "details": [
         "파일 수와 관계없이 자료 올리기·자료 보기로 안내해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "a5020d5a346164ae441b4cac9edd8bcc097431bd-0",
@@ -24,7 +24,7 @@
         "자료 묶음과 개별 자료 구분을 없애고 자료로 통일했어요",
         "자료 게시글 수와 첨부 파일 수를 구분해 표시해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "1cabb0d5fe4cb8f0f59c3b3764c6a9dcc6ec14df-0",
