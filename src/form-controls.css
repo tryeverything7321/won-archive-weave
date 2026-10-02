@@ -113,3 +113,10 @@
 #root .site-shell .event-editor-step > .field-wide {grid-column:1 / -1;}
 #root .site-shell .event-editor-form > [class*="eventCore"] > .event-editor-step {border-bottom:0;}
 #root .site-shell .calendar-import-shortcut {max-width:920px;margin:32px auto 0;padding:20px 0;border-top:1px solid #d3e0e5;}
+
+.site-shell .calendar-planner-actions > .calendar-connect-entry {flex-direction:column;gap:4px;height:auto;padding:10px 14px;}
+.calendar-provider-labels,.calendar-provider-labels > span {display:inline-flex;align-items:center;gap:5px;}
+.calendar-provider-labels {flex-wrap:wrap;justify-content:center;gap:10px;font-size:12px;font-weight:500;line-height:20px;}
+.calendar-provider-labels img,.profile-section-nav button > img {object-fit:contain;flex-shrink:0;}
+.calendar-provider-labels > span {white-space:nowrap;}
+@media(max-width:600px){.site-shell .calendar-planner-actions{width:100%;}.site-shell .calendar-planner-actions > .button{flex-basis:100%;}.site-shell .calendar-planner-actions > .calendar-manage-link{margin-inline:auto;}}

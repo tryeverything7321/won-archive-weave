@@ -1,3 +1,5 @@
+import googleCalendarIcon from "../assets/providers/google-calendar.png";
+import timeTreeIcon from "../assets/providers/timetree.ico";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import {
   ArrowLeft,
@@ -424,7 +426,7 @@ export function CalendarPage() {
         <div className="calendar-planner-message"><h2>행사를 일정에 더하세요</h2><p>직접 등록하거나 공유 캘린더를 연결할 수 있어요</p></div>
         <div className="calendar-planner-actions">
           <Link className="button button-primary" to="/calendar/new">행사 등록</Link>
-          <Link className="button button-secondary" to="/calendar/connect">공유 캘린더 연결</Link>
+          <Link className="button button-secondary calendar-connect-entry" to="/calendar/connect"><span>공유 캘린더 연결</span><span className="calendar-provider-labels"><span><img src={googleCalendarIcon} alt="" width="20" height="20" />Google Calendar</span><span><img src={timeTreeIcon} alt="" width="20" height="20" />TimeTree</span></span></Link>
           <Link className="calendar-manage-link" to="/profile?tab=activity&manage=events">내 일정 관리</Link>
         </div>
       </section>
@@ -725,8 +727,8 @@ export function CalendarConnectPage() {
     >
       {draftReturn && <Link className="back-link" to={draftReturn}><ArrowLeft size={17} /> 작성 중인 행사로 돌아가기</Link>}
       <div className="profile-section-nav" aria-label="가져올 캘린더 선택">
-        <button type="button" aria-pressed={connectionMode === 'personal'} onClick={() => setConnectionMode('personal')}>내 Google 일정 가져오기</button>
-        <button type="button" aria-pressed={connectionMode === 'organization'} onClick={() => setConnectionMode('organization')}>단체 공개 캘린더 연결</button>
+        <button type="button" aria-pressed={connectionMode === 'personal'} onClick={() => setConnectionMode('personal')}><img src={googleCalendarIcon} alt="" width="22" height="22" />내 Google 일정 가져오기</button>
+        <button type="button" aria-pressed={connectionMode === 'organization'} onClick={() => setConnectionMode('organization')}><img src={googleCalendarIcon} alt="" width="22" height="22" /><img src={timeTreeIcon} alt="" width="22" height="22" />단체 공개 캘린더 연결</button>
       </div>
       {connectionMode === 'personal' ? <GoogleCalendarImport /> : <>
       {audienceReady && audience !== "member" && (
