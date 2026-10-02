@@ -180,11 +180,11 @@ function parseFile(value: unknown): MaterialBundleFile | null {
 }
 
 export function parseMaterialBundle(value: unknown): MaterialBundle {
-  if (!value || typeof value !== "object") throw new Error("자료 묶음 응답을 확인하지 못했어요.");
+  if (!value || typeof value !== "object") throw new Error("자료 응답을 확인하지 못했어요.");
   const row = value as Record<string, unknown>;
   const bundleId = text(row.bundleId, 160);
   const title = text(row.title, 160);
-  if (!bundleId || !title || !Array.isArray(row.files)) throw new Error("자료 묶음 응답을 확인하지 못했어요.");
+  if (!bundleId || !title || !Array.isArray(row.files)) throw new Error("자료 응답을 확인하지 못했어요.");
   const visibility = displayBundleVisibility(row.visibility);
   const rawRights = row.rights && typeof row.rights === "object" ? row.rights as Record<string, unknown> : null;
   const redistribution: BundleRights = rawRights?.redistribution === "download_allowed" || rawRights?.redistribution === "source_link_only"

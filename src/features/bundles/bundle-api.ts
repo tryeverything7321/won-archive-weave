@@ -11,7 +11,7 @@ import {
 
 function services() {
   const value = getFirebaseServices();
-  if (!value) throw new Error("자료 묶음 기능을 준비하고 있어요.");
+  if (!value) throw new Error("자료 기능을 준비하고 있어요.");
   return value;
 }
 
@@ -52,7 +52,7 @@ export async function createMaterialBundle(input: {
   const payload = { ...input, visibility: serverBundleVisibility(input.visibility) };
   const callable = httpsCallable<typeof payload, { bundleId: string; status: "draft" }>(services().functions, "createMaterialBundle");
   const result = await callable(payload);
-  if (!result.data.bundleId || result.data.status !== "draft") throw new Error("자료 묶음 저장 결과를 확인하지 못했어요.");
+  if (!result.data.bundleId || result.data.status !== "draft") throw new Error("자료 저장 결과를 확인하지 못했어요.");
   return result.data;
 }
 
@@ -115,7 +115,7 @@ export async function uploadPreparedBundleFile(
 export async function finalizeMaterialBundle(bundleId: string, requestId: string) {
   const callable = httpsCallable<{ bundleId: string; requestId: string }, { bundleId: string; status: "active" }>(services().functions, "finalizeMaterialBundle");
   const result = await callable({ bundleId, requestId });
-  if (result.data.bundleId !== bundleId || result.data.status !== "active") throw new Error("자료 묶음 완료 상태를 확인하지 못했어요.");
+  if (result.data.bundleId !== bundleId || result.data.status !== "active") throw new Error("자료 완료 상태를 확인하지 못했어요.");
   return result.data;
 }
 
@@ -131,7 +131,7 @@ export async function getMaterialBundle(bundleId: string): Promise<MaterialBundl
 export async function listMyMaterialBundles(cursor?: string | null): Promise<{ bundles: MaterialBundle[]; nextCursor: string | null }> {
   const callable = httpsCallable<{ limit: number; cursor?: string }, { items: unknown[]; nextCursor?: string | null }>(services().functions, "listMyMaterialBundles");
   const result = await callable({ limit: 50, ...(typeof cursor === "string" ? { cursor } : {}) });
-  if (!Array.isArray(result.data.items)) throw new Error("내 자료 묶음 목록을 확인하지 못했어요.");
+  if (!Array.isArray(result.data.items)) throw new Error("내 자료 목록을 확인하지 못했어요.");
   return {
     bundles: result.data.items.map(parseMaterialBundle),
     nextCursor: typeof result.data.nextCursor === "string" ? result.data.nextCursor : null,

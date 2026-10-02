@@ -79,7 +79,7 @@ export function MyBundleManager() {
       <div><h2 id="my-bundles-title">내 자료</h2><p>파일별 검사 상태와 표시 순서를 관리할 수 있어요.</p></div>
       <Link className="button button-primary" to="/contribute?intent=material"><FilePlus2 size={17} /> 자료 올리기</Link>
     </div>
-    {!bundles.length ? <p>아직 올린 자료 묶음이 없습니다.</p> : bundles.filter(bundle=>!selectedId||bundle.bundleId===selectedId).map((bundle) => <BundleEditor key={`${bundle.bundleId}:${bundle.updatedAtMs ?? 0}`} bundle={bundle} onChanged={load} />)}
+    {!bundles.length ? <p>아직 올린 자료이 없습니다.</p> : bundles.filter(bundle=>!selectedId||bundle.bundleId===selectedId).map((bundle) => <BundleEditor key={`${bundle.bundleId}:${bundle.updatedAtMs ?? 0}`} bundle={bundle} onChanged={load} />)}
     {nextCursor !== null && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "자료 더 보기"}</button>}
     {message && <p role="alert">{message}</p>}
   </section>;

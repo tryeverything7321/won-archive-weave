@@ -196,7 +196,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
     }
     if (!rightsConfirmed) return setStatus({ tone: "error", message: "공유 권한과 개인정보 확인을 완료해 주세요." });
     setSelectionError("");
-    setStatus({ tone: "working", message: "자료 묶음을 만들고 파일을 올리고 있어요." });
+    setStatus({ tone: "working", message: "자료를 만들고 파일을 올리고 있어요." });
     try {
       let resolvedArchiveEventId = archiveEventId;
       if (!resolvedArchiveEventId && calendarEventId) {
@@ -253,7 +253,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
     <section className={styles.shell} aria-labelledby="bundle-contribution-title">
       <header className={styles.heading}>
         <div>
-          <p>자료 묶음</p>
+          <p>자료</p>
           <h2 id="bundle-contribution-title">파일부터 한 번에 올려요</h2>
           <span>여러 파일에 제목·공개 범위·공유 권한을 한 번만 입력합니다. 본문은 선택 사항입니다.</span>
         </div>
@@ -269,7 +269,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
 
       {!services || !user ? (
         <div className={styles.loginState}>
-          <p>{services ? "파일을 고르고 등록하려면 로그인해 주세요." : "자료 묶음 기능을 준비하고 있어요."}</p>
+          <p>{services ? "파일을 고르고 등록하려면 로그인해 주세요." : "자료 기능을 준비하고 있어요."}</p>
           {services && <div className="community-login-actions"><ProviderLoginButton provider="kakao" onClick={() => startOAuthLogin("kakao", loginReturnTo)} /><ProviderLoginButton provider="naver" onClick={() => startOAuthLogin("naver", loginReturnTo)} />
 <ProviderLoginButton provider="google" onClick={() => startOAuthLogin("google", loginReturnTo)} /></div>}
         </div>
@@ -368,7 +368,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
             {!completed && <button className="button button-primary" type="submit" disabled={status.tone === "working" || files.length === 0}>{status.tone === "working" ? <LoaderCircle className="spin" size={18} /> : <FilePlus2 size={18} />}{status.tone === "working" ? "등록 중" : "자료 등록"}</button>}
           </div>
           {status.tone !== "idle" && <div className={`${styles.status} ${styles[status.tone]}`} role={status.tone === "error" ? "alert" : "status"}>{status.tone === "success" ? <CheckCircle2 size={20} /> : status.tone === "working" ? <LoaderCircle className="spin" size={20} /> : <CircleAlert size={20} />}<span>{status.message}</span></div>}
-          {completed && <div className={styles.completionActions}><Link className="button button-primary" to={`/bundles/${encodeURIComponent(bundleId)}`} state={{ returnTo }}>자료 묶음 보기</Link><Link className="button button-secondary" to="/profile?tab=activity">내 자료 관리</Link><Link className="button button-secondary" to={returnTo}>이전 화면으로</Link>{relationState === "failed" && <button type="button" className="button button-secondary" onClick={() => void connectEvent(bundleId)}>행사 연결 다시 시도</button>}</div>}
+          {completed && <div className={styles.completionActions}><Link className="button button-primary" to={`/bundles/${encodeURIComponent(bundleId)}`} state={{ returnTo }}>자료 보기</Link><Link className="button button-secondary" to="/profile?tab=activity">내 자료 관리</Link><Link className="button button-secondary" to={returnTo}>이전 화면으로</Link>{relationState === "failed" && <button type="button" className="button button-secondary" onClick={() => void connectEvent(bundleId)}>행사 연결 다시 시도</button>}</div>}
         </form>
       )}
     </section>

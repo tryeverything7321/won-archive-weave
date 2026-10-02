@@ -60,7 +60,7 @@ export function BundleDetailPage() {
   };
 
   if (loadState === "loading") return <PageFrame eyebrow="자료" title="자료를 불러오고 있어요" description="파일별 공개 상태를 확인하고 있어요"><p role="status"><LoaderCircle className="spin" size={18} /> 잠시만 기다려 주세요.</p></PageFrame>;
-  if (loadState === "error" || !bundle) return <PageFrame eyebrow="자료" title="자료 묶음을 열지 못했어요" description={message || "공개가 중단되었거나 열람 권한이 필요한 자료일 수 있어요."}><div className={styles.actions}><Link to={returnTo}>자료 목록</Link><button type="button" onClick={() => { setLoadState("loading"); setAttempt((value) => value + 1); }}><RotateCcw size={17} /> 다시 확인</button></div></PageFrame>;
+  if (loadState === "error" || !bundle) return <PageFrame eyebrow="자료" title="자료를 열지 못했어요" description={message || "공개가 중단되었거나 열람 권한이 필요한 자료일 수 있어요."}><div className={styles.actions}><Link to={returnTo}>자료 목록</Link><button type="button" onClick={() => { setLoadState("loading"); setAttempt((value) => value + 1); }}><RotateCcw size={17} /> 다시 확인</button></div></PageFrame>;
 
   return <PageFrame eyebrow="자료" title={bundle.title} description={`${bundle.files.length}개 파일 · ${bundle.visibility}`}>
     <div className={styles.bundlePage}>
