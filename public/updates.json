@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T03:04:52.801Z",
+  "generatedAt": "2026-10-02T03:08:24.599Z",
   "entries": [
     {
       "id": "ae1b470c20e52bd0675078b8d439f600149f5729-0",
@@ -13,7 +13,7 @@
         "관리자도 기존 회의록의 제목·본문·출처를 수정할 수 있어요",
         "첨부파일 이름은 두 개까지 표시하고 나머지는 외 N개로 정리해요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "626aeda7a301dfb49e4132b9883be1c08f05913b-0",
