@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T21:14:28.911Z",
+  "generatedAt": "2026-10-02T21:41:11.695Z",
   "entries": [
+    {
+      "id": "4ec9f0e29f986fd31cb0fcd13ec3362f9e00bb1c-0",
+      "commit": "4ec9f0e29f986fd31cb0fcd13ec3362f9e00bb1c",
+      "committedAt": "2026-10-03T06:40:58+09:00",
+      "area": "화면·사용성",
+      "title": "자료 수정과 파일 이름 변경을 한 번에 저장해요",
+      "details": [
+        "수정 내용 저장 버튼을 눈에 잘 보이게 배치하고 자료 상세의 넓은 여백과 버튼 정렬을 다듬었어요",
+        "게시판에서도 바꾼 파일 표시 이름을 볼 수 있어요"
+      ],
+      "status": "development"
+    },
     {
       "id": "02b3501bf6546013f1e17e78a20bc7f3ab6c2f96-0",
       "commit": "02b3501bf6546013f1e17e78a20bc7f3ab6c2f96",
