@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T03:08:33.833Z",
+  "generatedAt": "2026-10-02T03:16:08.902Z",
   "entries": [
+    {
+      "id": "ce3a70589cf36f149f1dfc46c7003d82b0180aa0-0",
+      "commit": "ce3a70589cf36f149f1dfc46c7003d82b0180aa0",
+      "committedAt": "2026-10-02T12:15:58+09:00",
+      "area": "자료 등록",
+      "title": "회의록도 작성할 때와 같은 화면에서 수정해요",
+      "details": [
+        "수정 버튼을 누르면 기존 내용과 표시 방식을 불러온 작성 화면으로 이동해요",
+        "입력한 모양 유지·제목과 목록 정리, 예시와 미리보기, 텍스트 파일 가져오기를 함께 사용할 수 있어요"
+      ],
+      "status": "development"
+    },
     {
       "id": "ae1b470c20e52bd0675078b8d439f600149f5729-0",
       "commit": "ae1b470c20e52bd0675078b8d439f600149f5729",
