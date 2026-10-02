@@ -13032,29 +13032,31 @@ main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
 .community-opening-intro h2 { margin:0 0 10px; font-size:22px; }
 .community-opening-intro p { margin:0; line-height:1.7; }
 
-/* Naver provider publication is pending; existing sessions remain valid. */
-.provider-login-pending {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: min(100%, 244px);
-  gap: 8px;
+/* Keep existing Naver login available while provider approval is pending. */
+.provider-login-approval {
+  position: relative;
+  overflow: visible;
+  margin-bottom: 14px;
 }
-.provider-login-pending .provider-login:disabled {
-  width: 100%;
-  opacity: 1;
-  filter: grayscale(1);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.provider-login-approval .provider-approval-badge {
+  position: absolute;
+  z-index: 1;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 16px);
+  padding: 4px 10px;
+  border: 1px solid #bfd3d9;
+  border-radius: 999px;
+  background: #fff;
+  color: #365664;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  box-shadow: 0 2px 5px rgb(20 57 87 / 8%);
 }
-.provider-login-pending small {
-  color: #506574;
-  font-size: 12px;
-  line-height: 1.5;
-  word-break: keep-all;
-  text-align: center;
-}
-.community-login-actions:has(.provider-login-pending) {
+.community-login-actions:has(.provider-login-approval) {
   align-items: flex-start;
+  row-gap: 24px;
 }

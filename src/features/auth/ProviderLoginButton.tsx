@@ -50,10 +50,10 @@ export function ProviderLoginButton({
   const button = (
     <button
       {...buttonProps}
-      disabled={approvalPending || buttonProps.disabled}
+      disabled={buttonProps.disabled}
       aria-describedby={approvalPending ? [buttonProps["aria-describedby"], noticeId].filter(Boolean).join(" ") : buttonProps["aria-describedby"]}
       aria-label={buttonProps["aria-label"] ?? (recent ? `${label} · 이 브라우저에서 최근 로그인` : label)}
-      className={`provider-login provider-login-${provider} ${provider === "google" ? "provider-login-google-button" : "provider-login-official"} ${className}`.trim()}
+      className={`provider-login provider-login-${provider} ${provider === "google" ? "provider-login-google-button" : "provider-login-official"} ${approvalPending ? "provider-login-approval" : ""} ${className}`.trim()}
       type={type}
     >
       {provider === "google" ? <><ProviderMark provider="google" /><span>Google로 로그인</span></> : <img
@@ -64,12 +64,8 @@ export function ProviderLoginButton({
       />}
       <span className="sr-only">{label}</span>
       {recent && <span className="provider-recent-login">최근 로그인</span>}
+      {approvalPending && <span id={noticeId} className="provider-approval-badge">서비스 승인 진행 중</span>}
     </button>
   );
-  return approvalPending ? (
-    <div className="provider-login-pending">
-      {button}
-      <small id={noticeId}>네이버 로그인 서비스 승인 진행 중</small>
-    </div>
-  ) : button;
+  return button;
 }
