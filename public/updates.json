@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T21:11:48.856Z",
+  "generatedAt": "2026-10-02T21:13:41.097Z",
   "entries": [
     {
       "id": "02b3501bf6546013f1e17e78a20bc7f3ab6c2f96-0",
@@ -13,7 +13,7 @@
         "QC 테스트 정리는 운영 센터에서만 보여요",
         "행사 보기 버튼과 장소·주최 정보 사이에 여유를 두고 카드별 버튼 높이를 맞췄어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "0e00071adf7fa510d8456676a30bdf12e8596c3f-0",
