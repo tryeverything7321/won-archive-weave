@@ -31,7 +31,7 @@ import {
 if (!getApps().length) initializeApp()
 
 const reservationTtlMs = 15 * 60_000
-const maximumConcurrentReservations = 3
+const maximumConcurrentReservations = maximumBundleFiles + 1
 const maximumActiveReservationBytes = 100 * 1024 * 1024
 const maximumDailyReservationBytes = 512 * 1024 * 1024
 const usageWindowMs = 24 * 60 * 60_000
@@ -57,6 +57,8 @@ type BundleReservation = {
   fingerprint: string
   status: 'active' | 'fulfilled' | 'expired'
   totalBytes: number
+  quotaBytes?: number
+  accountedCommittedBytes?: number
   expiresAtMs: number
   files: Record<string, BundleReservationFile>
 }
@@ -78,8 +80,8 @@ function normalizedUsage(value: unknown, nowMs: number): BundleUsage {
 
 function reserveUsage(value: BundleUsage, bytes: number): BundleUsage {
   const next = { ...value, activeCount: value.activeCount + 1, activeBytes: value.activeBytes + bytes }
-  if (next.activeCount > maximumConcurrentReservations) throw new HttpsError('resource-exhausted', '진행 중인 업로드를 마친 뒤 다시 시도해 주세요', { retryAfterSeconds: 60 })
-  if (next.activeBytes > maximumActiveReservationBytes) throw new HttpsError('resource-exhausted', '진행 중인 묶음 업로드 용량이 커요', { retryAfterSeconds: 60 })
+  if (next.activeCount > maximumConcurrentReservations) throw new HttpsError('resource-exhausted', '진행 중인 업로드를 마친 뒤 다시 시도해 주세요')
+  if (next.activeBytes > maximumActiveReservationBytes) throw new HttpsError('resource-exhausted', '진행 중인 묶음 업로드 용량이 커요')
   if (next.committedBytes + next.activeBytes > maximumDailyReservationBytes) throw new HttpsError('resource-exhausted', '이 계정의 하루 업로드 한도에 도달했어요')
   return next
 }
@@ -170,8 +172,9 @@ export const prepareMaterialBundleFiles = onCall({ region: 'asia-northeast3' }, 
   let prepared: BundleReservationFile[] = []
   const requestFingerprint = bundleCommandFingerprint(inputFiles)
   await firestore.runTransaction(async (transaction) => {
-    const [bundleSnapshot, reservationSnapshot, usageSnapshot, command] = await Promise.all([
+    const [bundleSnapshot, reservationSnapshot, usageSnapshot, command, priorReservations] = await Promise.all([
       transaction.get(bundleRef), transaction.get(reservationRef), transaction.get(usageRef), transaction.get(commandRef),
+      transaction.get(firestore.collection('materialBundleUploadReservations').where('bundleId', '==', bundleId).where('status', '==', 'active')),
     ])
     const bundle = recordFrom(bundleSnapshot)
     assertOwner(bundle, uid)
@@ -223,10 +226,34 @@ export const prepareMaterialBundleFiles = onCall({ region: 'asia-northeast3' }, 
     if (activeFiles.length > maximumBundleFiles) throw new HttpsError('resource-exhausted', '한 묶음에는 파일을 10개까지 담을 수 있어요')
     if (totalStoredBytes > maximumBundleBytes) throw new HttpsError('resource-exhausted', '한 묶음의 파일 합계는 100MB까지예요')
     const totalBytes = prepared.reduce((sum, file) => sum + file.sizeBytes, 0)
-    const usage = reserveUsage(normalizedUsage(usageSnapshot.data(), nowMs), totalBytes)
+    let usage = normalizedUsage(usageSnapshot.data(), nowMs)
+    // Replaced or expired uploads must not keep charging the user's retry budget.
+    // Existing reservations without accounting fields are reconciled lazily here.
+    for (const snapshot of priorReservations.docs) {
+      const prior = reservationFrom(snapshot)
+      if (!prior || prior.ownerUid !== uid) continue
+      const committed = Object.values(prior.files).filter(file => file.reconciled).reduce((sum, file) => sum + file.sizeBytes, 0)
+      const remaining = Object.values(prior.files).filter(file => {
+        const current = files[file.fileId]
+        return !file.reconciled && prior.expiresAtMs > nowMs && current?.status !== 'withdrawn'
+          && current?.revision === file.revision && current?.storagePath === file.storagePath
+      }).reduce((sum, file) => sum + file.sizeBytes, 0)
+      usage = {
+        ...usage,
+        activeCount: Math.max(0, usage.activeCount - (remaining === 0 ? 1 : 0)),
+        activeBytes: Math.max(0, usage.activeBytes - (prior.quotaBytes ?? prior.totalBytes) + remaining),
+        committedBytes: usage.committedBytes + Math.max(0, committed - (prior.accountedCommittedBytes ?? 0)),
+      }
+      transaction.update(snapshot.ref, {
+        quotaBytes: remaining, accountedCommittedBytes: committed,
+        ...(remaining === 0 ? {status: 'expired', expiredAt: FieldValue.serverTimestamp()} : {}),
+        updatedAt: FieldValue.serverTimestamp(),
+      })
+    }
+    usage = reserveUsage(usage, totalBytes)
     const reservationFiles = Object.fromEntries(prepared.map((file) => [file.targetName, file]))
     transaction.create(reservationRef, {
-      ownerUid: uid, bundleId, requestId, fingerprint: requestFingerprint, status: 'active', totalBytes,
+      ownerUid: uid, bundleId, requestId, fingerprint: requestFingerprint, status: 'active', totalBytes, quotaBytes: totalBytes, accountedCommittedBytes: 0,
       expiresAtMs, expiresAt: Timestamp.fromMillis(expiresAtMs), cleanupDueAt: Timestamp.fromMillis(expiresAtMs),
       files: reservationFiles, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
     })
@@ -272,14 +299,21 @@ export async function recordUploadedMaterialBundleObject(input: {
     if (selected.reconciled) return current.generation === input.generation
     if (selected.reconciled || reservation.status !== 'active') return false
     const files = { ...reservation.files, [input.targetName]: { ...selected, reconciled: true } }
-    const fulfilled = Object.values(files).every((file) => file.reconciled)
+    const remainingBytes = Math.max(0, (reservation.quotaBytes ?? reservation.totalBytes) - selected.sizeBytes)
+    const committedBytes = Object.values(files).filter(file => file.reconciled).reduce((sum, file) => sum + file.sizeBytes, 0)
+    const fulfilled = remainingBytes === 0
     const nowMs = Date.now()
     transaction.update(reservationRef, {
-      files, ...(fulfilled ? { status: 'fulfilled', fulfilledAt: FieldValue.serverTimestamp(), cleanupDueAt: FieldValue.delete() } : {}),
+      files, quotaBytes: remainingBytes, accountedCommittedBytes: committedBytes, ...(fulfilled ? { status: 'fulfilled', fulfilledAt: FieldValue.serverTimestamp(), cleanupDueAt: FieldValue.delete() } : {}),
       updatedAt: FieldValue.serverTimestamp(),
     })
-    if (fulfilled) transaction.set(usageRef, {
-      ...releaseUsage(normalizedUsage(usageSnapshot.data(), nowMs), reservation.totalBytes, reservation.totalBytes), updatedAt: FieldValue.serverTimestamp(),
+    const usage = normalizedUsage(usageSnapshot.data(), nowMs)
+    transaction.set(usageRef, {
+      ...usage,
+      activeCount: Math.max(0, usage.activeCount - (fulfilled ? 1 : 0)),
+      activeBytes: Math.max(0, usage.activeBytes - ((reservation.quotaBytes ?? reservation.totalBytes) - remainingBytes)),
+      committedBytes: usage.committedBytes + Math.max(0, committedBytes - (reservation.accountedCommittedBytes ?? 0)),
+      updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true })
     transaction.update(bundleRef, {
       [`files.${input.fileId}.status`]: 'scanning', [`files.${input.fileId}.scanStatus`]: 'pending',
@@ -613,8 +647,8 @@ export const cleanupMaterialBundleUploads = onSchedule(
         transaction.set(usageRef, {
           ...releaseUsage(
             normalizedUsage(usageSnapshot.data(), nowMs),
-            currentReservation.totalBytes,
-            Object.values(currentReservation.files).filter((file) => file.reconciled).reduce((sum, file) => sum + file.sizeBytes, 0),
+            currentReservation.quotaBytes ?? currentReservation.totalBytes,
+            Math.max(0, Object.values(currentReservation.files).filter((file) => file.reconciled).reduce((sum, file) => sum + file.sizeBytes, 0) - (currentReservation.accountedCommittedBytes ?? 0)),
           ),
           updatedAt: FieldValue.serverTimestamp(),
         }, { merge: true })

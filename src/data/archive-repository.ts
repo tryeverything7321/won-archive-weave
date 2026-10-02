@@ -24,6 +24,7 @@ export type ArchiveMaterial = Material & {
 }
 
 export type ArchiveActivity = Activity & {
+  materialRedirectId?: string
   id?: string
   linkedMaterialIds?: string[]
   textContent?: import('../features/content/text-content').TextContent

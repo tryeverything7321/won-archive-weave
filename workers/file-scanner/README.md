@@ -4,11 +4,11 @@ This container is the malware-engine boundary used by `scanQuarantinedUpload`.
 
 - Cloud Run IAM accepts only OIDC-authenticated `POST` requests from an allowed invoker.
 - The application also requires `x-weave-scanner-token` as a defense-in-depth shared secret.
-- It rejects empty requests and bodies larger than 20 MiB.
+- The HTTP listener starts only after daemon readiness; engine failures still fail closed. It rejects empty requests and bodies larger than 20 MiB.
 - Only ClamAV exit code `0` becomes `clean`.
 - Malware exit code `1` becomes `blocked`.
 - Missing definitions, definition refresh failure and engine errors fail closed with a non-2xx response.
-- Each `clamscan` child is forcibly killed with `SIGKILL` after 60 seconds and the request fails closed.
+- The persistent `clamd` engine loads definitions once per container; `clamdscan` clients share the engine. Each client is forcibly killed with `SIGKILL` after 60 seconds and the request fails closed.
 - The caller binds the returned verdict to the exact Storage path, generation, size and SHA-256 before it updates a submission.
 
 Runtime configuration:

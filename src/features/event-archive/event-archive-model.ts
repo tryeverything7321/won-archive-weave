@@ -54,6 +54,8 @@ export type EventArchiveOverview = {
 };
 
 export type ArchiveDiscoveryFilters = {
+  scope?: "resources";
+  keyword?: string;
   organizerId?: string;
   heldYear?: number;
   uploadYear?: number;
@@ -91,6 +93,7 @@ export type ArchiveDiscoveryResult = {
 };
 
 export type ArchiveDiscoveryItem = {
+  fileCount?: number;
   targetType: "event" | ArchiveRelationTarget;
   id: string;
   title: string;

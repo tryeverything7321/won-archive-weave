@@ -229,3 +229,11 @@
 
 .selectedConditions button { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:8px 12px; border:1px solid #c4d9d8; border-radius:10px; color:#143957; background:#edf4f2; font:inherit; cursor:pointer; }
 .selectedConditions button:focus-visible { outline:3px solid #246e7a; outline-offset:3px; }
+
+.resourceActions {display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;margin:16px 0 24px}
+.resourceActions > a {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;box-sizing:border-box;white-space:nowrap}
+.resourceSearch {display:flex;align-items:center;gap:12px;padding:0 16px;background:#fff;border:1px solid #bfd8e3;border-radius:12px;min-height:52px;margin:18px 0}
+.resourceSearch input {flex:1;min-width:0;width:100%;border:0;background:transparent;min-height:50px;font:inherit;color:#143957;outline-offset:2px}
+@media(max-width:600px){.resourceActions {justify-content:stretch}.resourceActions>a {flex:1}.resourceSearch {margin:12px 0}}
+
+.resourceActions :global(.button) { border-radius: 999px; }

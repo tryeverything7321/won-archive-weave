@@ -153,7 +153,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
     : []
   const submissionOwners = new Map(submissions.map((doc) => [doc.id, safeOwner(doc)]))
   const items: DiscoveryItem[] = [...eventItems.values()]
-  const readableBundles = []
+  const readableBundles: NonNullable<ReturnType<typeof projectArchiveBundle>>[] = []
   for (const doc of bundleDocs) {
     const linkedEventIds = [...(relations.get(`bundle:${doc.id}`) ?? [])].filter((id) => eventItems.has(id)).sort()
     const bundle = projectArchiveBundle(doc, viewer, linkedEventIds)
@@ -167,7 +167,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
       organizerIds: [], linkedEventIds, canLink: viewer.administrator || (viewer.uid !== null && doc.get('ownerUid') === viewer.uid),
     })
   }
-  const readableMaterials = []
+  const readableMaterials: NonNullable<ReturnType<typeof projectArchiveMaterial>>[] = []
   for (const doc of materialDocs) {
     const material = projectArchiveMaterial(doc, viewer)
     if (!material) continue
@@ -191,7 +191,11 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
       canLink: viewer.administrator || (viewer.uid !== null && submissionOwners.get(activity.id) === viewer.uid),
     })
   }
-  const filtered = items.filter((item) => archiveDiscoveryItemMatches(item, filters, eventItems, items)).sort((left, right) => {
+  const resourcesOnly = data.scope === 'resources'
+  const keyword = typeof data.keyword === 'string' ? data.keyword.trim().slice(0, 160).toLocaleLowerCase('ko-KR') : ''
+  const filtered = items.filter((item) => (!resourcesOnly || item.targetType === 'material' || item.targetType === 'bundle')
+    && (!keyword || item.title.toLocaleLowerCase('ko-KR').includes(keyword))
+    && archiveDiscoveryItemMatches(item, filters, eventItems, items)).sort((left, right) => {
     return right.sortMs - left.sortMs || right.targetType.localeCompare(left.targetType) || right.id.localeCompare(left.id)
   })
   const after = filtered.filter((item) => isAfterArchiveCursor({ sortMs: item.sortMs, kind: item.targetType, id: item.id }, cursor))
@@ -225,6 +229,7 @@ export const searchArchiveDiscovery = onCall({ region: 'asia-northeast3' }, asyn
       region: item.region,
       format: item.format,
       canLink: item.canLink,
+      fileCount: item.targetType === 'bundle' ? readableBundles.find(bundle => bundle.bundleId === item.id)?.files.length ?? 0 : item.targetType === 'material' && readableMaterials.find(material => material.id === item.id)?.hasOriginalFile ? 1 : 0,
     })),
     facets: {
       organizers,

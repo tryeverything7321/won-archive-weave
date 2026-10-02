@@ -50,3 +50,9 @@
   .fileActions button { flex: 1; }
   .managerFile { grid-template-columns: 1fr; }
 }
+
+.actions {align-items:center;gap:12px;flex-wrap:wrap}
+.actions :is(a,button) {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;box-sizing:border-box}
+.fileCard {align-items:center}
+.fileCard .actions {justify-content:flex-end}
+@media(max-width:650px){.fileCard .actions {justify-content:flex-start;width:100%}.fileCard .actions :is(a,button) {flex:1}}

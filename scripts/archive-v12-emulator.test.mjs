@@ -28,6 +28,13 @@ test('year-only event, six files, two records, shared collections and private re
   assert.equal(overview.counts.bundleCount,1);assert.equal(overview.counts.fileCount,6);assert.equal(overview.counts.activityCount,2)
   const result=await invoke(searchArchiveDiscovery,{heldYear:2025,uploadYear:2026,region:tag},null)
   assert.ok(result.items.some(item=>item.targetType==='bundle'&&item.id===bundleId),'KST upload year and event year remain separate')
+  const materialId=tag+'-meeting';await set('materials/'+materialId,{title:'합성 회의록 '+tag,status:'published',visibility:'public',sourceMode:'text',body:'합성 회의 내용',kind:'자료',rights:{redistribution:'view_only'},createdAt:Timestamp.now()});
+  const unified=await invoke(searchArchiveDiscovery,{scope:'resources'},null);
+  assert.ok(unified.items.some(item=>item.id===materialId&&item.targetType==='material'));
+  assert.ok(unified.items.some(item=>item.id===bundleId&&item.targetType==='bundle'&&item.fileCount===6));
+  assert.ok(unified.items.every(item=>['material','bundle'].includes(item.targetType)));
+  const searched=await invoke(searchArchiveDiscovery,{scope:'resources',keyword:tag},null);
+  assert.ok(searched.items.some(item=>item.id===materialId));assert.ok(searched.items.every(item=>item.title.includes(tag)));
   const collections=[]
   for(let i=0;i<2;i++){const c=await invoke(createArchiveCollection,{requestId:command(),title:'합성 모음 '+i,description:'',visibility:'public'});created.push('archiveCollections/'+c.collectionId);collections.push(c.collectionId);await invoke(replaceArchiveCollectionItems,{requestId:command(),collectionId:c.collectionId,items:refs})}
   await assert.rejects(invoke(replaceArchiveCollectionItems,{requestId:command(),collectionId:collections[0],items:[]},otherAuth),e=>e.code==='permission-denied')

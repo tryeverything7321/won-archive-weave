@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Filter, RotateCcw, X } from "lucide-react";
+import { Filter, RotateCcw, Search, X } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useFirebaseAudience } from "../auth/useFirebaseAudience";
 import { searchArchiveDiscovery } from "./event-archive-api";
@@ -8,7 +8,7 @@ import styles from "./EventArchive.module.css";
 
 const keys = ["organizer", "heldYear", "uploadYear", "region", "archiveFormat"] as const;
 
-export function ArchiveDiscoveryPanel() {
+export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boolean}) {
   const location = useLocation();
   const { audience, ready } = useFirebaseAudience();
   const [search, setSearch] = useSearchParams();
@@ -17,13 +17,14 @@ export function ArchiveDiscoveryPanel() {
   const requestRef = useRef(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [pageError, setPageError] = useState("");
+  const keyword = search.get("q") ?? "";
+  const [debouncedKeyword,setDebouncedKeyword] = useState(keyword);
+  useEffect(()=>{const timer=setTimeout(()=>setDebouncedKeyword(keyword),250);return()=>clearTimeout(timer)},[keyword]);
+  const organizerId=search.get("organizer")||undefined, heldYear=Number(search.get("heldYear"))||undefined, uploadYear=Number(search.get("uploadYear"))||undefined, region=search.get("region")||undefined, format=search.get("archiveFormat")||search.get("type")||undefined;
   const filters = useMemo(() => ({
-    organizerId: search.get("organizer") || undefined,
-    heldYear: Number(search.get("heldYear")) || undefined,
-    uploadYear: Number(search.get("uploadYear")) || undefined,
-    region: search.get("region") || undefined,
-    format: search.get("archiveFormat") || undefined,
-  }), [search]);
+    ...(resourcesOnly ? {scope: "resources" as const, keyword: debouncedKeyword} : {}),
+    organizerId,heldYear,uploadYear,region,format,
+  }), [debouncedKeyword,resourcesOnly,organizerId,heldYear,uploadYear,region,format]);
   const active = keys.some((key) => search.has(key));
   const [conditionsOpen, setConditionsOpen] = useState(active);
 
@@ -57,7 +58,7 @@ export function ArchiveDiscoveryPanel() {
     finally { if (request === requestRef.current) setLoadingMore(false); }
   };
 
-  const setFilter = (key: typeof keys[number], value: string) => setSearch((current) => {
+  const setFilter = (key: typeof keys[number] | "q", value: string) => setSearch((current) => {
     const next = new URLSearchParams(current);
     if (value) next.set(key, value); else next.delete(key);
     return next;
@@ -66,7 +67,8 @@ export function ArchiveDiscoveryPanel() {
   const facets = result?.facets;
 
   return <section className={styles.section} aria-labelledby="archive-discovery-title">
-    <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">행사·자료 묶음·기록 찾기</h2><p>주최나 행사가 열린 해로 찾아보세요.</p></div><Filter size={26} aria-hidden="true" /></div>
+    <div className={styles.heading}><div className={styles.headingCopy}><h2 id="archive-discovery-title">{resourcesOnly ? "자료 찾기" : "행사·자료·기록 찾기"}</h2><p>{resourcesOnly ? "제목·자료 형식·행사 정보로 찾아보세요." : "주최나 행사가 열린 해로 찾아보세요."}</p></div><Filter size={26} aria-hidden="true" /></div>
+    {resourcesOnly && <label className={styles.resourceSearch}><Search size={20} aria-hidden="true"/><span className="sr-only">자료 검색</span><input type="search" value={keyword} placeholder="자료 제목 검색" onChange={event=>setFilter("q",event.target.value)}/></label>}
     <details className={styles.conditions} open={conditionsOpen} onToggle={event => setConditionsOpen(event.currentTarget.open)}>
       <summary>상세 조건{active ? ` · ${keys.filter(key => search.has(key)).length}개 적용` : ""}</summary>
     <div className={styles.formGrid}>
@@ -81,13 +83,13 @@ export function ArchiveDiscoveryPanel() {
     {state === "loading" && <p className={styles.status} role="status">행사와 연결된 자료를 찾고 있어요.</p>}
     {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert"><RotateCcw size={16} /> 행사 기준 검색을 완료하지 못했어요.</p>}
     {state === "ready" && result && <>
-      <ul className={styles.counts} aria-label="현재 조건의 고유 결과"><li>행사 {result.counts.eventCount}</li><li>자료 묶음 {result.counts.bundleCount}</li><li>개별 자료 {result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 {result.counts.fileCount}</li></ul>
+      <ul className={styles.counts} aria-label="현재 조건의 고유 결과">{resourcesOnly ? <><li>자료 {result.counts.bundleCount + result.counts.materialCount}</li><li>첨부 파일 {result.counts.fileCount}</li></> : <><li>행사 {result.counts.eventCount}</li><li>자료 묶음 {result.counts.bundleCount}</li><li>개별 자료 {result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 {result.counts.fileCount}</li></>}</ul>
       {result.items.length ? <div className={styles.grid}>{result.items.map((item) => {
         const isEvent = item.targetType === "event";
         const path = isEvent ? `/archive-events/${encodeURIComponent(item.id)}` : archiveRelationPath(item as ArchiveRelationSummary);
         const detail = isEvent ? `${item.heldYear}년 · ${item.region || "지역 미입력"}` : item.format;
-        return <article className={styles.item} key={`${item.targetType}:${item.id}`}><small>{archiveTargetLabel(item.targetType)}</small><Link to={path} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link>{detail && <p>{detail}</p>}</article>;
-      })}</div> : <p className={styles.status}>현재 조건에서 볼 수 있는 행사·자료·기록이 없어요.</p>}
+        return <article className={styles.item} key={`${item.targetType}:${item.id}`}><small>{resourcesOnly ? (item.fileCount ? `${item.fileCount}개 파일` : "글·회의록") : archiveTargetLabel(item.targetType)}</small><Link to={path} state={{ returnTo: location.pathname + location.search }}>{item.title}</Link>{detail && <p>{detail}</p>}</article>;
+      })}</div> : <p className={styles.status}>현재 조건에서 볼 수 있는 자료가 없어요.</p>}
       {result.nextCursor && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "검색 결과 더 보기"}</button>}
       {pageError && <p role="alert">{pageError}</p>}
       <p className={styles.muted}>현재 권한에서 조회한 결과 · {new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short", timeZone: result.timeZone }).format(new Date(result.asOfMs))} 기준</p>

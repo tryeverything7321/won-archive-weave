@@ -1,5 +1,5 @@
 import { ArrowLeft, Download, Eye, LoaderCircle, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { PageFrame } from "../../components/PageFrame";
 import { callableWriteErrorMessage } from "../../lib/firebase/callable-write-error";
@@ -20,6 +20,7 @@ export function BundleDetailPage() {
   const candidate = location.state?.returnTo;
   const returnTo = typeof candidate === "string" && /^\/(?![/\\])/.test(candidate) ? candidate : "/resources";
   const [attempt, setAttempt] = useState(0);
+  const pollingStarted = useRef(0);
   const [bundle, setBundle] = useState<MaterialBundle | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("");
@@ -29,9 +30,16 @@ export function BundleDetailPage() {
     let active = true;
     void getMaterialBundle(bundleId)
       .then((value) => { if (active) { setBundle(value); setLoadState("ready"); } })
-      .catch((error) => { if (active) { setMessage(callableWriteErrorMessage(error, "자료·기록")); setLoadState("error"); } });
+      .catch((error) => { if (active) { setMessage(callableWriteErrorMessage(error, "자료·기록")); setLoadState(current => current === "ready" ? "ready" : "error"); } });
     return () => { active = false; };
   }, [attempt, bundleId]);
+
+  useEffect(()=>{
+    if (!pollingStarted.current) pollingStarted.current=Date.now();
+    if (Date.now() - pollingStarted.current > 120_000 || !bundle?.files.some(file=>file.status === "upload_pending" || file.status === "scanning")) return;
+    const timer=setTimeout(()=>{if(document.visibilityState === "visible")setAttempt(value=>value+1)},5000);
+    return()=>clearTimeout(timer);
+  },[attempt,bundle]);
 
   const openFile = async (fileId: string, action: "preview" | "download") => {
     setOpeningFileId(fileId);
@@ -58,7 +66,8 @@ export function BundleDetailPage() {
         <div><dt>이용</dt><dd>{bundle.rights === "download_allowed" ? "원본 내려받기 가능" : bundle.rights === "source_link_only" ? "출처 링크에서만 이용" : "위브에서 보기"}</dd></div>
       </dl>
       <section aria-labelledby="bundle-files-title">
-        <div className={styles.sectionHeading}><h2 id="bundle-files-title">묶음 파일</h2><span>안전 확인을 통과한 파일만 열 수 있어요</span></div>
+        <div className={styles.sectionHeading}><h2 id="bundle-files-title">묶음 파일</h2><span>바이러스·파일 형식 검사를 통과하면 열 수 있어요</span></div>
+        {bundle.files.some(file=>file.status === "upload_pending" || file.status === "scanning" || file.status === "error") && <div className={styles.actions}><p role="status">검사 중인 파일은 상태를 자동으로 갱신해요. 검사 연결 오류는 파일이 위험하다는 뜻이 아니에요.</p><button type="button" className="button button-secondary" onClick={()=>{pollingStarted.current=Date.now();setAttempt(value=>value+1)}}><RotateCcw size={17} aria-hidden="true"/>상태 다시 확인</button><Link className="button button-secondary" to="/profile">내 자료 수정·재시도</Link></div>}
         <div className={styles.fileGrid}>
           {bundle.files.map((file, index) => {
             const state = bundleFileStatusCopy(file.status);

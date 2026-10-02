@@ -149,9 +149,10 @@ export function createBundleRightsRecord(input: {
 
 export function bundleFileStatusCopy(status: BundleFileStatus) {
   if (status === "ready") return { label: "열람 가능", tone: "success" as const, actionable: true };
-  if (status === "scanning" || status === "upload_pending") return { label: "안전 확인 중", tone: "working" as const, actionable: false };
+  if (status === "upload_pending") return { label: "검사 접수 대기", tone: "working" as const, actionable: false };
+  if (status === "scanning") return { label: "파일 검사 중", tone: "working" as const, actionable: false };
   if (status === "blocked") return { label: "안전 검사 차단", tone: "error" as const, actionable: false };
-  if (status === "error") return { label: "처리 실패", tone: "error" as const, actionable: false };
+  if (status === "error") return { label: "검사 연결 오류", tone: "error" as const, actionable: false };
   return { label: "공개 중단", tone: "neutral" as const, actionable: false };
 }
 

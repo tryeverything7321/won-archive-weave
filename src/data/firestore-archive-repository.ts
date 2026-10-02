@@ -82,6 +82,7 @@ function publishedActivity(value: Record<string, unknown>, audience: ArchiveAudi
     ? {
         ...parsed,
         origin: 'published',
+        ...(typeof value.materialRedirectId === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(value.materialRedirectId) ? {materialRedirectId: value.materialRedirectId}:{}),
         ...(typeof value.id === 'string' ? { id: value.id } : {}),
         linkedMaterialIds: linkedMaterialIds(value),
         ...(readTextContent(value.textContent) ? { textContent: readTextContent(value.textContent) } : {}),
@@ -267,7 +268,7 @@ export const publishedArchiveRepository: PublishedArchiveRepository = {
     return {
       items: pageDocs
         .map((item) => publishedActivity({ ...item.data(), id: item.id }, audience))
-        .filter((item): item is ArchiveActivity => item !== null),
+        .filter((item): item is ArchiveActivity => item !== null && !item.materialRedirectId),
       nextCursor,
       hasMore: snapshot.docs.length > pageSize && nextCursor !== null,
     }

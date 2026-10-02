@@ -8,7 +8,7 @@ import {
 import { motion } from "motion/react";
 import { MarkdownBody } from '../features/content/MarkdownBody';
 import { readTextContent } from '../features/content/text-content';
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import {
   ActivityCard,
   EmptyState,
@@ -328,12 +328,10 @@ export function ActivityPage() {
       setHasMoreMaterials(false);
     }
     try {
-      const page = await publishedArchiveRepository.listPublicActivityMaterialsPage(slug, {
-        cursor,
-        pageSize: 24,
-        audience,
-      });
-      const parent = await publishedArchiveRepository.getPublicActivity(slug, { audience });
+      const [page, parent] = await Promise.all([
+        publishedArchiveRepository.listPublicActivityMaterialsPage(slug, {cursor, pageSize: 24, audience}),
+        publishedArchiveRepository.getPublicActivity(slug, { audience }),
+      ]);
       const reused = parent ? await publishedArchiveRepository.listLinkedMaterials(parent, { audience }) : [];
       const readableItems = parent ? [...new Map([...page.items, ...reused].map((item) => [item.id, item])).values()] : [];
       if (currentRequest !== materialRequestId.current) return;
@@ -408,6 +406,7 @@ export function ActivityPage() {
       </PageFrame>
     );
   }
+  if (visiblePublishedActivity?.materialRedirectId) return <Navigate replace to={`/materials/${encodeURIComponent(visiblePublishedActivity.materialRedirectId)}`} state={{returnTo}} />;
   if (!activity) return <NotFoundPage />;
   const isFixtureActivity = !visiblePublishedActivity && Boolean(fixtureActivity);
   const instagramAttachments = visiblePublishedActivity?.instagramAttachments ?? [];
@@ -427,7 +426,7 @@ export function ActivityPage() {
         </div>
       </div>
       {visiblePublishedActivity && <>
-        <OwnedSubmissionActions id={visiblePublishedActivity.slug} returnTo={returnTo} kind="activity" />
+        <OwnedSubmissionActions id={visiblePublishedActivity.id ?? visiblePublishedActivity.slug} returnTo={returnTo} kind="activity" />
         <Link className="button button-secondary" to={`/archive-relations/new?targetType=activity&targetId=${encodeURIComponent(visiblePublishedActivity.id ?? visiblePublishedActivity.slug)}&returnTo=${encodeURIComponent(`${location.pathname}${location.search}`)}`}>이 기록을 행사에 연결</Link>
       </>}
       <div className="detail-layout">

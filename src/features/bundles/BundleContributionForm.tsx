@@ -238,7 +238,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
       const [success] = await uploadRows(bundleId, [row]);
       await finalizeMaterialBundle(bundleId, crypto.randomUUID());
       setStatus(success
-        ? { tone: "success", message: `${row.displayName} 파일을 다시 올렸어요. 안전 확인을 기다려 주세요.` }
+        ? { tone: "success", message: `${row.displayName} 파일을 다시 올렸어요. 검사 결과는 자료 화면에서 확인할 수 있어요.` }
         : { tone: "error", message: `${row.displayName} 파일을 다시 올리지 못했어요.` });
     } catch (error) {
       patchFile(row.clientFileId, { status: "failed", error: callableWriteErrorMessage(error, "자료·기록") });
@@ -317,7 +317,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
                     <span title={item.file.name}>{item.file.name} · {formatBytes(item.file.size)}</span>
                     {item.status === "hashing" && <small>파일 확인 중</small>}
                     {item.status === "uploading" && <small>업로드 {item.progress}%</small>}
-                    {item.status === "uploaded" && <small className={styles.success}>업로드 완료 · 안전 확인 대기</small>}
+                    {item.status === "uploaded" && <small className={styles.success}>파일 전송 완료</small>}
                     {item.status === "failed" && <small className={styles.error}>{item.error || "이 파일을 올리지 못했어요."}</small>}
                   </div>
                   <div className={styles.fileActions}>

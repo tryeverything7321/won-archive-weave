@@ -11,7 +11,7 @@ const bearerToken = process.env.SCANNER_BEARER_TOKEN ?? ''
 const scanTimeoutMs = 60_000
 
 async function clamVersion() {
-  const { stdout } = await execFileAsync('clamscan', ['--version'], { timeout: 10_000 })
+  const { stdout } = await execFileAsync('clamdscan', ['--version'], { timeout: 10_000 })
   const version = stdout.trim()
   if (!version) throw new Error('scanner_version_missing')
   return version.slice(0, 160)
@@ -32,7 +32,7 @@ async function requestBytes(request) {
 }
 
 function runClamScan(path) {
-  const child = spawn('clamscan', ['--no-summary', '--stdout', path], {
+  const child = spawn('clamdscan', ['--config-file=/app/clamd.conf', '--no-summary', '--stream', path], {
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   return collectScannerChild(child, scanTimeoutMs)

@@ -15,6 +15,7 @@ export function callableWriteErrorMessage(error: unknown, target: WriteTarget): 
   if (code === "storage/unauthenticated") return "로그인이 만료되었어요. 다시 로그인한 뒤 파일을 올려 주세요.";
   if (code === "storage/retry-limit-exceeded" || code === "storage/invalid-checksum" || code === "storage/canceled") return "파일 전송을 완료하지 못했어요. 연결 상태를 확인하고 이 파일만 다시 올려 주세요.";
   if (code === "resource-exhausted") {
+    if (/[가-힣]/u.test(message) && message.length <= 160) return message;
     const seconds = error && typeof error === "object" && "details" in error
       ? Number((error.details as { retryAfterSeconds?: unknown } | null)?.retryAfterSeconds) : NaN;
     return Number.isFinite(seconds) && seconds > 0 && seconds <= 86400

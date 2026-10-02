@@ -17,7 +17,7 @@ export function useOperatorAccess(): OperatorAccess {
       const request = ++generation;
       if (!user) { setAccess({ state: 'signed-out', memberRead: false }); return; }
       setAccess({ state: 'checking', memberRead: false });
-      void getIdTokenResult(user, true).then(({ claims }) => {
+      void getIdTokenResult(user).then(({ claims }) => {
         if (request !== generation) return;
         const operator = claims.role === 'administrator' || claims.role === 'moderator';
         setAccess({ state: operator ? 'allowed' : 'denied', memberRead: claims.role === 'administrator' && claims.memberRead === true });

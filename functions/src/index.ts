@@ -104,3 +104,5 @@ export { upsertArchiveOrganizer, listArchiveOrganizers } from './archive/organiz
 export { createArchiveCollection, updateArchiveCollection, replaceArchiveCollectionItems, getArchiveCollection, listArchiveCollections } from './archive/collections.js';
 
 export { searchArchiveDiscovery } from './archive/discovery.js';
+
+export {classifySubmissionAsMaterial} from './uploads/submission-classification.js'
