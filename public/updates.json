@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T21:43:13.789Z",
+  "generatedAt": "2026-10-02T21:44:16.800Z",
   "entries": [
     {
       "id": "4ec9f0e29f986fd31cb0fcd13ec3362f9e00bb1c-0",
@@ -13,7 +13,7 @@
         "수정 내용 저장 버튼을 눈에 잘 보이게 배치하고 자료 상세의 넓은 여백과 버튼 정렬을 다듬었어요",
         "게시판에서도 바꾼 파일 표시 이름을 볼 수 있어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "02b3501bf6546013f1e17e78a20bc7f3ab6c2f96-0",
