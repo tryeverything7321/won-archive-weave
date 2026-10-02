@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T03:16:08.902Z",
+  "generatedAt": "2026-10-02T03:17:22.529Z",
   "entries": [
     {
       "id": "ce3a70589cf36f149f1dfc46c7003d82b0180aa0-0",
@@ -13,7 +13,7 @@
         "수정 버튼을 누르면 기존 내용과 표시 방식을 불러온 작성 화면으로 이동해요",
         "입력한 모양 유지·제목과 목록 정리, 예시와 미리보기, 텍스트 파일 가져오기를 함께 사용할 수 있어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "ae1b470c20e52bd0675078b8d439f600149f5729-0",
