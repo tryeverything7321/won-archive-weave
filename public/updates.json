@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T01:10:03.457Z",
+  "generatedAt": "2026-10-02T01:15:10.970Z",
   "entries": [
+    {
+      "id": "f796f57769ce8052ebb0b4f085eca746aec48004-0",
+      "commit": "f796f57769ce8052ebb0b4f085eca746aec48004",
+      "committedAt": "2026-10-02T10:15:00+09:00",
+      "area": "가입·로그인",
+      "title": "네이버 로그인 버튼과 승인 안내를 함께 볼 수 있어요",
+      "details": [
+        "네이버 로그인 버튼을 다시 선택할 수 있어요",
+        "서비스 승인 안내를 로그인 문구 아래 작은 배지로 표시해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "d3ea061f4d7eee0567b13f9a57a400ffedcb57ec-0",
       "commit": "d3ea061f4d7eee0567b13f9a57a400ffedcb57ec",
