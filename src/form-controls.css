@@ -87,3 +87,29 @@
 .site-shell .member-profile-submit {margin-top:8px;padding-top:16px;}
 
 @media(max-width:700px){.site-shell:has(main :is(input,select,textarea):focus) .weave-feedback-widget{visibility:hidden;pointer-events:none;}}
+
+/* Calendar entry is a compact task bar, not a promotional menu. */
+.site-shell .calendar-planner-cta {grid-template-columns:minmax(0,1fr) auto;gap:24px;margin:24px 0;padding:24px;background:#fff!important;}
+.site-shell .calendar-planner-message {display:block!important;}
+.site-shell .calendar-planner-message h2 {font-size:22px;margin:0 0 6px;}
+.site-shell .calendar-planner-message p {font-size:15px;margin:0;font-weight:400;}
+.site-shell .calendar-planner-actions {max-width:none;align-items:center;gap:12px;}
+.site-shell .calendar-planner-actions > .calendar-manage-link {border:0;background:transparent;min-height:44px;padding:8px;font-size:14px;text-decoration:underline;text-underline-offset:4px;}
+/* Keep labels and controls in the same rows; helper text follows its control. */
+#root .site-shell .event-editor {max-width:920px;margin-inline:auto;}
+#root .site-shell .event-editor-form {gap:28px;}
+#root .site-shell .event-editor [class*="eventCore"] {overflow:visible;border:0;border-radius:0;background:transparent;display:grid;gap:28px;}
+#root .site-shell .event-editor-step {border:0;border-radius:0;border-top:1px solid #d3e0e5;background:transparent;padding:24px 0 0;gap:20px 24px;}
+#root .site-shell .event-editor-step legend {padding:0 12px 0 0;font-size:20px;line-height:1.5;}
+#root .site-shell .event-editor-step label:not(.event-check):not(.event-file-picker) {display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px;line-height:24px;}
+#root .site-shell .event-editor-step label > small {font-size:14px;line-height:1.5;font-weight:400;}
+#root .site-shell .event-editor-step :is(input,select) {align-self:auto;}
+#root .site-shell .event-editor-step .event-review-note {margin:0;}
+#root .site-shell .event-editor-heading {background:transparent;padding:0 0 24px;}
+@media(max-width:800px){.site-shell .calendar-planner-cta{grid-template-columns:1fr;padding:20px;gap:16px;}.site-shell .calendar-planner-actions{max-width:none;}.site-shell .calendar-planner-actions > .calendar-manage-link{flex:0 0 auto;}}
+@media(max-width:600px){#root .site-shell .event-editor-step{grid-template-columns:minmax(0,1fr);}.site-shell .calendar-planner-message h2{font-size:20px;}}
+#root .site-shell .page-frame:has(> .page-content-stage > .event-editor) {max-width:1040px;}
+#root .site-shell .event-editor {background:transparent;}
+#root .site-shell .event-editor-step > .field-wide {grid-column:1 / -1;}
+#root .site-shell .event-editor-form > [class*="eventCore"] > .event-editor-step {border-bottom:0;}
+#root .site-shell .calendar-import-shortcut {max-width:920px;margin:32px auto 0;padding:20px 0;border-top:1px solid #d3e0e5;}

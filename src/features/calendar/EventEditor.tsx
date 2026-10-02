@@ -8,7 +8,6 @@ import { getFirebaseServices, isOAuthConfigured } from "../../lib/firebase/clien
 import { callableWriteErrorMessage } from "../../lib/firebase/callable-write-error";
 import { startOAuthLogin } from "../auth/api";
 import { ProviderLoginButton } from "../auth/ProviderLoginButton";
-import { AuthoringFlow } from "../authoring/AuthoringFlow";
 import authoringStyles from "../authoring/AuthoringFields.module.css";
 import { DraftRecoveryPanel } from "../drafts/DraftRecoveryPanel";
 import { InstagramPostAttachment } from "../social/InstagramPostAttachment";
@@ -52,11 +51,6 @@ type EventEditorProps = {
 
 type EditorStatus = { tone: "idle" | "working" | "success" | "error"; message: string };
 type PhotoError = { target: "thumbnail" | "gallery"; message: string };
-const eventFlowSteps = [
-  { id: "event-core", label: "기본 정보", description: "이름·일시·장소" },
-  { id: "event-media", label: "소개·사진", description: "필요한 정보 보강" },
-  { id: "event-visibility", label: "공개 확인", description: "대상 확인 후 등록" },
-] as const;
 
 function newEventId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return `event-${crypto.randomUUID()}`;
@@ -348,33 +342,32 @@ export function EventEditor({ hideHeading = false, eventId, draftId, returnTo = 
             }}
             onRetry={eventDraft.retry}
           />
-          <AuthoringFlow label="행사 등록 순서" steps={eventFlowSteps} />
           <div className={authoringStyles.eventCore} id="event-core">
             <fieldset className="event-editor-step">
-              <legend><span>1</span> 어떤 행사인지 알려 주세요</legend>
+              <legend>기본 정보</legend>
               <label className="field-wide"><span>행사 이름 <FieldRequirement /></span><input required value={value.title} onChange={(event) => set("title", event.target.value)} maxLength={120} /></label>
               <label><span>주최 <FieldRequirement /></span><input required value={value.organizerName} onChange={(event) => set("organizerName", event.target.value)} maxLength={80} /></label>
               <label><span>지역 <FieldRequirement /></span><input required value={value.region} onChange={(event) => set("region", event.target.value)} maxLength={40} /></label>
             </fieldset>
 
             <fieldset className="event-editor-step">
-              <legend><span>2</span> 언제 어디에서 만나는지 적어 주세요</legend>
+              <legend>일시와 장소</legend>
               <label><span>{value.allDay ? "시작일" : "시작"} <FieldRequirement /></span><input required type={value.allDay ? "date" : "datetime-local"} value={eventEditorDateInputValue(value.startAt, value.allDay)} onChange={(event) => set("startAt", value.allDay ? eventEditorSetAllDayDate(value.startAt, event.target.value) : event.target.value)} /></label>
               <label><span>{value.allDay ? "종료일 (이 날까지 포함)" : "종료"} <FieldRequirement /></span><input required type={value.allDay ? "date" : "datetime-local"} value={eventEditorDateInputValue(value.endAt, value.allDay)} onChange={(event) => set("endAt", value.allDay ? eventEditorSetAllDayDate(value.endAt, event.target.value) : event.target.value)} /></label>
               <label className="event-check field-wide"><input type="checkbox" checked={value.allDay} onChange={(event) => {
                 invalidateOperation();
                 setValue((current) => eventEditorToggleAllDay(current, event.target.checked));
               }} /> 하루 종일 이어지는 행사예요</label>
-              <label>장소 이름 <small>온라인 행사라면 비워도 돼요</small><input value={value.locationName} onChange={(event) => set("locationName", event.target.value)} maxLength={160} /></label>
+              <label>장소 이름<input value={value.locationName} onChange={(event) => set("locationName", event.target.value)} maxLength={160} /><small>온라인 행사라면 비워도 돼요</small></label>
               <label>주소<input value={value.address} onChange={(event) => set("address", event.target.value)} maxLength={240} /></label>
-              <label className="field-wide">온라인 참여 링크 <small>오프라인 행사라면 비워도 돼요</small><input type="url" value={value.onlineUrl} onChange={(event) => set("onlineUrl", event.target.value)} placeholder="https://" /></label>
+              <label className="field-wide">온라인 참여 링크<input type="url" value={value.onlineUrl} onChange={(event) => set("onlineUrl", event.target.value)} placeholder="https://" /><small>오프라인 행사라면 비워도 돼요</small></label>
               <p className="field-wide event-review-note">장소 이름과 온라인 참여 링크 중 하나는 꼭 입력해 주세요.</p>
             </fieldset>
           </div>
 
           <fieldset className="event-editor-step" id="event-media">
-            <legend><span>3</span> 행사 소개를 더해 주세요 <small>선택 사항</small></legend>
-            <label className="field-wide">한 줄 소개 <small>비워 두어도 행사 이름과 일정은 표시돼요</small><input value={value.summary} onChange={(event) => set("summary", event.target.value)} maxLength={240} /></label>
+            <legend>소개와 사진 <small>선택</small></legend>
+            <label className="field-wide">한 줄 소개<input value={value.summary} onChange={(event) => set("summary", event.target.value)} maxLength={240} /><small>비워 두어도 행사 이름과 일정은 표시돼요</small></label>
             <label className={`field-wide ${authoringStyles.eventDescription}`}>자세한 안내<textarea value={value.description} onChange={(event) => set("description", event.target.value)} maxLength={5000} rows={9} /></label>
             <p className="field-wide event-review-note" id="event-photo-policy">사진은 선택 사항 · JPG·PNG·WEBP · 한 장당 최대 10MB</p>
             <label className="event-file-picker field-wide">
@@ -451,7 +444,7 @@ export function EventEditor({ hideHeading = false, eventId, draftId, returnTo = 
           </details>
 
           <fieldset className="event-editor-step event-editor-step-visibility" id="event-visibility">
-            <legend><span>4</span> 공개 범위를 확인해 주세요</legend>
+            <legend>공개 설정</legend>
             <label className="field-wide"><span>공개 범위 <FieldRequirement /></span>
               <select
                 required

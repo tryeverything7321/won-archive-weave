@@ -19,7 +19,6 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { PageFrame } from "../components/PageFrame";
 import { WeaveBadge } from "../components/WeaveBadge";
-import { WeaveSymbol } from "../components/WeaveSymbol";
 import { showPublicFixtures } from "../config/public-fixtures";
 import { CalendarEventMedia } from "../features/calendar/CalendarEventMedia";
 import { EventShareLink } from "../features/calendar/EventShareLink";
@@ -422,16 +421,11 @@ export function CalendarPage() {
         : "전국 교당과 교구, 청년 모임의 일정을 한곳에서 살펴보세요."}
     >
       <section className="calendar-planner-cta">
-        <div className="calendar-planner-message">
-          <WeaveSymbol decorative />
-          <div>
-            <p>새로운 만남을 알리고 싶다면</p>
-            <h2>함께할 행사를 알려 주세요</h2>
-          </div>
-        </div>
+        <div className="calendar-planner-message"><h2>행사를 일정에 더하세요</h2><p>직접 등록하거나 공유 캘린더를 연결할 수 있어요</p></div>
         <div className="calendar-planner-actions">
-          <Link className="button button-primary" to="/calendar/new">행사 등록하기</Link>
-          <Link className="button button-secondary" to="/profile?tab=activity&manage=events">내 일정 수정·삭제</Link>
+          <Link className="button button-primary" to="/calendar/new">행사 등록</Link>
+          <Link className="button button-secondary" to="/calendar/connect">공유 캘린더 연결</Link>
+          <Link className="calendar-manage-link" to="/profile?tab=activity&manage=events">내 일정 관리</Link>
         </div>
       </section>
       <section className="calendar-shell" aria-labelledby="calendar-month-title" ref={calendarShellRef} tabIndex={-1}>
