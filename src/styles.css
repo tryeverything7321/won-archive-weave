@@ -13031,3 +13031,30 @@ main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
 .community-opening-intro { padding:20px; margin-bottom:24px; border-radius:16px; background:#edf8f4; color:#143957; }
 .community-opening-intro h2 { margin:0 0 10px; font-size:22px; }
 .community-opening-intro p { margin:0; line-height:1.7; }
+
+/* Naver provider publication is pending; existing sessions remain valid. */
+.provider-login-pending {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 244px);
+  gap: 8px;
+}
+.provider-login-pending .provider-login:disabled {
+  width: 100%;
+  opacity: 1;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.provider-login-pending small {
+  color: #506574;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: keep-all;
+  text-align: center;
+}
+.community-login-actions:has(.provider-login-pending) {
+  align-items: flex-start;
+}
