@@ -1,8 +1,20 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-02T23:24:19.308Z",
+  "generatedAt": "2026-10-03T00:01:18.635Z",
   "entries": [
+    {
+      "id": "03678a1102e8a25cedee456885d8fa89c24a3836-0",
+      "commit": "03678a1102e8a25cedee456885d8fa89c24a3836",
+      "committedAt": "2026-10-03T09:01:07+09:00",
+      "area": "행사·탐색",
+      "title": "이미 등록된 행사도 상세 화면에서 삭제할 수 있어요",
+      "details": [
+        "작성자와 관리자가 직접 등록하거나 가져온 일정을 위브에서 삭제할 수 있어요",
+        "외부 원본과 처리 이력은 유지하고 삭제한 연동 일정이 다시 나타나지 않게 해요"
+      ],
+      "status": "development"
+    },
     {
       "id": "629fe246b6516e47bd64d2eb6bcb7eba679f4de6-0",
       "commit": "629fe246b6516e47bd64d2eb6bcb7eba679f4de6",
