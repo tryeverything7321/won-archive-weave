@@ -109,3 +109,4 @@ export {classifySubmissionAsMaterial} from './uploads/submission-classification.
 export {withdrawArchiveResource,manageQcResources,listManagedArchiveResources} from './archive/resource-management.js'
 
 export {getManagedArchiveResource,updateManagedArchiveResource} from './archive/resource-editing.js'
+export { getCalendarEventManagement, deleteCalendarEvent } from './calendar/event-deletion.js'

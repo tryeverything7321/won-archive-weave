@@ -120,3 +120,5 @@
 .calendar-provider-labels img,.profile-section-nav button > img {object-fit:contain;flex-shrink:0;}
 .calendar-provider-labels > span {white-space:nowrap;}
 @media(max-width:600px){.site-shell .calendar-planner-actions{width:100%;}.site-shell .calendar-planner-actions > .button{flex-basis:100%;}.site-shell .calendar-planner-actions > .calendar-manage-link{margin-inline:auto;}}
+
+.calendar-delete-confirm{width:100%;max-width:680px;padding:20px;border:1px solid #d6dfe3;border-radius:12px;background:#fff;}.calendar-delete-confirm h2{font-size:20px;}.calendar-delete-confirm label{display:grid;gap:8px;}.calendar-delete-confirm > div{display:flex;gap:12px;margin-top:16px;}

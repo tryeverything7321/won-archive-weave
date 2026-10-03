@@ -49,6 +49,10 @@ const inventory: Record<string, Record<string, CallableClass>> = {
     applyCalendarImportChange: 'role-write',
     disconnectCalendarSource: 'mixed-write',
   },
+  'calendar/event-deletion.ts': {
+    getCalendarEventManagement: 'member-read',
+    deleteCalendarEvent: 'mixed-write',
+  },
   'calendar/event-management.ts': {
     createManualEvent: 'member-write',
     updateManualEvent: 'member-write',
