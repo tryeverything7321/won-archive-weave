@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-13T04:38:21.887Z",
+  "generatedAt": "2026-10-13T04:39:13.411Z",
   "entries": [
     {
       "id": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0-0",
@@ -10,7 +10,7 @@
       "area": "개발·문서",
       "title": "Merge remote-tracking branch 'origin/main'",
       "details": [],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "86cb9970c0aa8de439ff438ec3bd9d867e50e412-0",
@@ -21,7 +21,7 @@
       "details": [
         "로그인 전에도 의견 보내기 버튼이 화면 내용과 겹치지 않아요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "85175a78b98039beddc6aa20b2566eb382feaed3-0",
@@ -35,7 +35,7 @@
         "소속 없음 선택을 소속 입력칸 바로 아래에서 할 수 있어요",
         "행사 종료 시각과 검색 결과가 없을 때의 안내를 보완했어요"
       ],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "03678a1102e8a25cedee456885d8fa89c24a3836-0",
