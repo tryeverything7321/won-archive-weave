@@ -1,5 +1,5 @@
 import { MapPin } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { NotFoundPage } from "./NotFoundPage";
 
 const policyContent = {
@@ -7,7 +7,7 @@ const policyContent = {
     eyebrow: "서비스 이용약관",
     title: "위브를 함께 쓰는 약속",
     intro:
-      "이 문서는 2026년 7월 20일 기준으로 작성한 시범 운영 약관입니다. 정식 공개 전에 운영 주체를 다시 확인하고 반영할 예정입니다.",
+      "위브는 원불교 청년회가 정식 운영하는 서비스입니다. 운영 주체 안내는 2026년 10월 13일 기준입니다.",
     sections: [
       [
         "서비스의 목적",
@@ -55,7 +55,7 @@ const policyContent = {
       ],
       [
         "보관과 삭제",
-        "계정과 게시물의 구체적인 보관 기간, 탈퇴와 삭제 절차는 정식 공개 전에 확정합니다. 확정된 내용은 이 페이지에서 변경 일자와 함께 안내합니다.",
+        "계정과 게시물의 구체적인 보관 기간, 탈퇴 후 게시물·댓글·운영 기록의 처리 범위와 처리 기한은 아직 확정되지 않았습니다. 관련 문의는 아래 개인정보·운영 문의로 보내 주세요. 확정된 기준은 변경 일자와 함께 안내합니다.",
       ],
     ],
   },
@@ -101,14 +101,24 @@ export function PolicyPage() {
         <h1>{content.title}</h1>
         <span>{content.intro}</span>
       </header>
-      <div className="policy-sections">
+      {policy === "privacy" ? <table className="privacy-summary">
+        <caption>상황별 개인정보 처리 안내</caption>
+        <thead><tr><th scope="col">이용 상황</th><th scope="col">처리하는 정보와 이용·삭제 안내</th></tr></thead>
+        <tbody>{content.sections.map(([title, body]) => <tr key={title}>
+          <th scope="row">{title}</th>
+          <td>{body.split(/(?<=\.)\s+/).map((text, index) => <p key={index}>{text}</p>)}</td>
+        </tr>)}</tbody>
+      </table> : <div className="policy-sections">
         {content.sections.map(([title, body]) => (
           <section key={title}>
             <h2>{title}</h2>
             <p>{body}</p>
+            {policy === "community" && title === "운영 결정과 이의 제기" && <p>
+              로그인 후 <Link to="/community#my-cases">커뮤니티의 내 신고와 운영 알림</Link>에서 해당 처리 결과의 ‘다시 확인 요청하기’를 선택해 접수할 수 있습니다. 응답 기한은 아직 확정되지 않았습니다. 접수 화면에 접근하기 어려우면 아래 운영 문의로 알려 주세요.
+            </p>}
           </section>
         ))}
-      </div>
+      </div>}
       <aside className="policy-contact">
         <MapPin size={19} aria-hidden="true" />
         <span>

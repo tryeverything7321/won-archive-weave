@@ -1,5 +1,5 @@
 import { OPENING_HREF } from "../community/opening-community-model";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, CircleHelp, X } from 'lucide-react';
 import { WeaveLogoLockup } from '../../components/WeaveLogoLockup';
@@ -33,12 +33,20 @@ export function OpeningWelcome() {
     if (!seen && pathname === "/") node?.showModal();
     return () => { node?.close(); };
   }, [pathname]);
+  const containFocus = (event: KeyboardEvent<HTMLDialogElement>) => {
+    if (event.key !== 'Tab') return;
+    const controls = [...event.currentTarget.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),[tabindex="0"]')].filter(node => node.getClientRects().length > 0);
+    const first = controls[0], last = controls.at(-1);
+    if (!first || !last) { event.preventDefault(); return; }
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  };
   const encouragement = encouragementHref
     ? <Link to={encouragementHref} onClick={close}>응원의 한마디 남기기 <ArrowRight size={16} aria-hidden="true" /></Link>
     : <span className={styles.pending} aria-disabled="true">응원의 한마디 남기기 <small>준비 중</small></span>;
   return <>
     <div className={styles.entry}><button ref={reopen} type="button" onClick={() => { setStep(-1); dialog.current?.showModal(); }}><CircleHelp size={16} aria-hidden="true" /> 위브 사용 안내</button></div>
-    <dialog ref={dialog} className={styles.dialog} aria-labelledby="weave-opening-title" onCancel={event => { event.preventDefault(); close(); }}>
+    <dialog ref={dialog} className={styles.dialog} aria-labelledby="weave-opening-title" onKeyDown={containFocus} onCancel={event => { event.preventDefault(); close(); }}>
       <button className={styles.close} type="button" aria-label="오픈 안내 닫기" onClick={close}><X size={22} aria-hidden="true" /></button>
       <WeaveLogoLockup className={styles.logo} />
       {step === -1 ? <>

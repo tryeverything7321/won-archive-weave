@@ -13115,3 +13115,13 @@ main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
 .community-page .page-intro-rule {display:none}
 .community-page .community-section-tabs {margin-top:20px;margin-bottom:16px}
 .community-page .community-purpose-filters {flex-wrap:wrap;overflow:visible;margin-right:0;padding-right:0}
+
+
+.privacy-summary {width:100%;border-collapse:collapse;margin:32px 0;color:#294555;font-size:16px;line-height:1.65;word-break:keep-all}
+.privacy-summary caption {text-align:left;font-size:22px;font-weight:700;margin-bottom:16px}
+.privacy-summary :is(th,td) {padding:20px 24px;text-align:left;vertical-align:top;border-bottom:1px solid #d4e3e8}
+.privacy-summary thead {background:#edf5f6}
+.privacy-summary tbody th {width:22%;min-width:140px}
+.privacy-summary p {margin:0 0 10px}
+.privacy-summary p:last-child {margin-bottom:0}
+@media(max-width:640px){.privacy-summary thead {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.privacy-summary :is(tbody,tr,th,td){display:block;min-width:0;width:auto}.privacy-summary tbody th{width:auto;padding:20px 0 8px;border:0}.privacy-summary td{padding:0 0 20px}.privacy-summary{margin-top:24px}}

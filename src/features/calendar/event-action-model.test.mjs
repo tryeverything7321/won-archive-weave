@@ -92,3 +92,24 @@ test("an ended event without a source link does not direct visitors to an absent
   assert.equal(model.label, "행사 종료");
   assert.doesNotMatch(model.description, /원문/);
 });
+
+const confirmedEvent = {
+  ...base,
+  id: "draft-09a61249-fad3-4190-b6b2-73f233aa632f",
+  startAt: new Date("2026-10-31T05:00:00Z"),
+  endAt: new Date("2026-10-31T09:00:00Z"),
+  registrationStatus: "open",
+  registrationUrl: "https://example.com/old-application",
+};
+test("confirmed spectator notice replaces stale application only for the designated event", () => {
+  const result = eventActionModel(confirmedEvent, now);
+  assert.equal(result.state, "spectators");
+  assert.match(result.label, /발표 접수 종료.*일반 관람 가능/);
+  assert.equal(result.registration.url, "https://www.instagram.com/won_buddhism_youth/");
+  assert.equal(eventActionModel({...confirmedEvent, id:"other-event"}, now).state, "open");
+  assert.equal(eventActionModel({...confirmedEvent, origin:"fixture"}, now).state, "open");
+});
+test("confirmed spectator notice never overrides cancellation or event end", () => {
+  assert.equal(eventActionModel({...confirmedEvent, eventState:"canceled"}, now).state, "canceled");
+  assert.equal(eventActionModel(confirmedEvent, new Date("2026-11-01T00:00:00Z")).state, "ended");
+});

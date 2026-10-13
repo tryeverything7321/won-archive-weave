@@ -123,7 +123,7 @@ export function StartPage() {
             만들고 있습니다.
           </p>
           <Link className="text-link" to="/activities/first-time-visit">
-            환대 가이드 보기 <ArrowRight size={17} />
+            환대 가이드 예시 보기 <ArrowRight size={17} />
           </Link>
         </motion.section>
       </div>

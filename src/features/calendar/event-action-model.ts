@@ -1,7 +1,7 @@
 import type { CalendarEvent, CalendarRegistrationStatus } from "./calendar-model";
 
 export type EventActionModel = {
-  state: "canceled" | "ended" | CalendarRegistrationStatus;
+  state: "canceled" | "ended" | "spectators" | CalendarRegistrationStatus;
   label: string;
   description: string;
   canAddToCalendar: boolean;
@@ -31,6 +31,20 @@ export function eventActionModel(
         : "이미 끝난 행사예요. 다른 일정을 살펴보세요.",
       canAddToCalendar: false,
       registration: null,
+    };
+  }
+
+  // Organizer-confirmed notice, 2026-10-13. Keep cancellation/end guards above it.
+  if (event.id === "draft-09a61249-fad3-4190-b6b2-73f233aa632f" && event.origin !== "fixture") {
+    return {
+      state: "spectators",
+      label: "발표 접수 종료 · 일반 관람 가능",
+      description: "발표 참가 접수는 종료됐어요. 일반 관람은 가능하며, 관람 방법은 원불교 청년회 공식 인스타그램으로 문의해 주세요.",
+      canAddToCalendar: true,
+      registration: {
+        url: "https://www.instagram.com/won_buddhism_youth/",
+        label: "공식 인스타그램에 문의",
+      },
     };
   }
 

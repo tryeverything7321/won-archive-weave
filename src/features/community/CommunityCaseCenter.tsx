@@ -76,7 +76,7 @@ export function CommunityCaseCenter() {
     return <div className="community-notice community-case-state" role="alert"><CircleAlert size={17} /> 운영 알림을 불러오지 못했어요. <button type="button" onClick={load}>다시 시도</button></div>;
   }
   return (
-    <details className="community-topic-disclosure community-case-center">
+    <details id="my-cases" open={window.location.hash === "#my-cases" || undefined} className="community-topic-disclosure community-case-center">
       <summary><ShieldAlert size={17} /> 내 신고와 운영 알림</summary>
       <div className="community-case-list" aria-live="polite">
         {!cases?.moderationNotices?.length && !cases?.moderatedPosts.length && !cases?.reports.length && !(cases?.appeals?.length ?? 0) && !cases?.blockedAuthors.length && (
