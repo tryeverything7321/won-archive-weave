@@ -159,7 +159,7 @@
 }
 
 /* While writing, keep feedback available after the form instead of over its fields. */
-.site-shell:has(main form) .weave-feedback-widget {
+.site-shell:has(main :is(form, .provider-login)) .weave-feedback-widget {
   position: relative;
   inset: auto;
   z-index: 1;
