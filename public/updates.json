@@ -1,15 +1,17 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-13T04:39:22.738Z",
+  "generatedAt": "2026-10-13T04:41:47.478Z",
   "entries": [
     {
       "id": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0-0",
       "commit": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0",
       "committedAt": "2026-10-13T13:38:06+09:00",
       "area": "개발·문서",
-      "title": "Merge remote-tracking branch 'origin/main'",
-      "details": [],
+      "title": "입력 화면 개선의 배포 기록을 정리했어요",
+      "details": [
+        "입력 화면과 로그인 버튼 겹침 개선의 변경 내역을 함께 정리했어요"
+      ],
       "status": "deployed"
     },
     {
