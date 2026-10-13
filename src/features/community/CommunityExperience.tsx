@@ -104,7 +104,7 @@ function Gate({ configured }: { configured: boolean }) {
   const location = useLocation();
   const returnTo = `${location.pathname}${location.search}${location.hash}`;
   return (
-    <section className="page-frame section-frame">
+    <section className="page-frame page-frame-utility section-frame community-page">
       <div className="page-intro">
         <p>자유 대화 공간</p>
         <h1>
@@ -654,7 +654,7 @@ export function CommunityExperience() {
   };
 
   return (
-    <section className="page-frame section-frame">
+    <section className="page-frame page-frame-utility section-frame community-page">
       <div className="page-intro">
         <p>자유 대화 공간</p>
         <h1>
@@ -774,8 +774,7 @@ export function CommunityExperience() {
       ) : (
         <div className="community-live">
           <section className="community-board-heading" aria-labelledby="community-board-title">
-            <div>
-              <p>함께 나누는 이야기</p>
+            <div className="sr-only">
               <h2 id="community-board-title">{openingMode ? "오픈 응원" : "요즘 위브에서는"}</h2>
             </div>
             <div className="community-board-tools">
@@ -790,7 +789,7 @@ export function CommunityExperience() {
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="글 내용이나 이름으로 찾아보기"
+                  placeholder="글 내용·이름 검색"
                 />
               </label>
               <label>
@@ -905,7 +904,7 @@ export function CommunityExperience() {
                 aria-pressed={purposeFilter === item}
                 onClick={() => setPurposeFilter(item)}
               >
-                {item}
+                {item === "모든 이야기" ? "모든 글 유형" : item}
               </button>
             ))}
           </div>

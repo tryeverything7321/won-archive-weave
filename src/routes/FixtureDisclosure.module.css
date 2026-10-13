@@ -1,4 +1,5 @@
 .disclosure {
+  margin-top: 28px;
   border: 1px dashed var(--weave-border, #dce5e2);
   border-radius: 18px;
   background: #e8f4f0;

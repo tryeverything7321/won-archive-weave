@@ -48,17 +48,17 @@ export function ActivityCard({ activity }: { activity: Activity & { origin?: "fi
   return (
     <motion.article
       layout={!reduceMotion}
-      className={`${discoveryStyles.activityCard} activity-card`}
+      className={`${discoveryStyles.activityCard} activity-card${!isFixture ? " activity-card-published" : ""}`}
       whileHover={reduceMotion ? undefined : { y: -8, rotate: -0.35 }}
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
     >
-      <div className={`card-visual ${activity.tone}`}>
+      {isFixture && <div className={`card-visual ${activity.tone}`}>
         <div className="card-record-graphic" aria-hidden="true">
           <span>활동 기록</span>
           <strong>{activity.type}</strong>
           {!isFixture && activity.place && <small>{activity.place}</small>}
         </div>
-      </div>
+      </div>}
       <div className="card-content">
         {isFixture && <WeaveBadge family="provenance" tone="fixture" size="compact" className={discoveryStyles.fixtureNotice}>예시</WeaveBadge>}
         <div className="card-meta badge-row" data-badge-primary-count="1" data-badge-secondary-count="1">
@@ -66,7 +66,7 @@ export function ActivityCard({ activity }: { activity: Activity & { origin?: "fi
           {activity.type.trim() && <WeaveBadge family="classification" tone="neutral" size="compact">{activity.type.trim()}</WeaveBadge>}
         </div>
         <h3><Link className={discoveryStyles.cardTitleLink} to={`/activities/${activity.slug}`} state={{ archiveReturn: `${location.pathname}${location.search}` }}>{activity.title}</Link></h3>
-        <p>{sentence(activity.summary)}</p>
+        {activity.summary.trim().replace(/[.。\s]+$/g, "") !== activity.title.trim().replace(/[.。\s]+$/g, "") && activity.summary.trim() && <p>{sentence(activity.summary)}</p>}
         <Link to={`/activities/${activity.slug}`} state={{ archiveReturn: `${location.pathname}${location.search}` }}>
           기록 자세히 보기 <ChevronRight size={16} />
         </Link>

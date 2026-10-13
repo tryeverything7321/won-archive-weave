@@ -221,7 +221,7 @@
   }
 }
 
-.conditions { border-block:1px solid #d8e5e3; padding-block:4px; }
+.conditions { border:0; padding-block:4px; }
 .conditions summary { cursor:pointer; min-height:44px; padding:12px 4px; color:#143957; font-weight:700; }
 .conditions[open] summary { margin-bottom:12px; }
 .conditions .formGrid { padding-bottom:16px; }
@@ -238,8 +238,8 @@
 
 .resourceActions :global(.button) { border-radius: 999px; }
 
-.resourceList {display:grid;border-top:1px solid #d5e3e9}
-.resourceColumns,.resourceRow {display:grid;grid-template-columns:minmax(230px,1fr) 155px 165px 150px;gap:16px;align-items:center;padding:14px 8px}
+.resourceList {display:grid}
+.resourceColumns,.resourceRow {display:grid;grid-template-columns:minmax(230px,1fr) 155px 165px 160px;gap:16px;align-items:center;padding:14px 8px}
 .resourceColumns {color:#506674;font-size:.83rem;font-weight:750;background:#f4f8fa}
 .resourceRow {border-bottom:1px solid #dce7eb;min-height:100px}
 .resourceRow:hover {background:#f7fafb}
@@ -253,10 +253,10 @@
 .rowOrganizer,.rowDate {font-size:.85rem;color:#45616f;word-break:keep-all}
 .rowDate {font-variant-numeric:tabular-nums}
 .rowActions {display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.rowActions a,.rowActions button {display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:40px;padding:0 8px;border:1px solid #c3d9e4;border-radius:7px;background:#fff;color:#245b7b;font:inherit;font-size:.82rem;cursor:pointer}
-.resourceRow :global(.owned-content-actions) {display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;border:0}
+.rowActions a,.rowActions button {white-space:nowrap;flex:0 0 auto;width:auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:0 8px;border:1px solid #c3d9e4;border-radius:7px;background:#fff;color:#245b7b;font:inherit;font-size:.82rem;cursor:pointer}
+.resourceRow :global(.owned-content-actions) {display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;border:0}
 .resourceRow :global(.owned-content-actions)>span {display:none}
-.resourceRow :global(.owned-content-actions .button) {min-height:40px;padding:0 8px;font-size:.82rem}
+.resourceRow :global(.owned-content-actions .button) {min-height:44px;padding:0 10px;font-size:.82rem;border-radius:7px;white-space:nowrap}
 @media(max-width:1000px){.resourceColumns,.resourceRow{grid-template-columns:minmax(180px,1fr) 130px 150px}.resourceColumns>span:last-child{display:none}.resourceRow>div:last-child{grid-column:1/-1;padding-left:70px}}
 @media(max-width:600px){.resourceColumns{display:none}.resourceRow{grid-template-columns:minmax(0,1fr);gap:7px;padding:16px 0}.rowOrganizer,.rowDate{padding-left:70px}.resourceRow>div:last-child{grid-column:auto}.resourceName{align-items:flex-start}.fileThumbnail{width:54px;height:64px}}
 
@@ -277,12 +277,12 @@
 @media(max-width:600px){.resourcesPage{width:calc(100% - 32px);margin-top:24px}.resourcesHeader{align-items:flex-start}.resourcesHeader p{max-width:180px;line-height:1.5}.resourcesHeader :global(.button){min-height:44px;padding:0 12px;flex-shrink:0}.resourcesPage>.section{padding:16px}.resourcesPage .rowOrganizer,.resourcesPage .rowDate,.resourcesPage .resourceRow>div:last-child{padding-left:84px}}
 
 .resourceTitle { min-width: 0; flex: 1; }
-.resourceName .fileSummary { display: flex; align-items: flex-start; gap: 8px; line-height: 1.55; }
+.resourceName .fileSummary { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:start; gap:4px 8px; line-height:1.55; }
 .fileCount,.fileMore { flex-shrink: 0; white-space: nowrap; }
 .fileNames { display: grid; gap: 2px; min-width: 0; max-width: 38ch; }
 .fileNames > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fileMore { border-radius: 5px; padding: 0 5px; background: #edf4f6; color: #345669; font-weight: 700; }
-@media(max-width:600px) { .resourceName .fileSummary { flex-wrap: wrap; gap: 4px 8px; }.fileNames { width: calc(100% - 60px); max-width: none; order: 3; }.fileMore { margin-left: 0; } }
+.fileMore { grid-column:2; justify-self:start; border-radius: 5px; padding: 0 5px; background: #edf4f6; color: #345669; font-weight: 700; }
+@media(max-width:600px) { .resourceName .fileSummary {grid-template-columns:minmax(0,1fr);gap:4px}.fileNames {width:100%;max-width:none}.fileMore {grid-column:1} }
 
 /* A selectable document stays a label with a compact checkbox and readable title. */
 .form { gap: 24px; }
@@ -297,3 +297,8 @@
   .form .connectorResults li { flex-direction: column; align-items: stretch; }
   .form .collectionActions { flex-wrap: nowrap; justify-content: flex-end; }
 }
+
+/* Keep actions identical across legacy text and multi-file records. */
+.resourceRow .rowActions {display:flex;flex-direction:row;gap:8px;flex-wrap:wrap}
+.resourceRow .rowActions :is(a,button) {width:auto;min-width:60px;min-height:44px;padding:0 10px;margin:0;white-space:nowrap}
+.resourceRow .rowActions > [role="alert"] {flex-basis:100%}

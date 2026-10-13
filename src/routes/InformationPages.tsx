@@ -100,16 +100,14 @@ export function StartPage() {
       }
       description="신앙 여부와 관계없이 참여할 수 있어요. 생각을 나누고 함께 공부하며, 직접 움직이는 청년들의 만남을 만들어가요."
     >
-      <div className="start-grid">
+      <div className="start-guide">
         <motion.section {...reveal(reduceMotion)}>
-          <span className="start-number">01</span>
           <h2>무엇을 하는 곳인가요</h2>
           <p>
             함께 공부하고 활동하며 스스로를 진급시키는 원불교 청년 조직입니다.
           </p>
         </motion.section>
         <motion.section {...reveal(reduceMotion, 58)}>
-          <span className="start-number">02</span>
           <h2>어디서 시작하면 좋을까요</h2>
           <p>
             지금 궁금한 주제를 살펴보고 마음이 가는 활동 기록부터 읽어 보세요.
@@ -119,7 +117,6 @@ export function StartPage() {
           </Link>
         </motion.section>
         <motion.section {...reveal(reduceMotion, 72)}>
-          <span className="start-number">03</span>
           <h2>처음이어도 참여할 수 있나요</h2>
           <p>
             처음 온 사람도 편안하게 어울릴 수 있도록 만남과 환대의 방법을 함께

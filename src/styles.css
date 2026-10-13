@@ -3676,8 +3676,8 @@
   align-items: end;
   justify-content: space-between;
   gap: 24px;
-  padding-top: 18px;
-  border-top: 1px solid #c9dfe9;
+  padding-top: 16px;
+  border-top: 0;
 }
 .community-board-heading p {
   margin: 0 0 6px;
@@ -3692,15 +3692,17 @@
   letter-spacing: -0.06em;
 }
 .community-board-tools {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(220px, 1fr) 136px 146px;
+  gap: 12px;
   align-items: center;
 }
 .community-search {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: min(320px, 38vw);
+  min-width: 0;
   min-height: 46px;
   padding: 0 13px;
   border: 1px solid #bdd8e6;
@@ -3890,7 +3892,7 @@
   color: #53717f;
 }
 .community-feed article > p {
-  margin: 16px 0 22px;
+  margin: 12px 0 16px;
   color: #213d4e;
   font-size: 16px;
   line-height: 1.75;
@@ -13076,3 +13078,40 @@ main .consent-field > span { flex:1; min-width:0; line-height:1.6; }
 .site-shell .page-frame-detail > .page-intro h1 { max-width:36ch!important;margin:0;font-size:clamp(26px,3vw,38px)!important;line-height:1.35; }
 .site-shell .page-frame-detail > .page-intro > span { margin:0;max-width:none;align-self:flex-start;padding:0; }
 .site-shell .page-frame-detail > .page-content-stage { padding-top:24px; }
+
+/* Content layouts: readable density without empty decorative slots. */
+.start-guide {display:grid;max-width:800px;gap:0;margin-top:24px}
+.start-guide section {padding:24px 0;min-height:0}
+.start-guide section + section {border-top:1px solid #dce7eb}
+.start-guide h2 {margin:0 0 12px;font-size:clamp(21px,2.2vw,27px);line-height:1.4;word-break:keep-all}
+.start-guide p {margin:0;color:#52616e;font-size:16px;line-height:1.75;word-break:keep-all}
+.start-guide .text-link {display:inline-flex;margin-top:14px;min-height:40px;align-items:center}
+.archive-activity-entry:only-child {grid-column:1 / -1;max-width:800px;width:100%}
+.activity-card-published .card-content {min-height:0;padding:24px;gap:12px}
+.activity-card-published .card-content h3 {margin:0;line-height:1.4}
+.activity-card-published .card-content p {min-height:0;margin:0;line-height:1.7}
+.activity-card-published .card-content > a {margin-top:8px;min-height:40px;align-self:flex-start}
+.archive-activity-entry:has(.archive-visibility-badge) .activity-card-published .card-meta {padding-right:0;margin-top:28px}
+.community-board-tools > * {min-width:0}
+.community-board-tools .community-search {width:100%;min-width:0}
+.community-board-tools :is(select,.button) {white-space:nowrap}
+.community-feed .community-post {padding:20px;min-height:0}
+.community-feed .community-post > p {margin:12px 0 16px}
+@media(min-width:641px) and (max-width:1000px) {
+ .community-board-tools {grid-template-columns:repeat(2,minmax(0,1fr))}
+ .community-board-tools .community-search {grid-column:2;grid-row:1}
+}
+@media(max-width:640px) {
+ .start-guide {margin-top:8px}
+ .start-guide section {padding:20px 0}
+ .activity-card-published .card-content {padding:20px}
+ .community-feed .community-post {padding:16px}
+}
+
+.community-page .page-intro {display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding-top:0!important;margin-top:0;min-height:0}
+.community-page .page-intro > p {margin:0}
+.community-page .page-intro h1 {margin:0}
+.community-page .page-intro > span {margin:0;max-width:68ch}
+.community-page .page-intro-rule {display:none}
+.community-page .community-section-tabs {margin-top:20px;margin-bottom:16px}
+.community-page .community-purpose-filters {flex-wrap:wrap;overflow:visible;margin-right:0;padding-right:0}
