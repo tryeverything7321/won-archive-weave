@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-13T07:28:58.337Z",
+  "generatedAt": "2026-10-13T08:21:00.032Z",
   "entries": [
     {
       "id": "e076e8f7361667d4e7e3722669ac8bc9e010b25d-0",
@@ -10,7 +10,7 @@
       "area": "자료 등록",
       "title": "행사 시간과 참여 대상, 내 기록 탐색을 보완했어요",
       "details": [],
-      "status": "development"
+      "status": "deployed"
     },
     {
       "id": "25333db43651f56840edfb79d1f84da4befe3137-0",
