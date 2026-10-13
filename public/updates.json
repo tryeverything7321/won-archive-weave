@@ -1,8 +1,21 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-13T04:41:58.175Z",
+  "generatedAt": "2026-10-13T05:00:52.766Z",
   "entries": [
+    {
+      "id": "2ed7e3bf5c52264dc17648e4436ea3f8562883c0-0",
+      "commit": "2ed7e3bf5c52264dc17648e4436ea3f8562883c0",
+      "committedAt": "2026-10-13T14:00:42+09:00",
+      "area": "화면·사용성",
+      "title": "목록과 이야기 화면을 읽기 편하게 다듬었어요",
+      "details": [
+        "자료 수정·삭제 버튼과 첨부파일 이름의 정렬을 맞췄어요",
+        "커뮤니티의 반복 제목과 좁은 검색창, 소개 화면의 과도한 여백을 정리했어요",
+        "활동 기록의 빈 장식과 반복 설명을 없앴어요"
+      ],
+      "status": "development"
+    },
     {
       "id": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0-0",
       "commit": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0",
