@@ -1,8 +1,28 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-13T04:36:08.628Z",
+  "generatedAt": "2026-10-13T04:38:21.887Z",
   "entries": [
+    {
+      "id": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0-0",
+      "commit": "c3e57c2fbc54ce606b4e2b8a2ce99fec9ab24ff0",
+      "committedAt": "2026-10-13T13:38:06+09:00",
+      "area": "개발·문서",
+      "title": "Merge remote-tracking branch 'origin/main'",
+      "details": [],
+      "status": "development"
+    },
+    {
+      "id": "86cb9970c0aa8de439ff438ec3bd9d867e50e412-0",
+      "commit": "86cb9970c0aa8de439ff438ec3bd9d867e50e412",
+      "committedAt": "2026-10-13T13:37:52+09:00",
+      "area": "가입·로그인",
+      "title": "로그인 버튼이 가려지지 않도록 정리했어요",
+      "details": [
+        "로그인 전에도 의견 보내기 버튼이 화면 내용과 겹치지 않아요"
+      ],
+      "status": "development"
+    },
     {
       "id": "85175a78b98039beddc6aa20b2566eb382feaed3-0",
       "commit": "85175a78b98039beddc6aa20b2566eb382feaed3",
