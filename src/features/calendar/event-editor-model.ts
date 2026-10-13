@@ -47,6 +47,7 @@ export type EventEditorValue = {
   allDay: boolean;
   timeZone: string;
   region: string;
+  audienceScope?: string;
   organizerName: string;
   locationName: string;
   address: string;
@@ -107,6 +108,7 @@ export function managedEventEditorValue(event: ManagedEvent): EventEditorValue {
     allDay: event.allDay,
     timeZone: event.timeZone,
     region: event.region,
+    audienceScope: event.audienceScope ?? "",
     organizerName: event.organizerName,
     locationName: event.locationName,
     address: event.address,
@@ -184,6 +186,7 @@ export function emptyEventEditorValue(now = new Date()): EventEditorValue {
     allDay: false,
     timeZone: "Asia/Seoul",
     region: "",
+    audienceScope: "",
     organizerName: "",
     locationName: "",
     address: "",

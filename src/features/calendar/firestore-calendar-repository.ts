@@ -111,6 +111,7 @@ function parseEvent(id: string, value: Record<string, unknown>): CalendarEvent |
     timeZone: typeof value.timeZone === "string" ? value.timeZone : "Asia/Seoul",
     ...(typeof value.topic === "string" ? { topic: value.topic as Topic } : {}),
     region: String(value.region ?? "전국"),
+    audienceScope: String(value.audienceScope ?? ""),
     locationName: String(value.locationName ?? "장소 확인 중"),
     ...(typeof value.address === "string" ? { address: value.address } : {}),
     ...(typeof value.onlineUrl === "string" ? { onlineUrl: value.onlineUrl } : {}),

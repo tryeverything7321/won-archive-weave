@@ -77,6 +77,7 @@ function initialEditorValue(initialValue: EventEditorProps["initialValue"]): Eve
     allDay: initialValue.allDay,
     timeZone: initialValue.timeZone,
     region: initialValue.region,
+    audienceScope: initialValue.audienceScope ?? "",
     organizerName: initialValue.organizerName,
     locationName: initialValue.locationName,
     address: initialValue.address,
@@ -347,7 +348,8 @@ export function EventEditor({ hideHeading = false, eventId, draftId, returnTo = 
               <legend>기본 정보</legend>
               <label className="field-wide"><span>행사 이름 <FieldRequirement /></span><input required value={value.title} onChange={(event) => set("title", event.target.value)} maxLength={120} /></label>
               <label><span>주최 <FieldRequirement /></span><input required value={value.organizerName} onChange={(event) => set("organizerName", event.target.value)} maxLength={80} /></label>
-              <label><span>지역 <FieldRequirement /></span><input required value={value.region} onChange={(event) => set("region", event.target.value)} maxLength={40} /></label>
+              <label><span>개최 지역 <FieldRequirement /></span><input placeholder="예: 서울 · 온라인" required value={value.region} onChange={(event) => set("region", event.target.value)} maxLength={40} /></label>
+              <label><span>참여 대상 <FieldRequirement optional /></span><input value={value.audienceScope ?? ""} onChange={(event) => set("audienceScope", event.target.value)} maxLength={120} placeholder="예: 전국 청년 누구나" /><small>개최 지역과 관계없이 참여할 수 있는 대상을 적어 주세요</small></label>
             </fieldset>
 
             <fieldset className="event-editor-step">

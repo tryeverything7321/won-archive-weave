@@ -26,6 +26,7 @@ export function ownedEventEditorRecord(event: CalendarEvent, record: Record<stri
     allDay: typeof record.allDay === "boolean" ? record.allDay : event.allDay,
     timeZone: String(record.timeZone ?? event.timeZone),
     region: String(record.region ?? event.region),
+    audienceScope: String(record.audienceScope ?? event.audienceScope ?? ""),
     organizerName: String(record.organizerName ?? event.organizerName),
     locationName: String(record.locationName ?? event.locationName),
     address: String(record.address ?? event.address ?? ""),

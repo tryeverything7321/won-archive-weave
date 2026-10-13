@@ -9129,7 +9129,9 @@ textarea,
     margin-top: 4px;
   }
   .calendar-view-toggle {
-    display: none;
+    display: flex;
+    align-self: flex-start;
+    margin-top: 12px;
   }
   .calendar-filter-panel {
     gap: 18px;

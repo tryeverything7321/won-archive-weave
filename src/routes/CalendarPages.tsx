@@ -213,7 +213,7 @@ function AgendaCard({
 }) {
   const reduceMotion = useReducedMotion();
   const actions = eventActionModel(event);
-  const accessibleEventLabel = `${eventDateLabel(event)}, ${event.region}, ${event.locationName}, ${event.title}, ${actions.label}`;
+  const accessibleEventLabel = `${eventDateTimeRangeLabel(event)}, ${event.region}, ${event.locationName}, ${event.title}, ${actions.label}`;
   return (
     <motion.article
       className={`${discoveryStyles.agendaCard} calendar-agenda-card ${event.eventState === "canceled" ? "is-canceled" : ""}`}
@@ -466,7 +466,7 @@ export function CalendarPage() {
 
         <div className="calendar-filter-panel">
           <label>
-            <span>지역</span>
+            <span>등록 지역</span>
             <select value={region} onChange={(event) => updateNavigation({ region: event.target.value })}>
               {!regions.includes(region) && <option>{region}</option>}
               {regions.map((item) => <option key={item}>{item}</option>)}
@@ -483,7 +483,7 @@ export function CalendarPage() {
             <span>행사 내용</span>
             <input type="search" value={search} onChange={(event) => updateNavigation({ search: event.target.value }, true)} placeholder="행사명, 장소, 내용 검색" />
           </label>
-          <p>{monthLabel(month)}에 불러온 일정을 지역과 주최별로 골라 볼 수 있어요.</p>
+          <p>{monthLabel(month)}에 불러온 일정을 등록된 지역과 주최별로 골라 볼 수 있어요. 참여 대상은 행사 상세에서 확인해 주세요.</p>
         </div>
 
         <div className="calendar-origin-key" aria-label="일정 구분">
@@ -530,7 +530,7 @@ export function CalendarPage() {
                     <div className="calendar-day-events">
                       {events.slice(0, 3).map((event) => (
                         <Link
-                          aria-label={`${eventDateLabel(event)}, ${event.region}, ${event.locationName}, ${event.organizerName}, ${event.title}, ${eventActionModel(event).label}`}
+                          aria-label={`${eventDateTimeRangeLabel(event)}, ${event.region}, ${event.locationName}, ${event.organizerName}, ${event.title}, ${eventActionModel(event).label}`}
                           className={`calendar-day-event ${event.origin === "fixture" ? "is-fixture" : "is-live"}`}
                           data-calendar-event-id={event.id}
                           state={detailState}
@@ -873,6 +873,7 @@ export function CalendarEventPage() {
         <aside className="calendar-detail-meta">
           <div><CalendarDays size={19} /><span>일시</span><strong>{eventDateTimeRangeLabel(event)}</strong></div>
           <div><MapPin size={19} /><span>장소</span><strong>{event.locationName}</strong>{event.address && <small>{event.address}</small>}</div>
+          {event.audienceScope && <div><UsersRound size={19} /><span>참여 대상</span><strong>{event.audienceScope}</strong></div>}
           <div><UsersRound size={19} /><span>주최</span><strong>{event.organizerName}</strong></div>
           {presentation.showSource && <div><ExternalLink size={19} /><span>가져온 곳</span><strong>{sourceLabels[event.sourceType]}</strong></div>}
         </aside>

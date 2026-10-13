@@ -136,6 +136,7 @@ function decodeCalendarEventDraft(value: unknown): CalendarEventDraftValue {
     allDay: record.allDay,
     timeZone: stringField(record, "timeZone", 80),
     region: stringField(record, "region", 40),
+    ...(record.audienceScope === undefined ? {} : {audienceScope: stringField(record, "audienceScope", 120)}),
     organizerName: stringField(record, "organizerName", 80),
     locationName: stringField(record, "locationName", 160),
     address: stringField(record, "address", 240),

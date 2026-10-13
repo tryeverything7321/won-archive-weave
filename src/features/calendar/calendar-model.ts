@@ -28,6 +28,7 @@ export type CalendarEvent = {
   timeZone: string;
   topic?: Topic;
   region: string;
+  audienceScope?: string;
   locationName: string;
   address?: string;
   onlineUrl?: string;
@@ -85,12 +86,15 @@ export function seoulDateKey(date: Date) {
 }
 
 export function eventTimeLabel(event: CalendarEvent) {
-  if (event.allDay) return "하루 종일";
-  return new Intl.DateTimeFormat("ko-KR", {
-    timeZone: event.timeZone,
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(event.startAt);
+  if (event.allDay) return eventDateTimeRangeLabel(event).includes(" ~ ")
+    ? eventDateTimeRangeLabel(event) : "하루 종일";
+  const format = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: event.timeZone, hour: "numeric", minute: "2-digit",
+  });
+  if (event.endAt <= event.startAt) return format.format(event.startAt);
+  const day = new Intl.DateTimeFormat("en-CA", {timeZone:event.timeZone,year:"numeric",month:"2-digit",day:"2-digit"});
+  if (day.format(event.startAt) !== day.format(event.endAt)) return eventDateTimeRangeLabel(event);
+  return `${format.format(event.startAt)} ~ ${format.format(event.endAt)}`;
 }
 
 export function eventDateLabel(event: CalendarEvent) {

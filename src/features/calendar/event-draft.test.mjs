@@ -152,3 +152,9 @@ test("same create document reloads every field and an older submit cannot clear 
     "missing",
   );
 });
+
+test('optional audience scope roundtrips without changing older drafts',()=>{
+ const value={...complete,audienceScope:'전국 청년 누구나'};
+ assert.deepEqual(calendarEventDraftCodec.decode(calendarEventDraftCodec.encode(value)),value);
+ assert.equal(calendarEventDraftCodec.decode(calendarEventDraftCodec.encode(complete)).audienceScope,undefined);
+});

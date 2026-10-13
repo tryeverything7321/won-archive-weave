@@ -213,8 +213,8 @@ export function SubmissionManager({ onEdit }: { onEdit?: (submission: OwnedSubmi
       )}
       {state === "limited" && (
         <div className="submission-manager-state" role="status">
-          <p><b>최근 기록 최대 100건을 보여 드려요</b></p>
-          <p>이 목록에는 확인 가능한 최근 기록이 최대 100건 표시됩니다. 이전 기록은 목록에 보이지 않을 수 있습니다.</p>
+          <p><b>기록을 나누어 보여 드려요</b></p>
+          <p>현재 날짜순 정렬을 적용할 수 없습니다. 더 보기로 이어서 확인한 기록은 함께 정렬해 보여 드려요.</p>
         </div>
       )}
       {state === "success" && items.length === 0 && (
@@ -223,7 +223,7 @@ export function SubmissionManager({ onEdit }: { onEdit?: (submission: OwnedSubmi
           <a className="button button-primary" href="/contribute">첫 기록 남기기</a>
         </div>
       )}
-      {listReady && items.length > 0 && (
+      {listReady && (items.length > 0 || hasMore) && (
         <>
           <div className="submission-manager-list">
             {items.map((submission) => {

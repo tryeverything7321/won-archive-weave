@@ -130,6 +130,7 @@ export type ManualEventInput = {
   allDay?: unknown
   timeZone?: unknown
   region?: unknown
+  audienceScope?: unknown
   organizerName?: unknown
   locationName?: unknown
   address?: unknown
@@ -153,6 +154,7 @@ export type NormalizedManualEvent = {
   allDay: boolean
   timeZone: string
   region: string
+  audienceScope?: string
   organizerName: string
   locationName: string
   address?: string
@@ -373,6 +375,7 @@ export function normalizeManualEventInput(data: ManualEventInput, ownerUid: stri
     allDay,
     timeZone,
     region: requiredText(data.region, 40),
+    audienceScope: optionalText(data.audienceScope, 120) ?? '',
     organizerName,
     locationName: locationName ?? '온라인',
     ...(optionalText(data.address, 240) ? { address: optionalText(data.address, 240) } : {}),
@@ -420,6 +423,7 @@ export function eventApprovalFingerprint(event: NormalizedManualEvent, attestati
     allDay: event.allDay,
     timeZone: event.timeZone,
     region: event.region,
+    audienceScope: event.audienceScope ?? '',
     organizerName: event.organizerName,
     locationName: event.locationName,
     address: event.address ?? '',
@@ -543,6 +547,7 @@ export function publicManualEventRecord(event: NormalizedManualEvent, previous?:
     allDay: event.allDay,
     timeZone: event.timeZone,
     region: event.region,
+    audienceScope: event.audienceScope ?? '',
     locationName: event.locationName,
     ...(event.address ? { address: event.address } : {}),
     ...(event.onlineUrl ? { onlineUrl: event.onlineUrl } : {}),
@@ -901,6 +906,7 @@ function clientEventRecord(id: string, value: DocumentData) {
     allDay: value.allDay === true,
     timeZone: String(value.timeZone ?? 'Asia/Seoul'),
     region: String(value.region ?? ''),
+    audienceScope: String(value.audienceScope ?? ''),
     organizerName: String(value.organizerName ?? ''),
     locationName: String(value.locationName ?? ''),
     address: String(value.address ?? ''),

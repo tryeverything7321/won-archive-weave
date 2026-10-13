@@ -56,7 +56,6 @@ const allowedActivityTopics = ['나와 마음', '관계와 공동체', '일과 �
 const MAX_SUBMISSION_FILES = 20
 const APPROVAL_LEASE_MS = 5 * 60 * 1_000
 const SOURCE_LINK_REVIEW_MS = 90 * 24 * 60 * 60 * 1_000
-const MAX_OWNER_SUBMISSIONS = 100
 const MAX_OWNER_SUBMISSION_PAGE_SIZE = 50
 const MAX_OPERATOR_EXCEPTION_PAGE_SIZE = 25
 const SUBMISSION_SORT_MIGRATION_BATCH_SIZE = 200
@@ -1472,28 +1471,40 @@ export const createSubmission = onCall({ region: 'asia-northeast3' }, async (req
   }
 })
 
+export function decodeLegacyOwnerCursor(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !/^legacy:[A-Za-z0-9_-]{1,128}$/.test(value)) {
+    throw new HttpsError('invalid-argument', '목록 위치가 변경됐어요. 새로고침한 뒤 다시 확인해 주세요')
+  }
+  return value.slice(7)
+}
+
 export const listMySubmissions = onCall({ region: 'asia-northeast3' }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', '로그인이 필요합니다')
   const firestore = getFirestore()
   const migration = await firestore.collection('systemMigrations').doc(SUBMISSION_SORT_MIGRATION_ID).get()
   const migrationComplete = migration.get('schemaVersion') === SUBMISSION_SORT_MIGRATION_SCHEMA_VERSION
     && migration.get('phase') === 'complete'
-  if (!migrationComplete) {
-    const snapshot = await firestore
-      .collection('submissions')
+  const rawCursor = request.data?.cursor
+  // A document-id page remains in the same ordering if migration finishes mid-session.
+  if (!migrationComplete || (typeof rawCursor === 'string' && rawCursor.startsWith('legacy:'))) {
+    const cursor = decodeLegacyOwnerCursor(rawCursor)
+    const pageSize = ownerSubmissionPageSize(request.data?.limit ?? request.data?.pageSize)
+    let query = firestore.collection('submissions')
       .where('ownerUid', '==', request.auth.uid)
-      .limit(MAX_OWNER_SUBMISSIONS)
-      .get()
-    const submissions = snapshot.docs
-      .filter((document) => document.get('deletedFromListings') !== true)
-      .map((document) => submissionOwnerRecord(document.id, document.data()))
-      .sort((left, right) => (right.updatedAtMs ?? right.createdAtMs ?? 0) - (left.updatedAtMs ?? left.createdAtMs ?? 0))
+      .orderBy(FieldPath.documentId())
+      .limit(pageSize + 1)
+    if (cursor) query = query.startAfter(cursor)
+    const snapshot = await query.get()
+    const page = snapshot.docs.slice(0, pageSize)
+    const hasMore = snapshot.size > pageSize
     return {
-      submissions,
-      limit: MAX_OWNER_SUBMISSIONS,
+      submissions: page.filter(document => document.get('deletedFromListings') !== true)
+        .map(document => submissionOwnerRecord(document.id, document.data())),
+      limit: pageSize,
       migrationRequired: true,
-      hasMore: false,
-      nextCursor: null,
+      hasMore,
+      nextCursor: hasMore && page.length ? `legacy:${page.at(-1)!.id}` : null,
     }
   }
 

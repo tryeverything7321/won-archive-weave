@@ -430,3 +430,14 @@ test('stale approved event media is removed for every visibility transition', ()
     ['approved/public/calendar-events/event/c.jpg'],
   ), ['approved/public/calendar-events/event/a.jpg', 'approved/members/calendar-events/event/b.jpg'])
 })
+
+test('audience scope is optional and distinct from location, survives publication and clearing', () => {
+  const event = normalizeManualEventInput(validInput({audienceScope:'전국 청년 누구나'}), ownerUid)
+  assert.equal(event.region, '서울')
+  assert.equal(event.locationName, '원불교 서울회관')
+  assert.equal(publicManualEventRecord(event).audienceScope, '전국 청년 누구나')
+  const cleared = normalizeManualEventInput(validInput({audienceScope:''}), ownerUid)
+  assert.equal(publicManualEventRecord(cleared).audienceScope, '')
+  assert.equal(normalizeManualEventInput(validInput(), ownerUid).audienceScope, '')
+  assert.throws(()=>normalizeManualEventInput(validInput({audienceScope:'가'.repeat(121)}), ownerUid))
+})

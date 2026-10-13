@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {getFirestore} from '../../functions/node_modules/firebase-admin/lib/firestore/index.js';
+import {listMySubmissions,decodeLegacyOwnerCursor} from '../../functions/lib/uploads/submissions.js';
+assert.ok(process.env.FIRESTORE_EMULATOR_HOST,'emulator required');
+assert.ok(process.env.GCLOUD_PROJECT?.startsWith('demo-'),'demo project required');
+test('fallback pages reach 125 records without dates and exclude other owners and deleted entries',async()=>{
+ const db=getFirestore();const uid='qa-pagination-owner';
+ const batch=db.batch();
+ for(let i=0;i<126;i++)batch.set(db.doc('submissions/qa-page-'+String(i).padStart(3,'0')),{ownerUid:uid,title:'시험 '+i,kind:'자료',status:'draft',visibility:'보류',deletedFromListings:i===3});
+ batch.set(db.doc('submissions/qa-page-other'),{ownerUid:'other',title:'not mine'});await batch.commit();
+ let cursor;const ids=[];
+ do { const page=await listMySubmissions.run({data:{pageSize:50,...(cursor?{cursor}:{})},auth:{uid,token:{}}});ids.push(...page.submissions.map(x=>x.id));cursor=page.nextCursor;
+  assert.equal(page.migrationRequired,true);
+  if(ids.length===49)await db.doc("systemMigrations/submissions-sort-created-at-v1").set({schemaVersion:1,phase:"complete"});
+ } while(cursor);
+ assert.equal(ids.length,125);assert.equal(new Set(ids).size,125);assert.ok(!ids.includes('qa-page-other'));assert.ok(!ids.includes('qa-page-003'));
+ await assert.rejects(listMySubmissions.run({data:{cursor:'legacy:../bad'},auth:{uid,token:{}}}));
+ assert.throws(()=>decodeLegacyOwnerCursor('legacy:a/b'));assert.equal(decodeLegacyOwnerCursor('legacy:abc'),'abc');
+});
