@@ -1,8 +1,22 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-03T00:03:59.838Z",
+  "generatedAt": "2026-10-13T04:36:08.628Z",
   "entries": [
+    {
+      "id": "85175a78b98039beddc6aa20b2566eb382feaed3-0",
+      "commit": "85175a78b98039beddc6aa20b2566eb382feaed3",
+      "committedAt": "2026-10-13T13:35:55+09:00",
+      "area": "화면·사용성",
+      "title": "입력하고 수정하는 화면을 다듬었어요",
+      "details": [
+        "입력칸과 체크박스, 필수 표시와 도움말 간격을 정리했어요",
+        "모바일에서 잘리던 검색칸과 작성 중 겹치던 버튼을 개선했어요",
+        "소속 없음 선택을 소속 입력칸 바로 아래에서 할 수 있어요",
+        "행사 종료 시각과 검색 결과가 없을 때의 안내를 보완했어요"
+      ],
+      "status": "development"
+    },
     {
       "id": "03678a1102e8a25cedee456885d8fa89c24a3836-0",
       "commit": "03678a1102e8a25cedee456885d8fa89c24a3836",
