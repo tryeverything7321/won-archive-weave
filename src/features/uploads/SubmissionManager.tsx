@@ -213,8 +213,8 @@ export function SubmissionManager({ onEdit }: { onEdit?: (submission: OwnedSubmi
       )}
       {state === "limited" && (
         <div className="submission-manager-state" role="status">
-          <p><b>기록 목록을 안전하게 정리하고 있어요</b></p>
-          <p>지금은 확인 가능한 기록을 최대 100건까지 보여 드려요. 정리가 끝나면 이전 기록까지 이어서 볼 수 있어요.</p>
+          <p><b>최근 기록 최대 100건을 보여 드려요</b></p>
+          <p>이 목록에는 확인 가능한 최근 기록이 최대 100건 표시됩니다. 이전 기록은 목록에 보이지 않을 수 있습니다.</p>
         </div>
       )}
       {state === "success" && items.length === 0 && (

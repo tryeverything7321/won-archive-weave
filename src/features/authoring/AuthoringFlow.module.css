@@ -79,12 +79,12 @@
 }
 
 .copy b {
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 .copy small {
   color: #607784;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
 }
 
 .activeLine {
@@ -104,7 +104,7 @@
   }
 
   .flow ol {
-    grid-template-columns: repeat(3, minmax(150px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -112,4 +112,12 @@
   .item a {
     transition: none;
   }
+}
+
+@media (max-width: 680px) {
+  .flow .item a { grid-template-columns: 1fr; justify-items: center; gap: 6px; padding: 8px 4px 12px; }
+  .copy { text-align: center; }
+  .copy small { display: none; }
+  .copy b { font-size: 14px; }
+  .activeLine { left: 8px; right: 8px; }
 }

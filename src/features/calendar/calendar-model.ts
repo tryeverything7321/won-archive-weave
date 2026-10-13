@@ -113,6 +113,17 @@ export function eventDateTimeLabel(event: CalendarEvent) {
   return `${date} · ${time}`;
 }
 
+/** Detail pages include the end; all-day calendar end dates are exclusive. */
+export function eventDateTimeRangeLabel(event: CalendarEvent) {
+  if (event.endAt <= event.startAt) return eventDateTimeLabel(event);
+  const dateFormat = new Intl.DateTimeFormat("ko-KR", {timeZone: event.timeZone, year: "numeric", month: "long", day: "numeric"});
+  const end = event.allDay ? new Date(event.endAt.getTime() - 1) : event.endAt;
+  const sameDay = dateFormat.format(event.startAt) === dateFormat.format(end);
+  if (event.allDay) return sameDay ? eventDateTimeLabel(event) : `${dateFormat.format(event.startAt)} ~ ${dateFormat.format(end)} · 하루 종일`;
+  const timeFormat = new Intl.DateTimeFormat("ko-KR", {timeZone: event.timeZone, hour: "numeric", minute: "2-digit"});
+  return `${eventDateTimeLabel(event)} ~ ${sameDay ? "" : dateFormat.format(end) + " · "}${timeFormat.format(end)}`;
+}
+
 function googleUtcDate(date: Date) {
   return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }

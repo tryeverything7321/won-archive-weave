@@ -1,3 +1,4 @@
+import { FieldRequirement } from "../components/forms/FieldRequirement";
 import googleCalendarIcon from "../assets/providers/google-calendar.png";
 import timeTreeIcon from "../assets/providers/timetree.ico";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
@@ -33,7 +34,7 @@ import { startOAuthLogin } from "../features/auth/api";
 import { ProviderLoginButton } from "../features/auth/ProviderLoginButton";
 import {
   eventDateLabel,
-  eventDateTimeLabel,
+  eventDateTimeRangeLabel,
   eventTimeLabel,
   googleCalendarAddUrl,
   monthKey,
@@ -486,7 +487,7 @@ export function CalendarPage() {
         </div>
 
         <div className="calendar-origin-key" aria-label="일정 구분">
-          <span><i className="is-live" /> 불러온 실제 일정 {shownEvents.filter(event => event.origin !== "fixture").length}건</span>
+          <span><i className="is-live" /> 현재 조건의 일정 {shownEvents.filter(event => event.origin !== "fixture").length}건</span>
           {examplesEnabled && <span><i className="is-fixture" /> 예시 {shownEvents.filter(event => event.origin === "fixture").length}건</span>}
           {showPublicFixtures && <label><input type="checkbox" checked={examplesEnabled} onChange={event => navigate({ pathname: "/calendar", search: calendarSearchWithExamples(serializeCalendarSearch(navigationSearch), event.target.checked) })} /> 예시 보기</label>}
         </div>
@@ -781,11 +782,11 @@ export function CalendarConnectPage() {
             </div>
           </fieldset>
           <div className="calendar-connect-grid">
-            <label><span>캘린더 이름</span><input required maxLength={80} value={name} onChange={(event) => setName(event.target.value)} placeholder="예: 서울교구 청년 일정" /></label>
-            <label><span>운영 주체</span><input required maxLength={80} value={organizerName} onChange={(event) => setOrganizerName(event.target.value)} placeholder="예: 서울교구 청년회" /></label>
-            <label><span>지역</span><input required maxLength={40} value={region} onChange={(event) => setRegion(event.target.value)} /></label>
+            <label><span>캘린더 이름 <FieldRequirement /></span><input required maxLength={80} value={name} onChange={(event) => setName(event.target.value)} placeholder="예: 서울교구 청년 일정" /></label>
+            <label><span>운영 주체 <FieldRequirement /></span><input required maxLength={80} value={organizerName} onChange={(event) => setOrganizerName(event.target.value)} placeholder="예: 서울교구 청년회" /></label>
+            <label><span>지역 <FieldRequirement /></span><input required maxLength={40} value={region} onChange={(event) => setRegion(event.target.value)} /></label>
             <label><span>공개 범위</span><select value={visibility} onChange={(event) => setVisibility(event.target.value as "public" | "member_only")}><option value="public">누구나 보기</option><option value="member_only">위브 로그인 이용자만 보기</option></select></label>
-            <label className="is-wide"><span>{urlLabel}</span><input required type="url" inputMode="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://" /></label>
+            <label className="is-wide"><span>{urlLabel} <FieldRequirement /></span><input required type="url" inputMode="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://" /></label>
           </div>
           <p className="calendar-connect-help">비공개 캘린더는 아직 연결하지 않아요. 원본 캘린더에서 공개 범위를 먼저 확인해 주세요.</p>
           <button className="button button-primary" type="submit" disabled={state === "submitting"}>{state === "submitting" ? "연결 요청을 보내는 중" : "공개 캘린더 연결 요청"}</button>
@@ -870,7 +871,7 @@ export function CalendarEventPage() {
         {event.thumbnail && <div className="calendar-detail-poster"><CalendarEventMedia image={event.thumbnail} /></div>}
       <div className={`${discoveryStyles.detailEssentials} calendar-detail-information`}>
         <aside className="calendar-detail-meta">
-          <div><CalendarDays size={19} /><span>일시</span><strong>{eventDateTimeLabel(event)}</strong></div>
+          <div><CalendarDays size={19} /><span>일시</span><strong>{eventDateTimeRangeLabel(event)}</strong></div>
           <div><MapPin size={19} /><span>장소</span><strong>{event.locationName}</strong>{event.address && <small>{event.address}</small>}</div>
           <div><UsersRound size={19} /><span>주최</span><strong>{event.organizerName}</strong></div>
           {presentation.showSource && <div><ExternalLink size={19} /><span>가져온 곳</span><strong>{sourceLabels[event.sourceType]}</strong></div>}

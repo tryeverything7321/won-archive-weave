@@ -50,7 +50,7 @@ export function DraftRecoveryPanel({
 
   if (state.phase === "hydrating") return <p role="status">초안을 확인하고 있어요.</p>;
   if (state.phase === "saving") return <p role="status">임시저장 중</p>;
-  if (state.phase === "saved") return <p role="status">임시저장됨 · {savedFormatter.format(state.savedAtMs)}</p>;
+  if (state.phase === "saved") return <div><p role="status">임시저장됨 · {savedFormatter.format(state.savedAtMs)}</p><details><summary>초안 보관 안내</summary><p>{draftPolicyCopy.storage}</p><p>{draftPolicyCopy.files}</p></details></div>;
   if (state.phase === "error") {
     return (
       <div role="alert">

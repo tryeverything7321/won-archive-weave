@@ -34,6 +34,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
     organizerId,heldYear,uploadYear,region,format,
   }), [debouncedKeyword,resourcesOnly,organizerId,heldYear,uploadYear,region,format]);
   const active = keys.some((key) => search.has(key));
+  const hasSearch = active || Boolean(keyword.trim() || search.get("type"));
   const [conditionsOpen, setConditionsOpen] = useState(active);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
     if (value) next.set(key, value); else next.delete(key);
     return next;
   }, { replace: true, preventScrollReset: true });
-  const reset = () => setSearch((current) => { const next = new URLSearchParams(current); keys.forEach((key) => next.delete(key)); return next; }, { replace: true, preventScrollReset: true });
+  const reset = () => setSearch((current) => { const next = new URLSearchParams(current); [...keys, "q", "type"].forEach((key) => next.delete(key)); return next; }, { replace: true, preventScrollReset: true });
   const facets = result?.facets;
 
   return <section className={styles.section} aria-labelledby="archive-discovery-title">
@@ -87,9 +88,9 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
       <label className={styles.form}>자료 형식<select value={filters.format ?? ""} onChange={(event) => setFilter("archiveFormat", event.target.value)}><option value="">모든 형식</option>{facets?.formats.map((format) => <option key={format}>{format}</option>)}</select></label>
     </div>
     </details>
-    {active && <div className={`${styles.actions} ${styles.selectedConditions}`} aria-label="적용한 상세 조건">{keys.filter(key => search.has(key)).map(key => <button type="button" key={key} onClick={() => setFilter(key, "")} aria-label={`${({ organizer: "주최", heldYear: "개최 연도", uploadYear: "업로드 연도", region: "지역", archiveFormat: "형식" })[key]} 조건 해제`}>{({ organizer: "주최", heldYear: "개최 연도", uploadYear: "업로드 연도", region: "지역", archiveFormat: "형식" })[key]}: {key === "organizer" ? facets?.organizers.find(item => item.id === search.get(key))?.displayName ?? "선택한 주최" : search.get(key)} <X size={14} aria-hidden="true" /></button>)}<button type="button" className="button button-secondary" onClick={reset}><X size={16} /> 행사 기준 초기화</button></div>}
-    {state === "loading" && <p className={styles.status} role="status">행사와 연결된 자료를 찾고 있어요.</p>}
-    {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert"><RotateCcw size={16} /> 행사 기준 검색을 완료하지 못했어요.</p>}
+    {active && <div className={`${styles.actions} ${styles.selectedConditions}`} aria-label="적용한 상세 조건">{keys.filter(key => search.has(key)).map(key => <button type="button" key={key} onClick={() => setFilter(key, "")} aria-label={`${({ organizer: "주최", heldYear: "개최 연도", uploadYear: "업로드 연도", region: "지역", archiveFormat: "형식" })[key]} 조건 해제`}>{({ organizer: "주최", heldYear: "개최 연도", uploadYear: "업로드 연도", region: "지역", archiveFormat: "형식" })[key]}: {key === "organizer" ? facets?.organizers.find(item => item.id === search.get(key))?.displayName ?? "선택한 주최" : search.get(key)} <X size={14} aria-hidden="true" /></button>)}<button type="button" className="button button-secondary" onClick={reset}><X size={16} /> 검색 조건 지우기</button></div>}
+    {state === "loading" && <p className={styles.status} role="status">자료를 찾고 있어요.</p>}
+    {state === "error" && <p className={`${styles.status} ${styles.error}`} role="alert"><RotateCcw size={16} /> 자료를 불러오지 못했어요. 다시 시도해 주세요.</p>}
     {state === "ready" && result && <>
       <ul className={styles.counts} aria-label="현재 조건의 고유 결과">{resourcesOnly ? <><li>자료 {result.totalCount ?? result.counts.bundleCount + result.counts.materialCount}</li><li>첨부 파일 {result.counts.fileCount}</li></> : <><li>행사 {result.counts.eventCount}</li><li>자료 {result.counts.bundleCount + result.counts.materialCount}</li><li>활동 기록 {result.counts.activityCount}</li><li>첨부 파일 {result.counts.fileCount}</li></>}</ul>
       {resourcesOnly ? <div className={styles.resourceList}>
@@ -108,7 +109,7 @@ export function ArchiveDiscoveryPanel({resourcesOnly=false}: {resourcesOnly?:boo
             <div>{item.targetType==="material"&&item.canEdit?<OwnedSubmissionActions id={item.id} returnTo="/resources" onDeleted={refresh}/>:item.targetType==="bundle"&&item.canEdit?<ResourceActions id={item.id} type="bundle" onDeleted={refresh}/>:operator.administrator&&(item.targetType==="material"||item.targetType==="bundle")?<AdminResourceActions id={item.id} type={item.targetType} title={item.title} onDeleted={refresh}/>:null}</div>
           </article>
         })}
-        {!result.items.length&&<p className={styles.status}>{audience==="public"?"공개된 자료가 없어요. 로그인하면 이용자에게 공개된 자료도 볼 수 있어요.":"현재 조건에서 볼 수 있는 자료가 없어요."}</p>}
+        {!result.items.length&&<p className={styles.status}>{hasSearch ? "검색 조건에 맞는 자료가 없어요." : audience==="public"?"공개된 자료가 없어요. 로그인하면 이용자에게 공개된 자료도 볼 수 있어요.":"아직 볼 수 있는 자료가 없어요."}{hasSearch && <button className="button button-secondary" type="button" onClick={reset}>검색 조건 지우기</button>}</p>}
       </div> : result.items.length ? <div className={styles.grid}>{result.items.map(item=><article className={styles.item} key={`${item.targetType}:${item.id}`}><Link to={item.href} state={{returnTo:location.pathname+location.search,resourcesReturn:location.pathname+location.search}}>{item.title}</Link></article>)}</div>:<p className={styles.status}>현재 조건에서 볼 수 있는 자료가 없어요.</p>}
       {result.nextCursor && <button type="button" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "불러오는 중" : "검색 결과 더 보기"}</button>}
       {pageError && <p role="alert">{pageError}</p>}

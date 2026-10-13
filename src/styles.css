@@ -3904,8 +3904,8 @@
   color: #244a5e;
 }
 .community-author time {
-  color: #7a909b;
-  font-size: 11px;
+  color: #526b78;
+  font-size: 13px;
   font-weight: 500;
 }
 .community-author {
@@ -12844,14 +12844,18 @@ section[aria-label="자료 본문"] {
 }
 
 /* Purpose-first local redesign: utility screens keep their controls near the heading. */
-.site-shell[data-workspace] .page-frame:not(.page-frame-editorial) > .page-intro { padding-block:24px!important; margin-bottom:24px!important; min-height:0; }
+.site-shell[data-workspace] .page-frame:not(.page-frame-editorial) > .page-intro { padding:0 0 16px!important; margin-bottom:0!important; min-height:0; }
 .site-shell[data-workspace] .page-frame:not(.page-frame-editorial) > .page-intro h1 { font-size:clamp(28px,3vw,40px)!important; max-width:26ch!important; line-height:1.3; }
 .site-shell[data-workspace] .page-intro > span:last-child { font-size:16px; max-width:68ch; }
 .site-shell[data-workspace] .page-intro h1 br { display:none; }
 .community-composer[hidden] { display:none; }
 .community-board-tools .button { min-height:44px; white-space:nowrap; }
 @media(max-width:1100px) { .site-shell { padding-bottom:calc(76px + env(safe-area-inset-bottom)); } }
-@media(max-width:640px) { .community-board-tools { flex-wrap:wrap; } .community-board-tools .community-search { flex-basis:100%; } }
+@media(max-width:640px) {
+  .community-board-tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .community-board-tools > .button,.community-board-tools .community-search { grid-column:1 / -1; }
+  .community-board-tools .community-search { width:100%; min-width:0; }
+}
 
 .resource-tools h2 { margin:0; }
 .resource-tools > div:first-child p { margin:0; }

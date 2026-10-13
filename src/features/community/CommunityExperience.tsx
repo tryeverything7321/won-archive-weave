@@ -782,7 +782,7 @@ export function CommunityExperience() {
               <button ref={composerTriggerRef} className="button button-primary" type="button" aria-expanded={composerOpen} aria-controls="community-composer" onClick={() => {
                 setComposerOpen(!composerOpen);
                 if (!composerOpen) requestAnimationFrame(() => composerRef.current?.focus());
-              }}><PencilLine size={18} aria-hidden="true" />{composerOpen ? "작성 잠시 접기" : openingMode ? "응원 남기기" : "이야기 남기기"}</button>
+              }}><PencilLine size={18} aria-hidden="true" />{composerOpen ? "작성 잠시 접기" : openingMode ? "응원 남기기" : feedbackMode ? "피드백 남기기" : "이야기 남기기"}</button>
               <label className="community-search">
                 <Search size={17} aria-hidden="true" />
                 <span className="sr-only">글 검색</span>
@@ -834,7 +834,7 @@ export function CommunityExperience() {
             />
             <div className="composer-top">
               <span>
-                <PencilLine size={16} /> 의견 남기기
+                <PencilLine size={16} /> {openingMode ? "응원 남기기" : feedbackMode ? "피드백 남기기" : "이야기 남기기"}
               </span>
               <label className="community-purpose-select">
                 <span>글의 성격</span>
@@ -857,11 +857,11 @@ export function CommunityExperience() {
               maxLength={bodyLimit}
               value={body}
               onChange={(event) => setBody(event.target.value)}
-              placeholder={composerHint || "요즘 마음에 남은 일이나 다른 사람과 나누고 싶은 경험을 적어 주세요"}
+              placeholder={openingMode ? "위브의 시작에 응원의 한마디를 남겨 주세요" : feedbackMode ? "좋았던 점이나 불편했던 점을 구체적으로 알려 주세요" : composerHint || "요즘 마음에 남은 일이나 다른 사람과 나누고 싶은 경험을 적어 주세요"}
             />
             <small id="community-composer-length">2~{bodyLimit.toLocaleString('ko-KR')}자 · 현재 {body.length.toLocaleString('ko-KR')}자</small>
             <small id="community-composer-hint" role="status" aria-live="polite">
-              {composerHint
+              {openingMode ? "응원 글은 오픈 응원 탭에 함께 표시돼요" : feedbackMode ? "글에는 위브 피드백 말머리가 붙어요" : composerHint
                 ? `글감 도움 · ${composerHint}`
                 : "예시를 골라도 작성 중인 내용은 그대로 유지돼요"}
             </small>
@@ -892,7 +892,7 @@ export function CommunityExperience() {
                 ) : (
                   <ArrowRight size={18} />
                 )}{" "}
-                글 올리기
+                {openingMode ? "응원 올리기" : feedbackMode ? "피드백 올리기" : "글 올리기"}
               </button>
             </div>
           </form>
@@ -994,9 +994,10 @@ export function CommunityExperience() {
             ) : (
               <div className="community-empty">
                 <MessageCircleMore size={27} />
-                <h2>{openingMode ? "첫 응원을 남겨 주세요" : posts.length || showPublicFixtures ? "찾는 글이 없어요" : "아직 첫 이야기를 기다리고 있어요"}</h2>
-                <p>{openingMode ? "현재 불러온 글에는 응원이 없어요. 이전 글을 더 보거나 첫 응원을 남겨 주세요." : posts.length || showPublicFixtures ? "검색어나 관심 주제를 바꿔 보세요." : "긴 글이 아니어도 괜찮아요. 오늘의 생각이나 경험을 편하게 남겨 보세요."}</p>
-                {!openingMode && !posts.length && !feedError && (
+                <h2>{search.trim() || topicFilter !== "전체" || purposeFilter !== "모든 이야기" ? "검색 조건에 맞는 글이 없어요" : openingMode ? "응원을 남겨 주세요" : posts.length || showPublicFixtures ? "찾는 글이 없어요" : "아직 첫 이야기를 기다리고 있어요"}</h2>
+                <p>{search.trim() || topicFilter !== "전체" || purposeFilter !== "모든 이야기" ? "검색 조건을 지우고 다시 살펴보세요." : openingMode ? "현재 불러온 글에는 응원이 없어요. 이전 글을 더 보거나 응원을 남겨 주세요." : posts.length || showPublicFixtures ? "검색어나 관심 주제를 바꿔 보세요." : "긴 글이 아니어도 괜찮아요. 오늘의 생각이나 경험을 편하게 남겨 보세요."}</p>
+                {(search.trim() || topicFilter !== "전체" || purposeFilter !== "모든 이야기") && <button type="button" className="button button-secondary" onClick={() => { setSearch(""); setTopicFilter("전체"); setPurposeFilter("모든 이야기"); }}>검색 조건 지우기</button>}
+                {!openingMode && !search.trim() && topicFilter === "전체" && purposeFilter === "모든 이야기" && !posts.length && !feedError && (
                   <div className="community-starters" aria-label="글감 예시">
                     {conversationStarterHints.map((starter) => (
                       <button

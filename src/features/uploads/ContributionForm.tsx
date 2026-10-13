@@ -774,7 +774,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
       className="live-contribution"
       aria-labelledby="live-contribution-title"
     >
-      <div className={`live-contribution-heading ${styles.compactHeading}`}>
+      <div className={user ? "sr-only" : `live-contribution-heading ${styles.compactHeading}`}>
         <div>
           <p>{editingSubmissionId ? "내용 수정" : user ? kindLabels[kind] : "시작하기"}</p>
           <h2 id="live-contribution-title">
@@ -792,12 +792,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
                 : "무엇을 남길지 먼저 고르고, 로그인한 뒤 이어서 작성할 수 있어요."}
           </span>
         </div>
-        {user ? (
-          <div className="contribution-session">
-            <CheckCircle2 size={17} />
-            <span><b>로그인됨</b>바로 작성할 수 있어요</span>
-          </div>
-        ) : (
+        {!user && (
           <div className="contribution-session muted">
             <LogIn size={17} />
             <span><b>로그인 필요</b>내용을 올리려면 로그인해 주세요</span>
@@ -806,7 +801,7 @@ function ContributionFormSession({ entry }: { entry: ReturnType<typeof readContr
       </div>
       <fieldset className={styles.kindChooser} aria-describedby="contribution-kind-help">
         <legend>{editingSubmissionId ? "수정 중인 게시물" : "무엇을 남길까요"}</legend>
-        <p id="contribution-kind-help">
+        <p id="contribution-kind-help" className={editingSubmissionId ? undefined : "sr-only"}>
           {editingSubmissionId ? "수정 중에는 게시물 종류를 바꿀 수 없어요." : "선택한 종류별로 초안을 따로 보관해요."}
         </p>
         <div className={styles.kindOptions}>

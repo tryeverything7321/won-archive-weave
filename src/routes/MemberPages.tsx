@@ -83,10 +83,10 @@ export function ContributePage() {
       eyebrow={editing ? "수정하기" : "등록하기"}
       title={
         <>
-          {editing ? "활동 기록·자료 수정" : "활동 기록·자료 올리기"}
+          {editing ? "활동 기록·자료 수정" : useBundle ? "자료 올리기" : "활동 기록·자료 올리기"}
         </>
       }
-      description={editing ? "내용을 수정하고 미리보기로 확인한 뒤 저장하세요." : "활동 후기나 공유할 자료를 남겨 주세요. 공개 범위를 직접 선택하고, 등록 후에는 내 위브에서 게시 상태와 관리 메뉴를 확인할 수 있어요."}
+      description={editing ? "내용을 수정하고 미리보기로 확인한 뒤 저장하세요." : useBundle ? "파일을 먼저 선택하고 제목과 공개 범위를 확인해 주세요." : "제목과 내용을 적고 공개 범위를 선택해 주세요."}
     >
       <Suspense fallback={<RouteLoading />}>
         {managedEdit ? <ManagedResourceEditForm key={location.search} /> : useBundle ? <BundleContributionForm /> : <ContributionForm />}
@@ -383,11 +383,10 @@ export function ProfilePage() {
       eyebrow="내 위브"
       title={
         <>
-          내 정보와 활동을
-          <br /> 한곳에서 관리해요
+          내 위브
         </>
       }
-      description="내 정보와 로그인 설정, 내가 남긴 기록과 행사를 필요한 곳에서 바로 관리할 수 있어요."
+      description="가입 정보와 내가 올린 글·자료·행사를 관리해요."
     >
       <div className="profile-dashboard">
         <section className="profile-hero-panel">

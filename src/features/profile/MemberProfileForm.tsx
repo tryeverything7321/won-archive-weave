@@ -513,7 +513,7 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
       <header className="member-profile-heading">
         <div>
           <p className="section-kicker">내 정보</p>
-          <h2 id={`${formId}-title`}>내 가입 정보를 관리해요</h2>
+          <h2 id={`${formId}-title`}>내 가입 정보</h2>
         </div>
         <p>실명과 소속은 필수입니다. 다른 이용자에게는 공개되지 않으며, 업무 권한이 있는 관리자만 필요한 경우 확인합니다.</p>
       </header>
@@ -529,7 +529,9 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
               required
               onChange={(event) => setField('realName', event.target.value)}
             />
-          </label>          <label className="member-profile-field" htmlFor={`${formId}-organization`}>
+          </label>
+          <div className="member-profile-organization">
+          <label className="member-profile-field" htmlFor={`${formId}-organization`}>
             <span>소속 교당·모임 <FieldRequirement /></span>
             <input
               id={`${formId}-organization`}
@@ -542,7 +544,9 @@ export function MemberProfileForm({ user, onPhotoChanged }: MemberProfileFormPro
               onChange={(event) => setField('organization', event.target.value)}
             />
           </label>
-          <label className="member-profile-field"><span><input type="checkbox" checked={value.organization === '소속 없음'} onChange={event => setField('organization', event.target.checked ? '소속 없음' : '')} /> 소속 없음</span></label></fieldset>
+          <label className="member-profile-field"><span><input type="checkbox" checked={value.organization === '소속 없음'} onChange={event => setField('organization', event.target.checked ? '소속 없음' : '')} /> 소속 없음</span></label>
+          </div>
+        </fieldset>
         <details className="member-profile-optional"><summary>선택 정보 추가</summary>
         <fieldset className="member-profile-section member-profile-photo-section">
           <legend>프로필 사진</legend>

@@ -1,3 +1,4 @@
+import { FieldRequirement } from "../../components/forms/FieldRequirement";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { onAuthStateChanged } from 'firebase/auth';
 import { calendarRequestIsCurrent } from './calendar-request';
@@ -364,7 +365,7 @@ export function GoogleCalendarImport() {
             <p>선택한 {selectedIds.size}개의 일정을 어떻게 소개할까요</p>
             <div>
               <label><span>기본 교당·주최</span><input maxLength={80} value={organizerName} onChange={(event) => setOrganizerName(event.target.value)} placeholder="같은 소속이면 여기에 한 번만 입력" /></label>
-              <label><span>지역</span><input required maxLength={40} value={region} onChange={(event) => setRegion(event.target.value)} /></label>
+              <label><span>지역 <FieldRequirement /></span><input required maxLength={40} value={region} onChange={(event) => setRegion(event.target.value)} /></label>
               <label><span>공개 범위</span><select value={visibility} onChange={(event) => setVisibility(event.target.value as typeof visibility)}><option value="public">누구나 보기</option><option value="member_only">위브 로그인 이용자만 보기</option></select></label>
             </div>
             {selectedIds.size > 0 && <>
@@ -373,11 +374,11 @@ export function GoogleCalendarImport() {
                 <fieldset className="google-calendar-event-affiliation" key={item.id} disabled={state === "submitting"}>
                   <legend>{item.summary || "제목 없는 일정"} · {eventDateLabel(item)}</legend>
                   <div>
-                    <label><span>교당·주최</span><input required maxLength={80} value={eventAffiliations[item.id]?.organizerName ?? organizerName} onChange={event => {
+                    <label><span>교당·주최 <FieldRequirement /></span><input required maxLength={80} value={eventAffiliations[item.id]?.organizerName ?? organizerName} onChange={event => {
                       const value = event.target.value;
                       setEventAffiliations(current => ({ ...current, [item.id]: { ...current[item.id], organizerName: value } }));
                     }} /></label>
-                    <label><span>지역</span><input required maxLength={40} value={eventAffiliations[item.id]?.region ?? region} onChange={event => {
+                    <label><span>지역 <FieldRequirement /></span><input required maxLength={40} value={eventAffiliations[item.id]?.region ?? region} onChange={event => {
                       const value = event.target.value;
                       setEventAffiliations(current => ({ ...current, [item.id]: { ...current[item.id], region: value } }));
                     }} /></label>

@@ -1,8 +1,8 @@
-.shell { width: min(100%, 1060px); margin: clamp(24px, 5vw, 64px) auto; color: #143957; }
+.shell { width: min(100%, 1060px); margin: 0 auto 32px; color: #143957; }
 .heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 18px; }
 .heading p, .heading h2, .heading span { margin: 0; }
 .heading p { color: #19705c; font-weight: 800; }
-.heading h2 { margin-top: 5px; font-family: SUITE, sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -0.04em; }
+.heading h2 { margin-top: 5px; font-family: SUITE, sans-serif; font-size: clamp(1.5rem, 2.5vw, 2rem); letter-spacing: -0.04em; }
 .heading span { display: block; max-width: 680px; margin-top: 9px; color: #566b75; line-height: 1.65; word-break: keep-all; }
 .modeLink { display: inline-flex; align-items: center; min-height: 44px; color: #146fa8; font-weight: 750; }
 .eventContext, .loginState { display: flex; justify-content: space-between; gap: 18px; padding: 16px 18px; border: 1px solid #b8d9cf; border-radius: 14px; background: #f1faf7; }

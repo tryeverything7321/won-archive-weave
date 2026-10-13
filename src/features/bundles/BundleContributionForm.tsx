@@ -223,7 +223,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
         tone: "success",
         message: failed
           ? `${files.length - failed}개 파일을 올렸고 ${failed}개는 다시 시도할 수 있어요.`
-          : `${files.length}개 파일을 한 묶음으로 올렸어요. 파일별 안전 확인이 끝나면 열 수 있어요.`,
+          : `${files.length}개 파일을 올렸어요. 파일별 안전 확인이 끝나면 열 수 있어요.`,
       });
       props.onCompleted?.({ bundleId: created.bundleId, status: "active" });
     } catch (error) {
@@ -364,7 +364,7 @@ export function BundleContributionForm(props: BundleContributionFormProps) {
           </fieldset>
 
           <div className={styles.submitBar}>
-            <div><strong>{bundleId ? "파일별 상태를 확인해 주세요" : `${files.length || 0}개 파일을 한 묶음으로 등록`}</strong><span>검사 대기·차단 파일은 열거나 내려받을 수 없습니다.</span></div>
+            <div><strong>{bundleId ? "파일별 상태를 확인해 주세요" : files.length ? `${files.length}개 파일을 첨부해 등록해요` : "먼저 올릴 파일을 선택해 주세요"}</strong><span>검사 대기·차단 파일은 열거나 내려받을 수 없습니다.</span></div>
             {!completed && <button className="button button-primary" type="submit" disabled={status.tone === "working" || files.length === 0}>{status.tone === "working" ? <LoaderCircle className="spin" size={18} /> : <FilePlus2 size={18} />}{status.tone === "working" ? "등록 중" : "자료 등록"}</button>}
           </div>
           {status.tone !== "idle" && <div className={`${styles.status} ${styles[status.tone]}`} role={status.tone === "error" ? "alert" : "status"}>{status.tone === "success" ? <CheckCircle2 size={20} /> : status.tone === "working" ? <LoaderCircle className="spin" size={20} /> : <CircleAlert size={20} />}<span>{status.message}</span></div>}

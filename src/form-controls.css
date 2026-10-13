@@ -65,7 +65,7 @@
 .site-shell .page-frame-utility > .page-content-stage {padding-top:24px;}
 .site-shell .page-frame-utility .event-editor {margin:0 auto 32px;background:transparent;}
 .site-shell .event-editor-heading h2,.site-shell .event-manager-heading h2 {font-size:clamp(22px,2.2vw,28px);line-height:1.4;}
-.site-shell .event-manager-actions .owner-icon-action {width:auto;min-width:92px;height:44px;padding:10px 14px;gap:8px;}
+.site-shell .event-manager-actions .owner-icon-action {display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:92px;min-height:44px;height:auto;padding:10px 14px;gap:8px;line-height:1.4;white-space:nowrap;}
 .site-shell .calendar-detail > .owned-content-actions {margin:16px 0 24px;padding:12px 0;}
 .site-shell .calendar-planner-actions > a {min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
 @media(max-width:600px){
@@ -122,3 +122,67 @@
 @media(max-width:600px){.site-shell .calendar-planner-actions{width:100%;}.site-shell .calendar-planner-actions > .button{flex-basis:100%;}.site-shell .calendar-planner-actions > .calendar-manage-link{margin-inline:auto;}}
 
 .calendar-delete-confirm{width:100%;max-width:680px;padding:20px;border:1px solid #d6dfe3;border-radius:12px;background:#fff;}.calendar-delete-confirm h2{font-size:20px;}.calendar-delete-confirm label{display:grid;gap:8px;}.calendar-delete-confirm > div{display:flex;gap:12px;margin-top:16px;}
+
+/* Long-form editors get writing room without inflating comments and short notes. */
+#root .site-shell main [aria-label="본문 작성"] textarea,
+#root .site-shell main .event-editor [class*="eventDescription"] textarea {
+  min-height: 260px;
+  line-height: 1.65;
+}
+@media (max-width: 700px) {
+  #root .site-shell main [aria-label="본문 작성"] textarea { min-height: 220px; }
+}
+
+/* The page already frames the form: avoid a second padded outer panel. */
+.site-shell .live-contribution { padding: 0; border: 0; background: transparent; }
+.site-shell .live-contribution .contribution-step > p { font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+.site-shell .live-contribution .contribution-step { padding: 20px; }
+.site-shell .member-profile-heading { padding: 16px 24px; }
+.site-shell .member-profile-heading .section-kicker { margin: 0 0 4px; }
+@media (max-width: 600px) {
+  .site-shell .live-contribution .contribution-step { padding: 16px; }
+}
+
+.site-shell .profile-hero-panel { padding: 20px 24px; margin-bottom: 0; gap: 16px; }
+.site-shell .profile-hero-panel h2 { font-size: 28px; line-height: 1.3; margin-bottom: 6px; }
+.site-shell .profile-avatar { width: 56px; }
+.site-shell .profile-dashboard { gap: 16px; }
+.site-shell .member-profile-heading h2 { font-size: 24px; margin: 0; }
+.site-shell .member-profile-heading > p { margin: 0; font-size: 14px; line-height: 1.6; }
+#root .site-shell main [aria-label="본문 작성"] textarea[wrap="off"] { white-space: pre; overflow-wrap: normal; }
+@media (max-width: 600px) {
+  .site-shell .profile-hero-panel { padding: 16px; gap: 12px; }
+  .site-shell .profile-hero-panel .profile-recovery-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0; }
+  .site-shell .profile-hero-panel .profile-recovery-actions .button { padding: 8px 10px; font-size: 14px; min-height: 44px; }
+  .site-shell .member-profile-heading { padding: 16px; gap: 12px; }
+  .site-shell .member-profile-form form { padding: 16px; }
+}
+
+/* While writing, keep feedback available after the form instead of over its fields. */
+.site-shell:has(main form) .weave-feedback-widget {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  width: auto;
+  max-width: none;
+  margin: 24px clamp(16px, 4vw, 56px);
+  visibility: visible;
+  pointer-events: auto;
+}
+html:has(.site-shell main form) { scroll-padding-bottom: 120px; }
+.site-shell main form :is(input, textarea, select, button) { scroll-margin-bottom: 120px; }
+
+/* Give the story, its helper text and its submit action separate readable rows. */
+.site-shell .community-composer:not([hidden]) { display: grid; gap: 12px; }
+.site-shell .community-composer small { font-size: 14px; line-height: 1.6; }
+.site-shell .community-composer .community-purpose-select { display: grid; gap: 8px; }
+.site-shell .community-composer > small + small { margin-top: -6px; }
+
+.site-shell .community-inline-classification label,
+.site-shell .community-comments form > label { display: grid; gap: 8px; }
+.site-shell .community-inline-classification { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.site-shell .community-inline-editor > small { font-size: 14px; line-height: 1.6; }
+
+.site-shell .member-profile-basic-fields { align-items: start; }
+.site-shell .member-profile-organization { display: grid; gap: 10px; min-width: 0; }
+.site-shell .member-profile-organization > label:last-child > span { display: flex; align-items: center; gap: 8px; min-height: 32px; }
