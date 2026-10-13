@@ -48,17 +48,10 @@ export function ActivityCard({ activity }: { activity: Activity & { origin?: "fi
   return (
     <motion.article
       layout={!reduceMotion}
-      className={`${discoveryStyles.activityCard} activity-card${!isFixture ? " activity-card-published" : ""}`}
+      className={`${discoveryStyles.activityCard} activity-card activity-card-published`}
       whileHover={reduceMotion ? undefined : { y: -8, rotate: -0.35 }}
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
     >
-      {isFixture && <div className={`card-visual ${activity.tone}`}>
-        <div className="card-record-graphic" aria-hidden="true">
-          <span>활동 기록</span>
-          <strong>{activity.type}</strong>
-          {!isFixture && activity.place && <small>{activity.place}</small>}
-        </div>
-      </div>}
       <div className="card-content">
         {isFixture && <WeaveBadge family="provenance" tone="fixture" size="compact" className={discoveryStyles.fixtureNotice}>예시</WeaveBadge>}
         <div className="card-meta badge-row" data-badge-primary-count="1" data-badge-secondary-count="1">
