@@ -1,8 +1,17 @@
 {
   "schemaVersion": 1,
   "repository": "tryeverything7321/won-archive-weave",
-  "generatedAt": "2026-10-13T06:04:12.743Z",
+  "generatedAt": "2026-10-13T07:03:14.318Z",
   "entries": [
+    {
+      "id": "25333db43651f56840edfb79d1f84da4befe3137-0",
+      "commit": "25333db43651f56840edfb79d1f84da4befe3137",
+      "committedAt": "2026-10-13T16:03:04+09:00",
+      "area": "커뮤니티",
+      "title": "행사 관람 안내와 운영 문의를 더 쉽게 확인해요",
+      "details": [],
+      "status": "development"
+    },
     {
       "id": "3e3c6943b1b9b7823e4614ac3fc975ac9c5a4306-0",
       "commit": "3e3c6943b1b9b7823e4614ac3fc975ac9c5a4306",
